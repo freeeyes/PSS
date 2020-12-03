@@ -712,13 +712,11 @@ typedef struct FILETESTRESULTINFO
 //对象创建信息
 struct _Object_Create_Info
 {
-    char   m_szCreateFileName[MAX_BUFF_100] = {'\0'};   //声明文件
+    string m_strCreateFileName;                         //声明文件
     uint32 m_u4Line                         = 0;        //声明行数位置
     uint32 m_u4Count                        = 0;        //对象个数
 
-    _Object_Create_Info()
-    {
-    }
+    _Object_Create_Info() = default;
 };
 
 //客户端连接活跃信息
@@ -1615,18 +1613,16 @@ struct _ClientNameInfo
     int16  m_u2Port                  = 0;           //客户端的端口
     int32  m_nConnectID              = 0;           //连接ID
     int32  m_nLog                    = 0;           //是否记录日志
-    char   m_szName[MAX_BUFF_100]    = {'\0'};      //连接别名
-    char   m_szClientIP[MAX_BUFF_50] = {'\0'};      //客户端的IP地址
+    string m_strName;                               //连接别名
+    string m_strClientIP;                           //客户端的IP地址
 
-    _ClientNameInfo()
-    {
-    }
+    _ClientNameInfo() = default;
 
     //拷贝构造函数
     _ClientNameInfo(const _ClientNameInfo& ar)
     {
-        sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
-        sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
+        this->m_strName = ar.m_strName;
+        this->m_strClientIP = ar.m_strClientIP;
         this->m_u2Port = ar.m_u2Port;
         this->m_nConnectID = ar.m_nConnectID;
         this->m_nLog = ar.m_nLog;
@@ -1634,8 +1630,8 @@ struct _ClientNameInfo
 
     _ClientNameInfo& operator = (const _ClientNameInfo& ar)
     {
-        sprintf_safe(this->m_szName, MAX_BUFF_100, "%s", ar.m_szName);
-        sprintf_safe(this->m_szClientIP, MAX_BUFF_50, "%s", ar.m_szClientIP);
+        this->m_strName = ar.m_strName;
+        this->m_strClientIP = ar.m_strClientIP;
         this->m_u2Port      = ar.m_u2Port;
         this->m_nConnectID = ar.m_nConnectID;
         this->m_nLog       = ar.m_nLog;

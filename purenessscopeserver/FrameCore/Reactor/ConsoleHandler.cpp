@@ -1,12 +1,8 @@
 #include "ConsoleHandler.h"
 
-CConsoleHandler::CConsoleHandler(void)
-{
-}
-
 const char* CConsoleHandler::GetError() const
 {
-    return m_szError;
+    return m_strError.c_str();
 }
 
 void CConsoleHandler::Close(int nIOCount)
@@ -34,7 +30,6 @@ void CConsoleHandler::Close(int nIOCount)
             App_MessageBlockManager::instance()->Close(m_pCurrMessage);
         }
 
-        SAFE_DELETE(m_pPacketParse);
         shutdown();
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::Close]Close(%d) OK.\n", GetConnectID()));
         SAFE_DELETE(m_pTCClose);
@@ -68,7 +63,7 @@ int CConsoleHandler::open(void*)
     if (nRet != 0)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [%d].\n", nRet));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [%d].", nRet);
+        m_strError = fmt::format("[CConsoleHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [{0}].", nRet);
         return -1;
     }
 
@@ -76,7 +71,7 @@ int CConsoleHandler::open(void*)
     if (this->peer().enable(ACE_NONBLOCK) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
+        m_strError = "CConsoleHandler::open]this->peer().enable  = ACE_NONBLOCK error.";
         return -1;
     }
 
@@ -84,7 +79,7 @@ int CConsoleHandler::open(void*)
     if (this->peer().get_remote_addr(m_addrRemote) == -1)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::open]this->peer().get_remote_addr error.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::open]this->peer().get_remote_addr error.");
+        m_strError = "[CConsoleHandler::open]this->peer().get_remote_addr error.";
         return -1;
     }
 
@@ -107,13 +102,7 @@ int CConsoleHandler::open(void*)
     //设置接收缓冲池的大小
     int nTecvBuffSize = MAX_MSG_SOCKETBUFF;
     ACE_OS::setsockopt(this->get_handle(), SOL_SOCKET, SO_SNDBUF, (char*)&nTecvBuffSize, sizeof(nTecvBuffSize));
-    m_pPacketParse = new CConsolePacketParse();
-
-    if (nullptr == m_pPacketParse)
-    {
-        OUR_DEBUG((LM_DEBUG, "[%t|CConnectHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
-        return -1;
-    }
+    m_pPacketParse = std::make_shared<CConsolePacketParse>();
 
     m_pPacketParse->Init();
 
@@ -152,7 +141,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     {
         m_u4CurrSize = 0;
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is nullptr.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is nullptr.");
+        m_strError = "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is nullptr.";
         return -1;
     }
 
@@ -161,7 +150,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     {
         m_u4CurrSize = 0;
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]m_pCurrMessage == nullptr.\n"));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input]m_pCurrMessage == nullptr.");
+        m_strError = "[CConsoleHandler::handle_input]m_pCurrMessage == nullptr.";
 
         Clear_PacketParse();
         return -1;
@@ -179,14 +168,14 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         return -1;
     }
 
-    int nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
+    auto nDataLen = (int)this->peer().recv(m_pCurrMessage->wr_ptr(), nCurrCount, MSG_NOSIGNAL, &nowait);
 
     if (nDataLen <= 0)
     {
         m_u4CurrSize = 0;
         uint32 u4Error = (uint32)errno;
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::handle_input] ConnectID = %d, recv data is error[%d].\n", GetConnectID(), nDataLen);
+        m_strError = fmt::format("[CConsoleHandler::handle_input] ConnectID = {0}, recv data is error[{1}].", GetConnectID(), nDataLen);
 
         Clear_PacketParse();
         return -1;
@@ -196,7 +185,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     m_pCurrMessage->wr_ptr(nDataLen);
 
     const char* pData = m_pCurrMessage->rd_ptr();
-    uint32 u4Len = (uint32)m_pCurrMessage->length();
+    auto u4Len = (uint32)m_pCurrMessage->length();
 
     OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]End is(0x%02x).\n", pData[nDataLen - 1]));
 
@@ -229,8 +218,6 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
         }
 
         Clear_PacketParse();
-
-        m_pPacketParse = new CConsolePacketParse();
 
         //申请头的大小对应的mb
         m_pCurrMessage = App_MessageBlockManager::instance()->Create(CONSOLE_PACKET_MAX_SIZE);
@@ -314,7 +301,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
     if (get_handle() == ACE_INVALID_HANDLE)
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
-        sprintf_safe(m_szError, MAX_BUFF_500, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID());
+        m_strError = fmt::format("[CConsoleHandler::SendPacket] ConnectID = {0}, get_handle() == ACE_INVALID_HANDLE.", GetConnectID());
         App_MessageBlockManager::instance()->Close(pMbData);
         return false;
     }
@@ -334,7 +321,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
     //循环发送，直到数据发送完成。
     while (true)
     {
-        int nCurrSendSize = (int)(pMbData->length() - nIsSendSize);
+        auto nCurrSendSize = (int)(pMbData->length() - nIsSendSize);
 
         if (nCurrSendSize <= 0)
         {
@@ -343,7 +330,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
             return false;
         }
 
-        int nDataLen = (int)this->peer().send(pMbData->rd_ptr(), nCurrSendSize, &nowait);
+        auto nDataLen = (int)this->peer().send(pMbData->rd_ptr(), nCurrSendSize, &nowait);
 
         if (nDataLen <= 0)
         {
@@ -387,13 +374,11 @@ void CConsoleHandler::Clear_PacketParse()
     }
 
     m_pCurrMessage = nullptr;
-
-    SAFE_DELETE(m_pPacketParse);
 }
 
 bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP) const
 {
-    if (GetXmlConfigAttribute(xmlConsoleClients)->vec.size() == 0)
+    if (GetXmlConfigAttribute(xmlConsoleClients)->vec.empty())
     {
         return true;
     }
@@ -414,6 +399,9 @@ bool CConsoleHandler::CheckMessage()
     uint8 u1Output = 0;
     IBuffPacket* pBuffPacket = nullptr;
     bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
+
+    //回收内存
+    m_pPacketParse->Close();
 
     if (true == blRet && false == SendMessage(pBuffPacket, u1Output))
     {

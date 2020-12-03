@@ -7,25 +7,19 @@
 class CCreateInfo
 {
 public:
-    CCreateInfo(void)
-    {
-        ACE_OS::memset(m_szUsedFileName, 0, MAX_BUFF_100);
-        m_u4UsedLine = 0;
-    }
+    CCreateInfo(void) = default;
 
-    virtual ~CCreateInfo(void)
-    {
-    }
+    virtual ~CCreateInfo(void) = default;
 
     void SetCreateInfo(const char* pFileName, uint32 u4Line)
     {
-        sprintf_safe(m_szUsedFileName, MAX_BUFF_100, "%s", pFileName);
+        m_strUsedFileName = pFileName;
         m_u4UsedLine = u4Line;
     }
 
-    char* GetCreateFileName()
+    string GetCreateFileName()
     {
-        return m_szUsedFileName;
+        return m_strUsedFileName;
     }
 
     uint32 GetCreateLine()
@@ -35,12 +29,11 @@ public:
 
     void ClearCreateInfo()
     {
-        m_szUsedFileName[0] = '\0';
         m_u4UsedLine = 0;
     }
 
 private:
-    char    m_szUsedFileName[MAX_BUFF_100] = {'\0'}; //创建此对象的文件名
+    string  m_strUsedFileName;                       //创建此对象的文件名
     uint32  m_u4UsedLine                   = 0;      //创建此对象的行号
 };
 

@@ -57,6 +57,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag, IBuffPacket* 
 
 int CBaseCommand::Do_Connect(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
+    ACE_UNUSED_ARG(pSendBuffPacket);
     OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] (%d)TCP CLIENT_LINK_CONNECT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
 
     //判断当前连接总数是否超越了2000个
@@ -72,6 +73,7 @@ int CBaseCommand::Do_Connect(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 
 int CBaseCommand::Do_DisConnect(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
+    ACE_UNUSED_ARG(pSendBuffPacket);
     //处理连接断开事件
     OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLIENT_LINK_CDISCONNET OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
 
@@ -80,6 +82,7 @@ int CBaseCommand::Do_DisConnect(IMessage* pMessage, IBuffPacket* pSendBuffPacket
 
 int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
+    ACE_UNUSED_ARG(pSendBuffPacket);
     //处理服务器发送客户端数据连接超过阀值的事件
     OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLINET_LINK_SNEDTIMEOUT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
 
@@ -89,6 +92,7 @@ int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage, IBuffPacket* pSendBuf
 int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
     //m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "测试邮件", "测试");
+    ACE_UNUSED_ARG(pSendBuffPacket);
 
     IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
 
@@ -125,7 +129,6 @@ int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 
     //(*pResponsesPacket) << u2PostCommandID;
     //(*pResponsesPacket) << u8ClientTime;
-    int nMessageID = 1;
 
     m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
 
@@ -160,6 +163,8 @@ void CBaseCommand::ReadIniFile(const char* pIniFileName)
 
 int CBaseCommand::Do_ClientSendOk(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
+    ACE_UNUSED_ARG(pSendBuffPacket);
+
     //接受数据发送成功事件
     _PacketInfo HeadPacket;
     pMessage->GetPacketHead(HeadPacket);
@@ -176,14 +181,17 @@ int CBaseCommand::Do_ReplyTest(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 	_PacketInfo BodyPacket;
 	pMessage->GetPacketBody(BodyPacket);
 
-	SendClient(BodyPacket, COMMAND_TESTREPLY, pMessage->GetMessageBase()->m_u4ConnectID, SIGNALING_KEY, SIGNALING_IV, false, pSendBuffPacket);
+	SendClient(BodyPacket, COMMAND_TESTREPLY, pMessage->GetMessageBase()->m_u4ConnectID, false, pSendBuffPacket);
 	return 0;
 }
 
 // 回复给客户端
-int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, char* pKey, char* pIv, bool nEncrypt, IBuffPacket* pSendBuffPacket)
+int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, bool nEncrypt, IBuffPacket* pSendBuffPacket)
 {
 	__ENTER_FUNCTION();
+
+    ACE_UNUSED_ARG(nConnectId);
+
 	int nRet = 0;
 	//拼装发送包体
 	//printf("Send: [%d][%#x], %s", nConnectId, nCommand, pData.c_str());
@@ -192,12 +200,10 @@ int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nCon
 	uint16 u2Command = nCommand;
 	uint32 u4PacketLen = BodyPacket.m_nDataLen;
 	char* pBuffer = BodyPacket.m_pData;
-    uint16 u2PostCommandID = nCommand;
 
 	if (nEncrypt) {
 		//pBuffer = m_CAESClass.aes_encrypt((char*)pData.c_str(), pKey, pIv, nPacketLen);
 	}
-	uint32 u4SendLen = u4PacketLen + 40;
 
     //这里演示的是同步发送
     //在需要及时返回的数据需求是，最好使用此方法

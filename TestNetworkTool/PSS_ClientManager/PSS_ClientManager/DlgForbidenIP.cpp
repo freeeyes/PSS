@@ -375,8 +375,8 @@ void CDlgForbidenIP::OnBnClickedButton7()
             memcpy_s(&ClientNameInfo.m_nConnectID, sizeof(int), &szRecvBuff[nPos], sizeof(int));
             nPos += sizeof(int);
 
-            memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
-            nPos += sizeof(char);
+            memcpy_s(&nStrLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+            nPos += sizeof(int);
 
             memcpy_s(ClientNameInfo.m_szClientIP, nStrLen, &szRecvBuff[nPos], nStrLen);
             nPos += nStrLen;
@@ -385,8 +385,8 @@ void CDlgForbidenIP::OnBnClickedButton7()
             memcpy_s(&ClientNameInfo.m_nPort, sizeof(int), &szRecvBuff[nPos], sizeof(int));
             nPos += sizeof(int);
 
-            memcpy_s(&nStrLen, sizeof(char), &szRecvBuff[nPos], sizeof(char));
-            nPos += sizeof(char);
+            memcpy_s(&nStrLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+            nPos += sizeof(int);
 
             memcpy_s(ClientNameInfo.m_szName, nStrLen, &szRecvBuff[nPos], nStrLen);
             nPos += nStrLen;

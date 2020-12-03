@@ -28,11 +28,11 @@ public:
     CConnectClient(void) = default;
     ~CConnectClient(void) final = default;
 
-    virtual int open(void*) final;
-    virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
-    virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask) final;
-    virtual int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
-    virtual bool Device_Send_Data(const char* pData, ssize_t nLen) final; //透传数据接口
+    int open(void*) final;
+    int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
+    int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask) final;
+    int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
+    bool Device_Send_Data(const char* pData, ssize_t nLen) final; //透传数据接口
 
     void SetClientMessage(IClientMessage* pClientMessage); //设置消息接收处理类
     void SetServerID(int nServerID);                       //设置当前的ServerID
@@ -45,8 +45,6 @@ public:
 
     void ClientClose();                                           //主动关闭
     _ClientConnectInfo GetClientConnectInfo() const;              //得到当前链接信息
-
-    void Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType, bool blLog = false) const;     //输出DEBUG信息
 
 private:
     int RecvData();                                                       //接收数据，正常模式

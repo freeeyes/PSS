@@ -8,7 +8,8 @@ void Combo_Common_Return_Data(uint8 u1OutputType, uint8 u1State, const char* pMe
     }
     else
     {
-        pBuffPacket->WriteStream(pMessage, (uint32)ACE_OS::strlen(pMessage));
+        string strMessage = pMessage;
+        pBuffPacket->WriteStream(strMessage.c_str(), (uint32)strMessage.length());
     }
 }
 
@@ -20,7 +21,8 @@ void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMes
     }
     else
     {
-        pBuffPacket->WriteStream(pMessage, (uint32)ACE_OS::strlen(pMessage));
+        string strMessage = pMessage;
+        pBuffPacket->WriteStream(pMessage, (uint32)strMessage.length());
     }
 }
 
@@ -262,19 +264,22 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
         {
             if (CommandInfo.m_u1OutputType == 0)
             {
-                auto u1ModuleNameLen = (uint8)ACE_OS::strlen(pModuleInfo->GetName());
+                string strName = pModuleInfo->GetName();
+                string strDesc = pModuleInfo->GetDesc();
+
+                auto u1ModuleNameLen = (uint8)strName.length();
                 (*pBuffPacket) << u1ModuleNameLen;
                 pBuffPacket->WriteStream(pModuleInfo->GetName(), u1ModuleNameLen);
-                auto u1SModileFileLen = (uint8)ACE_OS::strlen(pModuleInfo->strModuleName.c_str());
+                auto u1SModileFileLen = (uint8)pModuleInfo->strModuleName.length();
                 (*pBuffPacket) << u1SModileFileLen;
                 pBuffPacket->WriteStream(pModuleInfo->strModuleName.c_str(), u1SModileFileLen);
-                auto u1SModilePathLen = (uint8)ACE_OS::strlen(pModuleInfo->strModulePath.c_str());
+                auto u1SModilePathLen = (uint8)pModuleInfo->strModulePath.length();
                 (*pBuffPacket) << u1SModilePathLen;
                 pBuffPacket->WriteStream(pModuleInfo->strModulePath.c_str(), u1SModilePathLen);
-                auto u1SModileParamLen = (uint8)ACE_OS::strlen(pModuleInfo->strModuleParam.c_str());
+                auto u1SModileParamLen = (uint8)pModuleInfo->strModuleParam.length();
                 (*pBuffPacket) << u1SModileParamLen;
                 pBuffPacket->WriteStream(pModuleInfo->strModuleParam.c_str(), u1SModileParamLen);
-                auto u1SModileDescLen = (uint8)ACE_OS::strlen(pModuleInfo->GetDesc());
+                auto u1SModileDescLen = (uint8)strDesc.length();
                 (*pBuffPacket) << u1SModileDescLen;
                 pBuffPacket->WriteStream(pModuleInfo->GetDesc(), u1SModileDescLen);
 
@@ -1149,7 +1154,7 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
         {
             uint16 u2LogID = AppLogManager::instance()->GetLogID(i);
 
-            const char* pServerName = AppLogManager::instance()->GetLogInfoByServerName(u2LogID);
+            auto pServerName = AppLogManager::instance()->GetLogInfoByServerName(u2LogID);
 
             if (nullptr == pServerName)
             {
@@ -1157,9 +1162,10 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
                 continue;
             }
 
-            auto u1ServerNameLen = (uint8)ACE_OS::strlen(pServerName);
+            string strServerName = pServerName;
+            auto u1ServerNameLen = (uint8)strServerName.length();
 
-            const char* pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
+            auto pLogName = AppLogManager::instance()->GetLogInfoByLogName(u2LogID);
 
             if (nullptr == pLogName)
             {
@@ -1167,7 +1173,8 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
                 return;
             }
 
-            auto u1LogNameLen = (uint8)ACE_OS::strlen(pLogName);
+            string strLogName = pLogName;
+            auto u1LogNameLen = (uint8)strLogName.length();
 
             auto u1LogType = (uint8)AppLogManager::instance()->GetLogInfoByLogDisplay(u2LogID);
 
@@ -1411,29 +1418,23 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
 
         for (_ClientNameInfo clinetnameinfo : objClientNameInfo)
         {
-            VCHARS_STR strIP;
-            strIP.text = clinetnameinfo.m_szClientIP;
-            strIP.u1Len = (uint8)ACE_OS::strlen(clinetnameinfo.m_szClientIP);
-
-            VCHARS_STR strName;
-            strName.text = clinetnameinfo.m_szName;
-            strName.u1Len = (uint8)ACE_OS::strlen(clinetnameinfo.m_szName);
-
             if (CommandInfo.m_u1OutputType == 0)
             {
+                
+                (*pBuffPacket) << clinetnameinfo.m_strName;
                 (*pBuffPacket) << (uint32)clinetnameinfo.m_nConnectID;
-                (*pBuffPacket) << strIP;
+                (*pBuffPacket) << clinetnameinfo.m_strClientIP;
                 (*pBuffPacket) << (uint32)clinetnameinfo.m_u2Port;
-                (*pBuffPacket) << strName;
+                (*pBuffPacket) << clinetnameinfo.m_strName;
                 (*pBuffPacket) << (uint8)clinetnameinfo.m_nLog;
             }
             else
             {
                 std::stringstream ss_format;
                 ss_format << "m_nConnectID(" << clinetnameinfo.m_nConnectID << ")\n"
-                    << "strIP(" << clinetnameinfo.m_szClientIP << ")\n"
+                    << "strIP(" << clinetnameinfo.m_strClientIP << ")\n"
                     << "m_nPort(" << clinetnameinfo.m_u2Port << ")\n"
-                    << "strName(" << clinetnameinfo.m_szName << ")\n"
+                    << "strName(" << clinetnameinfo.m_strName << ")\n"
                     << "m_nLog=%(" << clinetnameinfo.m_nLog << ")\n";
                 string strLineText = ss_format.str();
                 pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
@@ -1581,19 +1582,15 @@ void DoMessage_ShowListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
 #else
             App_ControlListen::instance()->ShowListen(i, obj_ControlInfo);
 #endif
-            VCHARS_STR strIP;
-            strIP.text = obj_ControlInfo.m_szListenIP;
-            strIP.u1Len = (uint8)ACE_OS::strlen(obj_ControlInfo.m_szListenIP);
-
             if (CommandInfo.m_u1OutputType == 0)
             {
-                (*pBuffPacket) << strIP;
+                (*pBuffPacket) << obj_ControlInfo.m_strListenIP;
                 (*pBuffPacket) << obj_ControlInfo.m_u4Port;
             }
             else
             {
                 std::stringstream ss_format;
-                ss_format << "strIP(" << obj_ControlInfo.m_szListenIP << ")\n"
+                ss_format << "strIP(" << obj_ControlInfo.m_strListenIP << ")\n"
                     << "m_u4Port(" << obj_ControlInfo.m_u4Port << ")\n";
                 string strLineText = ss_format.str();
                 pBuffPacket->WriteStream(strLineText.c_str(), (uint32)strLineText.length());
@@ -1828,20 +1825,16 @@ void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
             _Object_Create_Info objCreateInfo;
             App_BuffPacketManager::instance()->GetCreateInfoList(i, objCreateInfo);
 
-            VCHARS_STR strFileName;
-            strFileName.text = objCreateInfo.m_szCreateFileName;
-            strFileName.u1Len = (uint8)ACE_OS::strlen(objCreateInfo.m_szCreateFileName);
-
             if (CommandInfo.m_u1OutputType == 0)
             {
-                (*pBuffPacket) << strFileName;
+                (*pBuffPacket) << objCreateInfo.m_strCreateFileName;
                 (*pBuffPacket) << objCreateInfo.m_u4Line;
                 (*pBuffPacket) << objCreateInfo.m_u4Count;
             }
             else
             {
                 std::stringstream ss_format;
-                ss_format << "strFileName(" << objCreateInfo.m_szCreateFileName << ")\n"
+                ss_format << "strFileName(" << objCreateInfo.m_strCreateFileName << ")\n"
                     << "m_u4Line(" << objCreateInfo.m_u4Line << ")\n"
                     << "m_u4Count(" << objCreateInfo.m_u4Count << ")\n";
                 string strLineText = ss_format.str();

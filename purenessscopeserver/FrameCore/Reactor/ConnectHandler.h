@@ -61,7 +61,7 @@ public:
     uint32 GetPacketParseInfoID() const;                                     //获得相应的m_u4PacketParseInfoID
 
 
-    bool CheckSendMask(uint32 u4PacketLen);                                  //检测指定的连接发送数据是否超过阻塞阀值
+    bool CheckSendMask(uint32 u4PacketLen) const;                            //检测指定的连接发送数据是否超过阻塞阀值
     bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize) final;  //发送当前数据
 
     bool SendTimeoutMessage() const;                                         //发送连接超时消息
@@ -80,12 +80,11 @@ public:
     _ClientIPInfo      GetClientIPInfo() const;                              //得到客户端IP信息
     _ClientIPInfo      GetLocalIPInfo() const;                               //得到监听IP信息
     void SetConnectName(const char* pName);                                  //设置当前连接名称
-    const char* GetConnectName();                                            //得到别名
+    const char* GetConnectName() const;                                      //得到别名
     void SetIsLog(bool blIsLog) final;                                       //设置当前连接数据是否写入日志
     bool GetIsLog() const;                                                   //获得当前连接是否可以写入日志
     void SetHashID(int nHashID);                                             //设置Hash数组下标
     int  GetHashID() const;                                                  //得到Hash数组下标
-    void Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType);                       //输出DEBUG信息
 
     bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                              //将发送数据写入文件
     bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
@@ -162,10 +161,9 @@ private:
     ACE_Recursive_Thread_Mutex        m_ThreadWriteLock;                     //控制多线程锁
     CHashTable<CConnectHandler>       m_objHashHandleList;                   //Hash管理表
     CObjectArrayList<CConnectHandler> m_objHandlerList;                      //数据列表对象
-    uint32                            m_u4CurrCount = 0;                     //当前池里Handler总数
 };
 
 
-typedef ACE_Singleton<CConnectHandlerPool, ACE_Null_Mutex> App_ConnectHandlerPool;
+using App_ConnectHandlerPool = ACE_Singleton<CConnectHandlerPool, ACE_Null_Mutex>;
 
 #endif

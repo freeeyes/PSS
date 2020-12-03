@@ -66,6 +66,9 @@ void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool 
 //TCP流消息处理
 uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);
 
+//记录日志方法
+void Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType, const ACE_INET_Addr& addrRemote);
+
 //File_Message的参数
 class _File_Message_Param
 {

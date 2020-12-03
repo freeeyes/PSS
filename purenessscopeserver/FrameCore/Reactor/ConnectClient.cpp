@@ -282,7 +282,7 @@ int CConnectClient::RecvData()
     }
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
-    Output_Debug_Data(m_pCurrMessage, LOG_SYSTEM_DEBUG_SERVERRECV);
+    Output_Debug_Data(m_pCurrMessage, LOG_SYSTEM_DEBUG_SERVERRECV, m_addrRemote);
 
     m_pCurrMessage->wr_ptr(nDataLen);
 
@@ -391,56 +391,6 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
     }
 
     return 0;
-}
-
-void CConnectClient::Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType, bool blLog) const
-{
-    string strHexChar;     //单个十六进制的字符
-    string strHexData;     //十六进制的字符串
-
-    if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || false == blLog)
-    {
-        auto nDataLen = (int)pMbData->length();
-        uint32 u4DebugSize = 0;
-        bool blblMore = false;
-
-        if ((uint32)nDataLen >= MAX_BUFF_200)
-        {
-            u4DebugSize = MAX_BUFF_200 - 1;
-            blblMore = true;
-        }
-        else
-        {
-            u4DebugSize = (uint32)nDataLen;
-        }
-
-        const char* pData = pMbData->rd_ptr();
-
-        for (uint32 i = 0; i < u4DebugSize; i++)
-        {
-            std::stringstream ss_format;
-
-            ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
-            strHexData += ss_format.str();
-        }
-
-        if (blblMore == true)
-        {
-            string strLog = fmt::format("[{0}:{1}]{2}.(packet is more than 200)",
-                m_addrRemote.get_host_addr(),
-                m_addrRemote.get_port_number(),
-                strHexData);
-            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
-        }
-        else
-        {
-            string strLog = fmt::format("[{0}:{1}]{2}.",
-                m_addrRemote.get_host_addr(),
-                m_addrRemote.get_port_number(),
-                strHexData);
-            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
-        }
-    }
 }
 
 int CConnectClient::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
@@ -589,7 +539,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     }
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
-    Output_Debug_Data(pmblk, LOG_SYSTEM_DEBUG_CLIENTSEND);
+    Output_Debug_Data(pmblk, LOG_SYSTEM_DEBUG_CLIENTSEND, m_addrRemote);
 
     ACE_Time_Value     nowait(MAX_MSG_PACKETTIMEOUT);
 

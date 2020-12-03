@@ -21,12 +21,12 @@
 class CConsoleHandler : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 {
 public:
-    CConsoleHandler(void);
+    CConsoleHandler(void) = default;
 
     //重写继承方法
-    virtual int open(void*);                                                //用户建立一个链接
-    virtual int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE);
-    virtual int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask);
+    int open(void*) final;                                                //用户建立一个链接
+    int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
+    int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask) final;
 
     bool SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType);
 
@@ -56,16 +56,16 @@ private:
     CONNECTSTATE               m_u1ConnectState        = CONNECTSTATE::CONNECT_INIT;       //目前链接处理状态
     CONNECTSTATE               m_u1SendBuffState       = CONNECTSTATE::CONNECT_SENDNON;    //目前缓冲器是否有等待发送的数据
     uint8                      m_u1IsClosing           = HANDLE_ISCLOSE_NO;  //是否应该关闭 0为否，1为是
-    char                       m_szError[MAX_BUFF_500] = {'\0'};
+    string                     m_strError;
     ACE_INET_Addr              m_addrRemote;
     ACE_Time_Value             m_atvConnect;
     ACE_Time_Value             m_atvInput;
     ACE_Time_Value             m_atvOutput;
     ACE_Time_Value             m_atvSendAlive;
     ACE_Recursive_Thread_Mutex m_ThreadLock;
-    _TimerCheckID*             m_pTCClose             = nullptr;
-    CConsolePacketParse*       m_pPacketParse         = nullptr;                 //数据包解析类
-    ACE_Message_Block*         m_pCurrMessage         = nullptr;                 //当前的MB对象
+    _TimerCheckID*                  m_pTCClose             = nullptr;
+    shared_ptr<CConsolePacketParse> m_pPacketParse         = nullptr;                 //数据包解析类
+    ACE_Message_Block*              m_pCurrMessage         = nullptr;                 //当前的MB对象
 };
 
 #endif

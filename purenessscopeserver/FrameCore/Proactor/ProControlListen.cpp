@@ -100,8 +100,7 @@ uint32 CProControlListen::GetListenCount()
         {
             _ControlInfo objInfo;
 
-            sprintf_safe(objInfo.m_szListenIP,
-                         MAX_BUFF_20, "%s", GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip.c_str());
+            objInfo.m_strListenIP = GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip;
             objInfo.m_u4Port = GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].port;
             m_vecListenList.push_back(objInfo);
         }
@@ -115,8 +114,8 @@ uint32 CProControlListen::GetListenCount()
             if (nullptr != pProConnectAcceptor)
             {
                 _ControlInfo objInfo;
-                sprintf_safe(objInfo.m_szListenIP,
-                             MAX_BUFF_20, "%s", pProConnectAcceptor->GetListenIP());
+
+                objInfo.m_strListenIP = pProConnectAcceptor->GetListenIP();
                 objInfo.m_u4Port = pProConnectAcceptor->GetListenPort();
                 m_vecListenList.push_back(objInfo);
             }

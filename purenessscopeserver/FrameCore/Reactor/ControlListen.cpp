@@ -1,13 +1,5 @@
 #include "ControlListen.h"
 
-CControlListen::CControlListen()
-{
-}
-
-CControlListen::~CControlListen()
-{
-}
-
 bool CControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IPType, int nPacketParseID)
 {
     bool blState = App_ConnectAcceptorManager::instance()->CheckIPInfo(pListenIP, u2Port);
@@ -89,14 +81,13 @@ uint32 CControlListen::GetListenCount()
     if (0 == App_ConnectAcceptorManager::instance()->GetCount())
     {
         //监控尚未启动，需要从配置文件中获取
-        int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
+        auto nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
         for (int i = 0; i < nServerPortCount; i++)
         {
             _ControlInfo objInfo;
 
-            sprintf_safe(objInfo.m_szListenIP,
-                         MAX_BUFF_20, "%s", GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip.c_str());
+            objInfo.m_strListenIP = GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].ip;
             objInfo.m_u4Port = GetXmlConfigAttribute(xmlTCPServerIPs)->vec[i].port;
             m_vecListenList.push_back(objInfo);
         }
@@ -110,8 +101,7 @@ uint32 CControlListen::GetListenCount()
             if (nullptr != pConnectAcceptor)
             {
                 _ControlInfo objInfo;
-                sprintf_safe(objInfo.m_szListenIP,
-                             MAX_BUFF_20, "%s", pConnectAcceptor->GetListenIP());
+                objInfo.m_strListenIP = pConnectAcceptor->GetListenIP();
                 objInfo.m_u4Port = pConnectAcceptor->GetListenPort();
                 m_vecListenList.push_back(objInfo);
             }

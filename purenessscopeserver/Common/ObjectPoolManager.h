@@ -122,7 +122,7 @@ public:
             for (int i = 0; i < n4Size; i++)
             {
                 OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Create]FileName=%s,m_u4Line=%d,m_u4Count=%d.\n",
-                           objCreateList[i].m_szCreateFileName,
+                           objCreateList[i].m_strCreateFileName.c_str(),
                            objCreateList[i].m_u4Line,
                            objCreateList[i].m_u4Count));
             }
@@ -175,16 +175,16 @@ public:
             for (uint32 i = 0; i < u4Count; i++)
             {
                 uint32 u4CreateLine = m_objCreateInfoList.GetObject(i)->GetCreateLine();
-                char* pCreateFileName = m_objCreateInfoList.GetObject(i)->GetCreateFileName();
+                string strCreateFileName = m_objCreateInfoList.GetObject(i)->GetCreateFileName();
 
-                if (strlen(pCreateFileName) > 0 && u4CreateLine > 0)
+                if (strCreateFileName.length() > 0 && u4CreateLine > 0)
                 {
                     bool blIsFind = false;
 
                     //正在使用的对象，进行统计
                     for (int j = 0; j < (int)objCreateList.size(); j++)
                     {
-                        if (0 == ACE_OS::strcmp(pCreateFileName, objCreateList[j].m_szCreateFileName)
+                        if (strCreateFileName == objCreateList[j].m_strCreateFileName
                             && u4CreateLine == objCreateList[j].m_u4Line)
                         {
                             blIsFind = true;
@@ -196,7 +196,7 @@ public:
                     if (false == blIsFind)
                     {
                         _Object_Create_Info obj_Packet_Create_Info;
-                        sprintf_safe(obj_Packet_Create_Info.m_szCreateFileName, MAX_BUFF_100, "%s", pCreateFileName);
+                        obj_Packet_Create_Info.m_strCreateFileName = strCreateFileName;
                         obj_Packet_Create_Info.m_u4Line = u4CreateLine;
                         obj_Packet_Create_Info.m_u4Count = 1;
                         objCreateList.push_back(obj_Packet_Create_Info);
@@ -270,7 +270,7 @@ public:
                                  tmNow->tm_hour,
                                  tmNow->tm_min,
                                  tmNow->tm_sec,
-                                 objCreateList[i].m_szCreateFileName,
+                                 objCreateList[i].m_strCreateFileName.c_str(),
                                  objCreateList[i].m_u4Line,
                                  objCreateList[i].m_u4Count);
 

@@ -6,7 +6,7 @@
 
 bool CServerManager::Init()
 {
-    int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
+    auto nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
     int nReactorCount = 3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread;
 
     //初始化Console相关参数
@@ -64,13 +64,13 @@ bool CServerManager::Init()
 #endif
 
     //初始化给插件的对象接口
-    IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_HandlerManager::instance());
-    IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance());
-    IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
-    ITMService* pTMService                     = dynamic_cast<ITMService*>(&m_TMService);
-    IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
-    ITTyClientManager* pTTyClientManager       = dynamic_cast<ITTyClientManager*>(App_ReTTyClientManager::instance());
-    IControlListen* pControlListen             = dynamic_cast<IControlListen*>(App_ControlListen::instance());
+    auto pConnectManager   = dynamic_cast<IConnectManager*>(App_HandlerManager::instance());
+    auto pClientManager    = dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance());
+    auto pFrameCommand     = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
+    auto pTMService        = dynamic_cast<ITMService*>(&m_TMService);
+    auto pServerManager    = dynamic_cast<IServerManager*>(this);
+    auto pTTyClientManager = dynamic_cast<ITTyClientManager*>(App_ReTTyClientManager::instance());
+    auto pControlListen    = dynamic_cast<IControlListen*>(App_ControlListen::instance());
 
     Server_Manager_Common_IObject(pConnectManager,
                                   pClientManager,
@@ -215,7 +215,7 @@ bool CServerManager::Run()
             GetXmlConfigAttribute(xmlTTyClientManagerInfo)->MaxTTyDevCount,
             GetXmlConfigAttribute(xmlTTyClientManagerInfo)->TimeCheck);
 
-    uint16 u2ServerPortCount = (uint16)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
+    auto u2ServerPortCount = (uint16)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
     //创建和启动TCP反应器
     for (uint16 i = 0; i < u2ServerPortCount; i++)
@@ -280,7 +280,7 @@ bool CServerManager::Run()
     }
 
     //开始启动tty相关监听
-    int nReTTyCount = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec.size();
+    auto nReTTyCount = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec.size();
 
     for (int i = 0; i < nReTTyCount; i++)
     {
@@ -301,7 +301,7 @@ bool CServerManager::Run()
     }
 
     //开启服务器间通讯相关配置信息
-    int nS2SCount = (int)GetXmlConfigAttribute(xmlServer2Server)->vec.size();
+    auto nS2SCount = (int)GetXmlConfigAttribute(xmlServer2Server)->vec.size();
 
     for (int i = 0; i < nS2SCount; i++)
     {
@@ -338,7 +338,7 @@ bool CServerManager::Run()
 
 bool CServerManager::Start_Tcp_Listen() const
 {
-    int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
+    auto nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
     for (int i = 0; i < nServerPortCount; i++)
     {
@@ -377,9 +377,9 @@ bool CServerManager::Start_Tcp_Listen() const
     return true;
 }
 
-bool CServerManager::Start_Udp_Listen() const
+bool CServerManager::Start_Udp_Listen()
 {
-    int nUDPServerPortCount = (int)GetXmlConfigAttribute(xmlUDPServerIPs)->vec.size();
+    auto nUDPServerPortCount = (int)GetXmlConfigAttribute(xmlUDPServerIPs)->vec.size();
 
     for (int i = 0; i < nUDPServerPortCount; i++)
     {
@@ -394,13 +394,7 @@ bool CServerManager::Start_Udp_Listen() const
         }
 
         //得到接收器
-        CReactorUDPHander* pReactorUDPHandler = new CReactorUDPHander();
-
-        if (nullptr == pReactorUDPHandler)
-        {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]UDP pReactorUDPHandler[%d] is nullptr.\n", i));
-            return false;
-        }
+        shared_ptr<CReactorUDPHander> pReactorUDPHandler = std::make_shared<CReactorUDPHander>();
 
         pReactorUDPHandler->SetPacketParseInfoID(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uPacketParseID);
         int nRet = pReactorUDPHandler->OpenAddress(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));
@@ -410,6 +404,8 @@ bool CServerManager::Start_Udp_Listen() const
             OUR_DEBUG((LM_INFO, "[CServerManager::Start] UDP Listen from [%s:%d] error(%d).\n", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
             return false;
         }
+
+        m_vecUDPList.emplace_back(pReactorUDPHandler);
 
         OUR_DEBUG((LM_INFO, "[CServerManager::Start] UDP Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
     }
@@ -493,10 +489,9 @@ void CServerManager::Multiple_Process_Start()
 
     //在Linux下采用多进程的方式启动
     // 打开（创建）锁文件
-    char szFileName[MAX_BUFF_200] = { '\0' };
-    ACE_OS::snprintf(szFileName, MAX_BUFF_200, "%s/lockwatch.lk", szWorkDir);
+    string strFileName = fmt::format("{0}/lockwatch.lk", szWorkDir);
     //文件打开权限为  S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
-    fd_lock = open(szFileName, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
+    fd_lock = open(strFileName.c_str(), O_RDWR | O_CREAT, S_IRWXU | S_IRWXG);
 
     if (fd_lock < 0)
     {
@@ -546,7 +541,7 @@ void CServerManager::Multiple_Process_Start()
 #endif
 }
 
-void CServerManager::Run_Child_Process_Start(int nNumChlid, int& fd_lock)
+void CServerManager::Run_Child_Process_Start(int nNumChlid, const int& fd_lock)
 {
     int nRet = 0;
 	for (int nChlidIndex = 1; nChlidIndex <= nNumChlid; nChlidIndex++)
@@ -622,11 +617,12 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_PacketParsePool OK.\n"));
     App_FileTestManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_FileTestManager OK.\n"));
+    m_vecUDPList.clear();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close UDP Listen OK.\n"));
     App_ReactorManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));
     App_ConsoleManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConsoleManager OK.\n"));
-
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
 
     return true;

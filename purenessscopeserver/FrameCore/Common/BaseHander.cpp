@@ -226,6 +226,56 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     return n1Ret;
 }
 
+void Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType, const ACE_INET_Addr& addrRemote)
+{
+    string strHexChar;     //单个十六进制的字符
+    string strHexData;     //十六进制的字符串
+
+    if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON)
+    {
+        auto nDataLen = (int)pMbData->length();
+        uint32 u4DebugSize = 0;
+        bool blblMore = false;
+
+        if ((uint32)nDataLen >= MAX_BUFF_200)
+        {
+            u4DebugSize = MAX_BUFF_200 - 1;
+            blblMore = true;
+        }
+        else
+        {
+            u4DebugSize = (uint32)nDataLen;
+        }
+
+        const char* pData = pMbData->rd_ptr();
+
+        for (uint32 i = 0; i < u4DebugSize; i++)
+        {
+            std::stringstream ss_format;
+
+            ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
+            strHexData += ss_format.str();
+        }
+
+        if (blblMore == true)
+        {
+            string strLog = fmt::format("[{0}:{1}]{2}.(packet is more than 200)",
+                addrRemote.get_host_addr(),
+                addrRemote.get_port_number(),
+                strHexData);
+            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
+        }
+        else
+        {
+            string strLog = fmt::format("[{0}:{1}]{2}.",
+                addrRemote.get_host_addr(),
+                addrRemote.get_port_number(),
+                strHexData);
+            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
+        }
+    }
+}
+
 void Send_MakePacket_Queue(_MakePacket const& objMakePacket)
 {
     //放入消息队列
@@ -512,8 +562,8 @@ _ClientNameInfo Tcp_Common_ClientNameInfo(uint32 u4ConnectID, const char* pConne
 {
     _ClientNameInfo ClientNameInfo;
     ClientNameInfo.m_nConnectID = (int)u4ConnectID;
-    sprintf_safe(ClientNameInfo.m_szName, MAX_BUFF_100, "%s", pConnectName);
-    sprintf_safe(ClientNameInfo.m_szClientIP, MAX_BUFF_50, "%s", pClientIP);
+    ClientNameInfo.m_strName = pConnectName;
+    ClientNameInfo.m_strClientIP = pClientIP;
     ClientNameInfo.m_u2Port = u2ClientPort;
 
     if (IsLog == true)

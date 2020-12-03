@@ -28,22 +28,24 @@ public:
     bool Start();
     bool Close();
 
-
 private:
     bool Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode) const;
     bool Run();
 
     bool Start_Tcp_Listen() const;                                //启动TCP监听
-    bool Start_Udp_Listen() const;                                //启动UDP监听
+    bool Start_Udp_Listen();                                      //启动UDP监听
     bool Start_Console_Tcp_Listen();                              //启动Console TCP监听
     void Multiple_Process_Start();                                //多进程启动
-    void Run_Child_Process_Start(int nNumChlid, int& fd_lock);    //运行子进程
+    void Run_Child_Process_Start(int nNumChlid, const int& fd_lock);    //运行子进程
+
+private:
     ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;             //后台管理链接
     CFrameCommand           m_objFrameCommand;                    //框架命令
     CTMService              m_TMService;                          //TS定时器
+    vector<shared_ptr<CReactorUDPHander>> m_vecUDPList;           //UDP监听对象列表
 };
 
 
-typedef ACE_Singleton<CServerManager, ACE_Null_Mutex> App_ServerManager;
+using App_ServerManager = ACE_Singleton<CServerManager, ACE_Null_Mutex>;
 
 #endif

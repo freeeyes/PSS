@@ -5,14 +5,10 @@
 
 struct _ControlInfo
 {
-    char m_szListenIP[MAX_BUFF_20];
-    uint32 m_u4Port;
+    string m_strListenIP;
+    uint32 m_u4Port = 0;
 
-    _ControlInfo()
-    {
-        m_szListenIP[0] = '\0';
-        m_u4Port        = 0;
-    }
+    _ControlInfo() = default;
 };
 
 typedef vector<_ControlInfo> vecControlInfo;

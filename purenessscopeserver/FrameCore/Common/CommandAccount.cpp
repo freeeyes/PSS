@@ -295,7 +295,7 @@ void CCommandAccount::GetFlowPortList(vector<_Port_Data_Account>& vec_Port_Data_
         if (nullptr != p_Port_Data_Account)
         {
             obj_Port_Data_Account = *p_Port_Data_Account;
-            vec_Port_Data_Account.push_back(obj_Port_Data_Account);
+            vec_Port_Data_Account.emplace_back(obj_Port_Data_Account);
         }
         });
 }

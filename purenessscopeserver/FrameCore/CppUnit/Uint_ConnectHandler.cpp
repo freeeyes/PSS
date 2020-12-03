@@ -111,8 +111,6 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Debug(void)
 
     m_pConnectHandler->SetIsLog(true);
 
-    m_pConnectHandler->Output_Debug_Data(pmb, LOG_SYSTEM_DEBUG_CLIENTRECV);
-
     pmb->release();
 }
 

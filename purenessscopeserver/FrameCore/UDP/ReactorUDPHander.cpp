@@ -2,6 +2,7 @@
 
 CReactorUDPHander::~CReactorUDPHander(void)
 {
+    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::~CReactorUDPHander]Begin.\n"));
 	if (nullptr != m_pBlockMessage)
 	{
 		m_pBlockMessage->release();
@@ -12,9 +13,10 @@ CReactorUDPHander::~CReactorUDPHander(void)
 		m_pBlockRecv->release();
 	}
 
-	ACE_Reactor_Mask close_mask = ACE_Event_Handler::ALL_EVENTS_MASK | ACE_Event_Handler::DONT_CALL;
-	this->reactor()->remove_handler(this, close_mask);
+    ACE_Reactor_Mask close_mask = ACE_Event_Handler::ALL_EVENTS_MASK | ACE_Event_Handler::DONT_CALL;
+    this->reactor()->remove_handler(this, close_mask);
 	m_skRemote.close();
+    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::~CReactorUDPHander]End.\n"));
 }
 
 int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor)

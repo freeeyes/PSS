@@ -86,7 +86,7 @@ int LoadModuleData(CServerObject* pServerObject)
     {
         _ControlInfo objControlInfo;
         pServerObject->GetControlListen()->ShowListen(i, objControlInfo);
-        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Listen IP=%s, Pord=%d.\n", objControlInfo.m_szListenIP, objControlInfo.m_u4Port));
+        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Listen IP=%s, Pord=%d.\n", objControlInfo.m_strListenIP.c_str(), objControlInfo.m_u4Port));
     }
 
     //显示框架工作线程ID

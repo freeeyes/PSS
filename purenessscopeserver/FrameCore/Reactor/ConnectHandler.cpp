@@ -238,7 +238,7 @@ int CConnectHandler::Dispose_Recv_Data()
     m_pBlockRecv->wr_ptr(nDataLen);
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
-    Output_Debug_Data(m_pBlockRecv, LOG_SYSTEM_DEBUG_CLIENTRECV);
+    Output_Debug_Data(m_pBlockRecv, LOG_SYSTEM_DEBUG_CLIENTRECV, m_addrRemote);
 
     //查看是否需要转发
     if ("" != m_strDeviceName)
@@ -402,7 +402,7 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
 	pmbSend->wr_ptr(u4Size);
 
     //如果是DEBUG状态，记录当前发送包的二进制数据
-    Output_Debug_Data(pmbSend, LOG_SYSTEM_DEBUG_CLIENTSEND);
+    Output_Debug_Data(pmbSend, LOG_SYSTEM_DEBUG_CLIENTSEND, m_addrRemote);
 
 
     //发送超时时间设置
@@ -634,56 +634,6 @@ uint32 CConnectHandler::Get_Recv_length() const
     return (uint32)(m_pBlockRecv->size() - m_pBlockRecv->length());
 }
 
-void CConnectHandler::Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType)
-{
-    string strHexChar;     //单个十六进制的字符
-    string strHexData;     //十六进制的字符串
-
-    if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || m_blIsLog == true)
-    {
-        auto u4DataLen = (uint32)pMbData->length();
-        uint32 u4DebugSize = 0;
-        bool blblMore = false;
-
-        if (u4DataLen >= m_u4PacketDebugSize)
-        {
-            u4DebugSize = m_u4PacketDebugSize - 1;
-            blblMore = true;
-        }
-        else
-        {
-            u4DebugSize = u4DataLen;
-        }
-
-        const char* pData = pMbData->rd_ptr();
-
-        for (uint32 i = 0; i < u4DebugSize; i++)
-        {
-            std::stringstream ss_format;
-
-            ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
-            strHexData += ss_format.str();
-        }
-
-        if (blblMore == true)
-        {
-            string strLog = fmt::format("[{0}:{1}]{2}.(packet is more than 200)",
-                m_addrRemote.get_host_addr(),
-                m_addrRemote.get_port_number(),
-                strHexData);
-            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
-        }
-        else
-        {
-            string strLog = fmt::format("[{0}:{1}]{2}.",
-                m_addrRemote.get_host_addr(),
-                m_addrRemote.get_port_number(),
-                strHexData);
-            AppLogManager::instance()->WriteLog_r(u2LogType, strLog);
-        }
-    }
-}
-
 int CConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmbHead)
 {
     _Head_Info objHeadInfo;
@@ -856,7 +806,7 @@ _ClientIPInfo  CConnectHandler::GetLocalIPInfo() const
     return ClientIPInfo;
 }
 
-bool CConnectHandler::CheckSendMask(uint32 u4PacketLen)
+bool CConnectHandler::CheckSendMask(uint32 u4PacketLen) const
 {
     ACE_UNUSED_ARG(u4PacketLen);
 
@@ -985,7 +935,7 @@ void CConnectHandler::SetIsLog(bool blIsLog)
     m_blIsLog = blIsLog;
 }
 
-const char* CConnectHandler::GetConnectName()
+const char* CConnectHandler::GetConnectName() const
 {
     return m_strConnectName.c_str();
 }

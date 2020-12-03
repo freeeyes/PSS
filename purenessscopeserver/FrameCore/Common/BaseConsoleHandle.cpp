@@ -32,7 +32,7 @@ bool Console_Common_SendMessage_Data_Check(uint32 u4ConnectID, IBuffPacket* pBuf
     return true;
 }
 
-bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCount, CConsolePacketParse* pPacketParse, uint8& u1Output, IBuffPacket*& pBuffPacket)
+bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCount, shared_ptr<CConsolePacketParse> pPacketParse, uint8& u1Output, IBuffPacket*& pBuffPacket)
 {
     u4AllRecvSize += (uint32)pPacketParse->GetMessageHead()->length() + (uint32)pPacketParse->GetMessageBody()->length();
     u4AllRecvCount++;

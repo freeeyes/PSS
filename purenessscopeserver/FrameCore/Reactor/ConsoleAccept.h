@@ -11,7 +11,7 @@
 class ConnectConsoleAcceptor : public ACE_Acceptor<CConsoleHandler, ACE_SOCK_ACCEPTOR>
 {
 protected:
-    virtual int make_svc_handler(CConsoleHandler*& sh);
+    int make_svc_handler(CConsoleHandler*& sh) final;
 
 public:
     int Init_Open(const ACE_INET_Addr& local_addr,

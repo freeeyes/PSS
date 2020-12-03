@@ -52,7 +52,9 @@ void CUnit_ConnectClient::Test_Output_Debug_Data(void)
     memcpy_safe((char* )&u4Data, 4, pMbData->wr_ptr(), 4);
     pMbData->wr_ptr(4);
 
-    m_pConnectClient->Output_Debug_Data(pMbData, LOG_SYSTEM_DEBUG_CLIENTRECV, true);
+    ACE_INET_Addr addrTest;
+    addrTest.set(10002, "127.0.0.1");
+    Output_Debug_Data(pMbData, LOG_SYSTEM_DEBUG_CLIENTRECV, addrTest);
     m_nTestCount++;
 }
 

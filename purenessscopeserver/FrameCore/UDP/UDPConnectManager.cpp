@@ -3,10 +3,7 @@
 uint32 CUDPConnectIDManager::GetConnetID(string strRemoteIP, uint16 u2RemotePort, bool& blNew)
 {
 	//×é³É×Ö·û´®
-	stringstream ss_format;
-	ss_format << strRemoteIP << ":" << u2RemotePort;
-
-	string strKey = ss_format.str();
+	string strKey = fmt::format("{0}:{1}", strRemoteIP, u2RemotePort);
 
 	mapConnectManager::iterator f = m_mapConnectManager.find(strKey);
 

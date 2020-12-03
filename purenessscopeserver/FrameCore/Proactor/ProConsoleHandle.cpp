@@ -63,7 +63,6 @@ void CProConsoleHandle::Close(int nIOCount)
         }
 
         m_ThreadWriteLock.release();
-        SAFE_DELETE(m_pPacketParse);
         OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::Close] Close(%d) delete OK.\n", GetConnectID()));
 
         delete this;
@@ -145,7 +144,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
     OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::open] Open(%d).\n", GetConnectID()));
 
-    m_pPacketParse = new CConsolePacketParse();
+    m_pPacketParse = std::make_shared<CConsolePacketParse>();
 
     if(nullptr == m_pPacketParse)
     {
@@ -187,8 +186,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             App_MessageBlockManager::instance()->Close(&mb);
         }
 
-        SAFE_DELETE(m_pPacketParse);
-
         OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_read_stream]Connectid=[%d] error(%d)...\n", GetConnectID(), errno));
 
         Close(2);
@@ -224,8 +221,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             {
                 App_MessageBlockManager::instance()->Close(&mb);
             }
-
-            SAFE_DELETE(m_pPacketParse);
 
             OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::handle_input]Read Shoter error(%d).", errno));
 
@@ -266,8 +261,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                     App_MessageBlockManager::instance()->Close(&mb);
                 }
 
-                SAFE_DELETE(m_pPacketParse);
-
                 Close(2);
                 return;
             }
@@ -282,9 +275,6 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         {
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
-
-        SAFE_DELETE(m_pPacketParse);
-        m_pPacketParse = new CConsolePacketParse();
 
         Close();
 
@@ -407,7 +397,6 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
 
-        SAFE_DELETE(m_pPacketParse);
         Close(2);
         return false;
     }
@@ -429,7 +418,6 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
             App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
         }
 
-        SAFE_DELETE(m_pPacketParse);
         Close(2);
         return false;
     }
@@ -442,6 +430,8 @@ bool CProConsoleHandle::CheckMessage()
     uint8 u1Output           = 0;
     IBuffPacket* pBuffPacket = nullptr;
     bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
+
+    m_pPacketParse->Close();
 
     if (true == blRet && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
     {

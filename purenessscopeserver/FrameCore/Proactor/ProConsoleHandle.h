@@ -70,7 +70,7 @@ private:
     ACE_Time_Value   m_atvOutput;
     ACE_Time_Value   m_atvSendAlive;
 
-    CConsolePacketParse* m_pPacketParse;             //数据包解析类
+    shared_ptr<CConsolePacketParse> m_pPacketParse;             //数据包解析类
 
     ACE_Recursive_Thread_Mutex m_ThreadWriteLock;
 

@@ -401,8 +401,8 @@ void CDlgServerConnect::OnBnClickedButton8()
             int  nIPLen         = 0;
             int  nListenPort    = 0;
 
-            memcpy_s(&nIPLen, sizeof(int), &szRecvBuff[nPos], sizeof(char));
-            nPos += sizeof(char);
+            memcpy_s(&nIPLen, sizeof(int), &szRecvBuff[nPos], sizeof(int));
+            nPos += sizeof(int);
 
             memcpy_s(szListenIP, 30, &szRecvBuff[nPos], sizeof(char)*nIPLen);
             nPos += sizeof(char)*nIPLen;

@@ -249,7 +249,7 @@ void CProConnectHandler::handle_read_stream(const ACE_Asynch_Read_Stream::Result
 
     m_atvInput = ACE_OS::gettimeofday();
 
-    Output_Debug_Data(&mb, LOG_SYSTEM_DEBUG_CLIENTRECV);
+    Output_Debug_Data(&mb, LOG_SYSTEM_DEBUG_CLIENTRECV, m_addrRemote);
 
     if (false == Dispose_Recv_buffer())
     {
@@ -358,7 +358,7 @@ bool CProConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pM
     pmbSend->wr_ptr(u4Size);
 
     //如果是DEBUG状态，记录当前发送包的二进制数据
-    Output_Debug_Data(pmbSend, LOG_SYSTEM_DEBUG_CLIENTSEND);
+    Output_Debug_Data(pmbSend, LOG_SYSTEM_DEBUG_CLIENTSEND, m_addrRemote);
 
     //统计发送数量
     m_atvOutput = tvSend;
@@ -509,59 +509,6 @@ void CProConnectHandler::Send_Hander_Event(uint8 u1Option)
 void CProConnectHandler::Get_Recv_length()
 {
     RecvClinetPacket();
-}
-
-void CProConnectHandler::Output_Debug_Data(ACE_Message_Block* pMbData, int nLogType)
-{
-    string strHexChar;     //单个十六进制的字符
-    string strHexData;     //十六进制的字符串
-
-    //如果是DEBUG状态，记录当前接受包的二进制数据
-    if (GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON || m_blIsLog == true)
-    {
-        char szLog[10] = { '\0' };
-        uint32  u4DebugSize = 0;
-        bool blblMore = false;
-
-        if (pMbData->length() >= m_u4PacketDebugSize)
-        {
-            u4DebugSize = m_u4PacketDebugSize - 1;
-            blblMore = true;
-        }
-        else
-        {
-            u4DebugSize = (uint32)pMbData->length();
-        }
-
-        const char* pData = pMbData->rd_ptr();
-
-        for (uint32 i = 0; i < u4DebugSize; i++)
-        {
-            std::stringstream ss_format;
-
-            ss_format << "0x" << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)pData[i] << " ";
-            strHexData += ss_format.str();
-        }
-
-        if (blblMore == true)
-        {
-            string strLog = fmt::format("[{0}:{1}]{2}.(Packet is more than 200)",
-                m_addrRemote.get_host_addr(), 
-                m_addrRemote.get_port_number(), 
-                m_pPacketDebugData);
-
-            AppLogManager::instance()->WriteLog_r(nLogType, strLog);
-        }
-        else
-        {
-            string strLog = fmt::format("[{0}:{1}]{2}.",
-                m_addrRemote.get_host_addr(),
-                m_addrRemote.get_port_number(),
-                m_pPacketDebugData);
-
-            AppLogManager::instance()->WriteLog_r(nLogType, strLog);
-        }
-    }
 }
 
 int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
