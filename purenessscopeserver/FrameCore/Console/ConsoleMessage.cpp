@@ -57,7 +57,7 @@ int CConsoleMessage::Init()
     return 0;
 }
 
-EM_CONSOLE_MESSAGE CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffPacket* pBuffPacket, uint8& u1OutputType)
+EM_CONSOLE_MESSAGE CConsoleMessage::Dispose(const ACE_Message_Block* pmb, shared_ptr<IBuffPacket> pBuffPacket, uint8& u1OutputType)
 {
     //¥¶¿Ì√¸¡Ó
     if(nullptr == pmb)
@@ -86,7 +86,7 @@ EM_CONSOLE_MESSAGE CConsoleMessage::Dispose(const ACE_Message_Block* pmb, IBuffP
     }
 }
 
-EM_CONSOLE_MESSAGE CConsoleMessage::ParsePlugInCommand(const char* pCommand, IBuffPacket* pBuffPacket) const
+EM_CONSOLE_MESSAGE CConsoleMessage::ParsePlugInCommand(const char* pCommand, shared_ptr<IBuffPacket> pBuffPacket) const
 {
     uint8 u1OutputType = 0;
 
@@ -189,17 +189,11 @@ bool CConsoleMessage::GetCommandInfo(const string& strCommand, _CommandInfo& Com
     return true;
 }
 
-EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType) const
+EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand_Plugin(const char* pCommand, shared_ptr<IBuffPacket> pBuffPacket, uint8& u1OutputType) const
 {
     _CommandInfo CommandInfo;
 
-    IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
-
-    if (nullptr == pCurrBuffPacket)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
-        return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
-    }
+    auto pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if (false == GetCommandInfo(pCommand, CommandInfo, false))
     {
@@ -213,11 +207,11 @@ EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand_Plugin(const char* pCommand, IB
     return DoCommand(CommandInfo, pCurrBuffPacket, pBuffPacket);
 }
 
-EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand(const char* pCommand, IBuffPacket* pBuffPacket, uint8& u1OutputType)
+EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand(const char* pCommand, shared_ptr<IBuffPacket> pBuffPacket, uint8& u1OutputType)
 {
     _CommandInfo CommandInfo;
 
-    IBuffPacket* pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pCurrBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     if(nullptr == pCurrBuffPacket)
     {
@@ -228,7 +222,6 @@ EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand(const char* pCommand, IBuffPack
     if(false == GetCommandInfo(pCommand, CommandInfo))
     {
         OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
-        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
@@ -237,7 +230,6 @@ EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand(const char* pCommand, IBuffPack
 
     if (0 != nPromission)
     {
-        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
@@ -247,7 +239,7 @@ EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand(const char* pCommand, IBuffPack
     return DoCommand(CommandInfo, pCurrBuffPacket, pBuffPacket);
 }
 
-EM_CONSOLE_MESSAGE CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, IBuffPacket* pCurrBuffPacket, IBuffPacket* pReturnBuffPacket) const
+EM_CONSOLE_MESSAGE CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pCurrBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket) const
 {
     uint16 u2ReturnCommandID = CONSOLE_COMMAND_UNKNOW;
 
@@ -276,7 +268,6 @@ EM_CONSOLE_MESSAGE CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, I
 
     if (u4PacketSize == 0 || CONSOLE_COMMAND_UNKNOW == u2ReturnCommandID)
     {
-        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
         return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
@@ -284,12 +275,10 @@ EM_CONSOLE_MESSAGE CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, I
     {
         (*pReturnBuffPacket) << u2ReturnCommandID;
         pReturnBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
-        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
     }
     else
     {
         pReturnBuffPacket->WriteStream(pCurrBuffPacket->GetData(), pCurrBuffPacket->GetPacketLen());
-        App_BuffPacketManager::instance()->Delete(pCurrBuffPacket);
     }
 
     return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_SUCCESS;

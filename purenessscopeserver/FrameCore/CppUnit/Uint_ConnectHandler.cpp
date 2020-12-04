@@ -35,7 +35,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
         return;
     }
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << (uint32)1;
 
@@ -131,7 +131,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
 {
     bool blRet = false;
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << (uint32)1;
 
@@ -157,7 +157,6 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_PostMessage]GetConnectState is fail.", true == blRet);
     }
 
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
     m_nTestCount++;
 }
 

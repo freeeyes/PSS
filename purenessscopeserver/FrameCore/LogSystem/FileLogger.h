@@ -75,9 +75,9 @@ public:
 
     bool SendMail(shared_ptr<_LogBlockInfo> pLogBlockInfo, const xmlMails::_Mail* pMailInfo = nullptr) const;
 
-    string GetLoggerName();
+    string GetLoggerName() const;
 
-    string GetServerName();
+    string GetServerName() const;
 
     int GetDisPlay() const;
 

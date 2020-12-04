@@ -15,9 +15,6 @@
 #define COMMAND_HEARTBEAT		0x2100			//ÐÄÌø
 #define COMMAND_TESTREPLY		0x2101			//²âÊÔ»Ø¸´
 
-#define SIGNALING_KEY									"R3CadminLUBOcomPuterWybNUsdkIPS"
-#define SIGNALING_IV									"ADMINLUBOCOMr3c"
-
 #define MESSAGE_FUNCTION_BEGIN(x) switch(x) {
 #define MESSAGE_FUNCTION(x,y,z,h) case x: { y(z,h); break; }
 #define MESSAGE_FUNCTION_END }

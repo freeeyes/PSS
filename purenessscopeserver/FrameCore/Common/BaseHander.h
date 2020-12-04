@@ -43,7 +43,7 @@ public:
 void Send_MakePacket_Queue(_MakePacket const& objMakePacket);
 
 //udp函数发送数据包合成函数
-bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, IBuffPacket* pBuffPacket, const ACE_SOCK_Dgram& skRemote, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, ACE_Message_Block* pBlockMessage);
+bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, shared_ptr<IBuffPacket> pBuffPacket, const ACE_SOCK_Dgram& skRemote, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, ACE_Message_Block* pBlockMessage);
 
 //udp处理消息头函数
 bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, uint32 u4Len);
@@ -58,10 +58,10 @@ bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPac
 bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, CPacketParse* pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck);
 
 //清理数据缓冲
-void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket);
+void Recovery_Common_BuffPacket(bool blDelete, shared_ptr<IBuffPacket> pBuffPacket);
 
 //错误信息返回工作线程
-void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket);
+void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, shared_ptr<IBuffPacket> pBuffPacket);
 
 //TCP流消息处理
 uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID);
@@ -83,7 +83,7 @@ public:
 };
 
 //文件压测数据入工作线程
-bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, IBuffPacket*& pBuffPacket, const char* pConnectName);
+bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, shared_ptr<IBuffPacket> pBuffPacket, const char* pConnectName);
 
 //Tcp_Common_ClientInfo的参数
 class _ClientConnectInfo_Param
@@ -120,8 +120,8 @@ public:
 
 //将数据添加入发送缓冲区
 bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Param,
-                                    ACE_Message_Block* pBlockMessage, uint32& u4PacketSize,
-                                    IBuffPacket*& pBuffPacket);
+    ACE_Message_Block* pBlockMessage, uint32& u4PacketSize,
+    shared_ptr<IBuffPacket> pBuffPacket);
 
 //Tcp_Common_Make_Send_Packet的参数
 class _Send_Packet_Param
@@ -139,9 +139,9 @@ public:
 
 //组装发送数据
 bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
-                                 IBuffPacket*& pBuffPacket,
-                                 ACE_Message_Block* pBlockMessage,
-                                 uint32& u4PacketSize);
+    shared_ptr<IBuffPacket> pBuffPacket,
+    ACE_Message_Block* pBlockMessage,
+    uint32& u4PacketSize);
 
 //Tcp_Common_Manager_Post_Message的参数
 class _Post_Message_Param

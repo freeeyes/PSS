@@ -1,6 +1,6 @@
 #include "HandlerManager.h"
 
-bool CPSSHandlerManager::PostMessage(uint32 u4ConnectID, uint16 u2CommandID, IBuffPacket*& pBuffPacket, CSend_Param objSendParam)
+bool CPSSHandlerManager::PostMessage(uint32 u4ConnectID, uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, CSend_Param objSendParam)
 {
 	if (u4ConnectID > 0)
 	{

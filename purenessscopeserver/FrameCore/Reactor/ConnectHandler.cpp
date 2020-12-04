@@ -308,7 +308,7 @@ bool CConnectHandler::Device_Send_Data(const char* pData, ssize_t nLen)
 {
     uint16 u2CommandID = 0x0000;
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
     pBuffPacket->WriteStream(pData, (uint32)nLen);
 
 	EM_SEND_PACKET_PARSE emState = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
@@ -819,7 +819,7 @@ void CConnectHandler::ClearPacketParse()
     m_pBlockRecv->reset();
 }
 
-bool CConnectHandler::Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket)
+bool CConnectHandler::Write_SendData_To_File(bool blDelete, shared_ptr<IBuffPacket> pBuffPacket)
 {
     //文件入口，直接写入日志
     _File_Message_Param obj_File_Message_Param;

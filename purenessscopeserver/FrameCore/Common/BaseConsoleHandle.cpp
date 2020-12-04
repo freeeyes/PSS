@@ -1,7 +1,7 @@
 #include "BaseConsoleHandle.h"
 
 
-bool Console_Common_SendMessage_Data_Check(uint32 u4ConnectID, IBuffPacket* pBuffPacket, uint8 u1OutputType, ACE_Message_Block*& pMbData)
+bool Console_Common_SendMessage_Data_Check(uint32 u4ConnectID, shared_ptr<IBuffPacket> pBuffPacket, uint8 u1OutputType, ACE_Message_Block*& pMbData)
 {
     CConsolePacketParse PacketParse;
 
@@ -24,15 +24,12 @@ bool Console_Common_SendMessage_Data_Check(uint32 u4ConnectID, IBuffPacket* pBuf
         pMbData->wr_ptr(pBuffPacket->GetPacketLen());
     }
 
-    //回收IBuffPacket发送数据的内存缓冲
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-
     PacketParse.Close();
 
     return true;
 }
 
-bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCount, shared_ptr<CConsolePacketParse> pPacketParse, uint8& u1Output, IBuffPacket*& pBuffPacket)
+bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCount, shared_ptr<CConsolePacketParse> pPacketParse, uint8& u1Output, shared_ptr<IBuffPacket>& pBuffPacket)
 {
     u4AllRecvSize += (uint32)pPacketParse->GetMessageHead()->length() + (uint32)pPacketParse->GetMessageBody()->length();
     u4AllRecvCount++;
@@ -51,12 +48,10 @@ bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCo
     else if (EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL == emReturn)
     {
         OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]Dispose CONSOLE_MESSAGE_FAIL.\n"));
-        App_BuffPacketManager::instance()->Delete(pBuffPacket);
         return false;
     }
     else
     {
-        App_BuffPacketManager::instance()->Delete(pBuffPacket);
         return false;
     }
 }

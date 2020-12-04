@@ -7,7 +7,7 @@
 class CPSSHandlerManager : public IConnectManager
 {
 public:
-	bool PostMessage(uint32 u4ConnectID, uint16 u2CommandID, IBuffPacket*& pBuffPacket, CSend_Param objSendParam) final;
+	bool PostMessage(uint32 u4ConnectID, uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, CSend_Param objSendParam) final;
 	
 	bool CloseConnect(uint32 u4ConnectID) final;
 

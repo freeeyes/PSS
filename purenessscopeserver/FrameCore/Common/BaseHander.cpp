@@ -9,7 +9,7 @@ void Recovery_Message(bool blDelete, char*& pMessage)
 }
 
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
-    IBuffPacket* pBuffPacket, 
+    shared_ptr<IBuffPacket> pBuffPacket,
     const ACE_SOCK_Dgram& skRemote,
     shared_ptr<_Packet_Parse_Info> pPacketParseInfo,
     ACE_Message_Block* pBlockMessage)
@@ -171,15 +171,13 @@ bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, CPacketParse* pPacketParse, 
     return true;
 }
 
-void Recovery_Common_BuffPacket(bool blDelete, IBuffPacket* pBuffPacket)
+void Recovery_Common_BuffPacket(bool blDelete, shared_ptr<IBuffPacket> pBuffPacket)
 {
-    if (true == blDelete)
-    {
-        App_BuffPacketManager::instance()->Delete(pBuffPacket);
-    }
+    ACE_UNUSED_ARG(blDelete);
+    pBuffPacket->Clear();
 }
 
-void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, IBuffPacket* pBuffPacket)
+void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, shared_ptr<IBuffPacket> pBuffPacket)
 {
     ACE_Message_Block* pSendMessage = nullptr;
 
@@ -285,7 +283,7 @@ void Send_MakePacket_Queue(_MakePacket const& objMakePacket)
     }
 }
 
-bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, IBuffPacket*& pBuffPacket, const char* pConnectName)
+bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, shared_ptr<IBuffPacket> pBuffPacket, const char* pConnectName)
 {
     string strHexChar;     //单个十六进制的字符
     string strHexData;     //十六进制的字符串
@@ -365,8 +363,8 @@ _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_Cli
 }
 
 bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Param,
-                                    ACE_Message_Block* pBlockMessage, uint32& u4PacketSize,
-                                    IBuffPacket*& pBuffPacket)
+    ACE_Message_Block* pBlockMessage, uint32& u4PacketSize,
+    shared_ptr<IBuffPacket> pBuffPacket)
 {
     //先判断要发送的数据长度，看看是否可以放入缓冲，缓冲是否已经放满。
     uint32 u4SendPacketSize = 0;
@@ -419,9 +417,9 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
 }
 
 bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
-                                 IBuffPacket*& pBuffPacket,
-                                 ACE_Message_Block* pBlockMessage,
-                                 uint32& u4PacketSize)
+    shared_ptr<IBuffPacket> pBuffPacket,
+    ACE_Message_Block* pBlockMessage,
+    uint32& u4PacketSize)
 {
     if (pBlockMessage == nullptr)
     {

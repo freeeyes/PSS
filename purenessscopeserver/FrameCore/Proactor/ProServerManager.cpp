@@ -407,10 +407,6 @@ bool CProServerManager::Close()
     AppLogManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close AppLogManager OK\n"));
 
-    App_BuffPacketManager::instance()->Close_Object(CBuffPacketManager::Close_Callback);
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_BuffPacketManager OK\n"));
-
-
     App_ProactorManager::instance()->StopProactor();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));
 

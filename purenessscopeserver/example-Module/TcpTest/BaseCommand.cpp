@@ -94,14 +94,6 @@ int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
     //m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "测试邮件", "测试");
     ACE_UNUSED_ARG(pSendBuffPacket);
 
-    IBuffPacket* pBodyPacket = m_pServerObject->GetPacketManager()->Create();
-
-    if(NULL == pBodyPacket)
-    {
-        OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pBodyPacket is NULL.\n"));
-        return -1;
-    }
-
     _PacketInfo BodyPacket;
     pMessage->GetPacketBody(BodyPacket);
 
@@ -111,7 +103,7 @@ int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
     //测试记录二进制日志
     //m_pServerObject->GetLogManager()->WriteLogBinary(LOG_SYSTEM, BodyPacket.m_pData, BodyPacket.m_nDataLen);
 
-    IBuffPacket* pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
+    shared_ptr<IBuffPacket> pResponsesPacket = m_pServerObject->GetPacketManager()->Create();
     uint16 u2PostCommandID = COMMAND_BASE;
 
     //如果数据长度是0，则什么都不做
@@ -130,8 +122,6 @@ int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
     //(*pResponsesPacket) << u2PostCommandID;
     //(*pResponsesPacket) << u8ClientTime;
 
-    m_pServerObject->GetPacketManager()->Delete(pBodyPacket);
-
     CSend_Param objSendParam;
 
     if(NULL != m_pServerObject->GetConnectManager())
@@ -145,7 +135,6 @@ int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
     else
     {
         OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
-        m_pServerObject->GetPacketManager()->Delete(pResponsesPacket);
     }
 
     //m_pServerObject->GetConnectManager()->CloseConnect(pMessage->GetMessageBase()->m_u4ConnectID);

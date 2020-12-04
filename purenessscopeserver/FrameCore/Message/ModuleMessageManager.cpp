@@ -1,11 +1,11 @@
 #include "ModuleMessageManager.h"
 
-int CModuleMessageManager::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket)
+int CModuleMessageManager::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket)
 {
     return App_ModuleLoader::instance()->SendModuleMessage(pModuleName, u2CommandID, pBuffPacket, pReturnBuffPacket);
 }
 
-int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThreadID, IBuffPacket* pHeadPacket, IBuffPacket* pBodyBuffPacket)
+int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThreadID, shared_ptr<IBuffPacket> pHeadPacket, shared_ptr<IBuffPacket> pBodyBuffPacket)
 {
     //向框架重发送消息，通过注册的插件进行消费
     ACE_Time_Value tvNow = ACE_OS::gettimeofday();

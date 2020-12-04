@@ -6,6 +6,11 @@
 
 #include "BuffPacket.h"
 
+CBuffPacket::~CBuffPacket()
+{
+    Close();
+}
+
 bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
 {
     try
@@ -15,12 +20,7 @@ bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
         if(nSize >= (int32)m_u4MaxPacketSize)
         {
             OUR_DEBUG((LM_ERROR, "[CBuffPacket::Init] nSize [%d] is more than m_u4MaxPacketSize.\n", nSize));
-			stringstream ss_format;
-            ss_format << "[CBuffPacket::Init] nSize ["
-                << nSize
-                << "] is more than m_u4MaxPacketSize.";
-
-			std::string strError = ss_format.str();
+			std::string strError = fmt::format("[CBuffPacket::Init] nSize [{0}]is more than m_u4MaxPacketSize.", nSize);
 			throw std::domain_error(strError);
         }
 

@@ -17,7 +17,7 @@ class CBuffPacket : public IBuffPacket
 {
 public:
     CBuffPacket() = default;
-    ~CBuffPacket(void) final = default;
+    ~CBuffPacket(void) final;
 
     uint32 GetPacketSize() final;       //得到数据包的格式化长度
     uint32 GetPacketLen() final;        //得到数据包的实际长度

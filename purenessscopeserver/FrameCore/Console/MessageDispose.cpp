@@ -1,6 +1,6 @@
 #include "MessageDispose.h"
 
-void Combo_Common_Return_Data(uint8 u1OutputType, uint8 u1State, const char* pMessage, IBuffPacket* pBuffPacket)
+void Combo_Common_Return_Data(uint8 u1OutputType, uint8 u1State, const char* pMessage, shared_ptr<IBuffPacket> pBuffPacket)
 {
     if (u1OutputType == 0)
     {
@@ -13,7 +13,7 @@ void Combo_Common_Return_Data(uint8 u1OutputType, uint8 u1State, const char* pMe
     }
 }
 
-void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMessage, IBuffPacket* pBuffPacket)
+void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMessage, shared_ptr<IBuffPacket> pBuffPacket)
 {
     if (u1OutputType == 0)
     {
@@ -26,7 +26,7 @@ void Combo_Common_Head_Data(uint8 u1OutputType, uint32 u4Count, const char* pMes
     }
 }
 
-void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, const vecClientConnectInfo VecClientConnectInfo, IBuffPacket* pBuffPacket)
+void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, const vecClientConnectInfo VecClientConnectInfo, shared_ptr<IBuffPacket> pBuffPacket)
 {
     string strIP;
 
@@ -69,7 +69,7 @@ void Combo_Common_vecClientConnectInfo(uint8 u1OutputType, const vecClientConnec
     }
 }
 
-void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPList, IBuffPacket* pBuffPacket)
+void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPList, shared_ptr<IBuffPacket> pBuffPacket)
 {
     for(_ForbiddenIP forbidenip : *pIPList)
     {
@@ -94,7 +94,7 @@ void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPLi
     }
 }
 
-void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_LoadModule(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     _FileInfo FileInfo;
 
@@ -142,7 +142,7 @@ void DoMessage_LoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     u2ReturnCommandID = CONSOLE_COMMAND_LOADMOUDLE;
 }
 
-void DoMessage_UnLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_UnLoadModule(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_strCommandExp.c_str(), (uint8)1, App_MessageServiceGroup::instance()->GetWorkThreadCount()) &&
         true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
@@ -157,7 +157,7 @@ void DoMessage_UnLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffP
     u2ReturnCommandID = CONSOLE_COMMAND_UNLOADMOUDLE;
 }
 
-void DoMessage_ReLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ReLoadModule(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (true == App_MessageManager::instance()->UnloadModuleCommand(CommandInfo.m_strCommandExp.c_str(), (uint8)2, App_MessageServiceGroup::instance()->GetWorkThreadCount()) &&
         true == App_MessageServiceGroup::instance()->PutUpdateCommandMessage(App_MessageManager::instance()->GetUpdateIndex()))
@@ -192,7 +192,7 @@ void DoMessage_ReLoadModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffP
     u2ReturnCommandID = CONSOLE_COMMAND_RELOADMOUDLE;
 }
 
-void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-c")
     {
@@ -241,7 +241,7 @@ void DoMessage_ClientMessageCount(const _CommandInfo& CommandInfo, IBuffPacket* 
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTCOUNT;
 }
 
-void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowModule(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -335,7 +335,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     }
 }
 
-void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     auto u2CommandID = (uint16)ACE_OS::strtol(CommandInfo.m_strCommandExp.c_str(), nullptr, 16);
 
@@ -395,7 +395,7 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     }
 }
 
-void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp != "-s")
     {
@@ -440,7 +440,7 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_THREADINFO;
 }
 
-void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -457,7 +457,7 @@ void DoMessage_ClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTINFO;
 }
 
-void DoMessage_CloseClient(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CloseClient(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     auto u4ConnectID = (uint32)ACE_OS::atoi(CommandInfo.m_strCommandExp.c_str());
 
@@ -478,7 +478,7 @@ void DoMessage_CloseClient(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     u2ReturnCommandID = CONSOLE_COMMAND_COLSECLIENT;
 }
 
-void DoMessage_ForbiddenIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ForbiddenIP(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     _ForbiddenIP ForbiddenIP;
 
@@ -505,7 +505,7 @@ void DoMessage_ForbiddenIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     u2ReturnCommandID = CONSOLE_COMMAND_FORBIDDENIP;
 }
 
-void DoMessage_ShowForbiddenList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowForbiddenList(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -528,7 +528,7 @@ void DoMessage_ShowForbiddenList(const _CommandInfo& CommandInfo, IBuffPacket* p
     u2ReturnCommandID = CONSOLE_COMMAND_FORBIDDENIPSHOW;
 }
 
-void DoMessage_LifedIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_LifedIP(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     App_ForbiddenIP::instance()->DelForeverIP(CommandInfo.m_strCommandExp.c_str());
     App_ForbiddenIP::instance()->DelTempIP(CommandInfo.m_strCommandExp.c_str());
@@ -548,7 +548,7 @@ void DoMessage_LifedIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket
     u2ReturnCommandID = CONSOLE_COMMAND_LIFTED;
 }
 
-void DoMessage_UDPClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_UDPClientInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -564,7 +564,7 @@ void DoMessage_UDPClientInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
     u2ReturnCommandID = CONSOLE_COMMAND_UDPCONNECTINFO;
 }
 
-void DoMessage_ServerConnectTCP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ServerConnectTCP(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -584,7 +584,7 @@ void DoMessage_ServerConnectTCP(const _CommandInfo& CommandInfo, IBuffPacket* pB
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERCONNECT_TCP;
 }
 
-void DoMessage_ServerConnectUDP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ServerConnectUDP(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -604,7 +604,7 @@ void DoMessage_ServerConnectUDP(const _CommandInfo& CommandInfo, IBuffPacket* pB
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERCONNECT_UDP;
 }
 
-void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -647,7 +647,7 @@ void DoMessage_ShowProcessInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_PROCESSINFO;
 }
 
-void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -709,7 +709,7 @@ void DoMessage_ShowClientHisTory(const _CommandInfo& CommandInfo, IBuffPacket* p
     u2ReturnCommandID = CONSOLE_COMMAND_CLIENTHISTORY;
 }
 
-void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp != "-a")
     {
@@ -779,7 +779,7 @@ void DoMessage_ShowAllCommandInfo(const _CommandInfo& CommandInfo, IBuffPacket* 
     u2ReturnCommandID = CONSOLE_COMMAND_ALLCOMMANDINFO;
 }
 
-void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -861,7 +861,7 @@ void DoMessage_ShowServerInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERINFO;
 }
 
-void DoMessage_ReConnectServer(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ReConnectServer(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nSerevrID = 0;
 
@@ -886,7 +886,7 @@ void DoMessage_ReConnectServer(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_SERVERRECONNECT;
 }
 
-void DoMessage_CommandTimeout(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CommandTimeout(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -908,7 +908,7 @@ void DoMessage_CommandTimeout(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDTIMEOUT;
 }
 
-void DoMessage_CommandTimeoutclr(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CommandTimeoutclr(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -926,7 +926,7 @@ void DoMessage_CommandTimeoutclr(const _CommandInfo& CommandInfo, IBuffPacket* p
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDTIMEOUTCLR;
 }
 
-void DoMessage_CommandDataLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_CommandDataLog(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -947,7 +947,7 @@ void DoMessage_CommandDataLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuf
     u2ReturnCommandID = CONSOLE_COMMAND_COMMANDDATALOG;
 }
 
-void DoMessage_SetDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetDebug(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint8 u1Debug = 0;
 
@@ -976,7 +976,7 @@ void DoMessage_SetDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
     u2ReturnCommandID = CONSOLE_COMMAND_SETDEBUG;
 }
 
-void DoMessage_ShowDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowDebug(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -998,7 +998,7 @@ void DoMessage_ShowDebug(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_SHOWDEBUG;
 }
 
-void DoMessage_SetTrackIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetTrackIP(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     _DyeIPInfo objDyeIPInfo;
 
@@ -1016,7 +1016,7 @@ void DoMessage_SetTrackIP(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     u2ReturnCommandID = CONSOLE_COMMAND_SETTRACKIP;
 }
 
-void DoMessage_SetTraceCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetTraceCommand(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     _DyeCommandInfo objDyeCommandInfo;
 
@@ -1041,7 +1041,7 @@ void DoMessage_SetTraceCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_SETTRACECOMMAND;
 }
 
-void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp != "-a")
     {
@@ -1087,7 +1087,7 @@ void DoMessage_GetTrackCommand(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_GETTRACKCOMMAND;
 }
 
-void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nConnectID = 0;
 
@@ -1132,7 +1132,7 @@ void DoMessage_GetConnectIPInfo(const _CommandInfo& CommandInfo, IBuffPacket* pB
     u2ReturnCommandID = CONSOLE_COMMAND_GETCONNECTIPINFO;
 }
 
-void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -1205,7 +1205,7 @@ void DoMessage_GetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_GETLOGINFO;
 }
 
-void DoMessage_SetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetLogLevelInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nLogLevel = 1;
 
@@ -1227,7 +1227,7 @@ void DoMessage_SetLogLevelInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_SETLOGLEVEL;
 }
 
-void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -1274,7 +1274,7 @@ void DoMessage_GetThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     u2ReturnCommandID = CONSOLE_COMMAND_GETWTAI;
 }
 
-void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp ==  "-a")
     {
@@ -1356,7 +1356,7 @@ void DoMessage_GetWorkThreadTO(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_GETWTTIMEOUT;
 }
 
-void DoMessage_SetWorkThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetWorkThreadAI(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     int nAI = 0;
     int nDispose = 0;
@@ -1394,7 +1394,7 @@ void DoMessage_SetWorkThreadAI(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_SETWTAI;
 }
 
-void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     string strNickName;
     vecClientNameInfo objClientNameInfo;
@@ -1445,7 +1445,7 @@ void DoMessage_GetNickNameInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBu
     u2ReturnCommandID = CONSOLE_COMMAND_GETNICKNAMEINFO;
 }
 
-void DoMessage_SetConnectLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetConnectLog(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ConnectID = 0;
     bool blIsLog = false;
@@ -1468,7 +1468,7 @@ void DoMessage_SetConnectLog(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
     u2ReturnCommandID = CONSOLE_COMMAND_SETCONNECTLOG;
 }
 
-void DoMessage_SetMaxConnectCount(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_SetMaxConnectCount(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint16 u2MaxConnectHandler = 0;
 
@@ -1490,7 +1490,7 @@ void DoMessage_SetMaxConnectCount(const _CommandInfo& CommandInfo, IBuffPacket* 
     u2ReturnCommandID = CONSOLE_COMMAND_SETMAXCONNECTCOUNT;
 }
 
-void DoMessage_AddListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_AddListen(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     bool blState = false;
     _ListenInfo objListenInfo;
@@ -1522,7 +1522,7 @@ void DoMessage_AddListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_ADD_LISTEN;
 }
 
-void DoMessage_DelListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_DelListen(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     bool blState = false;
     _ListenInfo objListenInfo;
@@ -1550,7 +1550,7 @@ void DoMessage_DelListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPack
     u2ReturnCommandID = CONSOLE_COMMAND_DEL_LISTEN;
 }
 
-void DoMessage_ShowListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ShowListen(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     uint32 u4ListenCount = 0;
 
@@ -1601,7 +1601,7 @@ void DoMessage_ShowListen(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPac
     u2ReturnCommandID = CONSOLE_COMMAND_SHOW_LISTEN;
 }
 
-void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -1654,7 +1654,7 @@ void DoMessage_MonitorInfo(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     u2ReturnCommandID = CONSOLE_COMMAND_MONITOR_INFO;
 }
 
-void DoMessage_ServerClose(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_ServerClose(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (nullptr == pBuffPacket)
     {
@@ -1667,7 +1667,7 @@ void DoMessage_ServerClose(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     u2ReturnCommandID = CONSOLE_COMMAND_COLSECLIENT;
 }
 
-void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     string strFileName;
 
@@ -1730,7 +1730,7 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, IBuffPacket* pBuff
     }
 }
 
-void DoMessage_TestFileStop(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_TestFileStop(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
@@ -1751,7 +1751,7 @@ void DoMessage_TestFileStop(const _CommandInfo& CommandInfo, IBuffPacket* pBuffP
     }
 }
 
-void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void DoMessage_PortList(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In.\n"));
 
@@ -1800,13 +1800,13 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
     }
 }
 
-void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     if (CommandInfo.m_strCommandExp == "-a")
     {
         u2ReturnCommandID = CONSOLE_COMMAND_PACKET_STATE;
 
-        uint32 u4Count = App_BuffPacketManager::instance()->GetCreateInfoCount();
+        uint32 u4Count = 0;
 
         if (CommandInfo.m_u1OutputType == 0)
         {
@@ -1823,7 +1823,6 @@ void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
         for (uint32 i = 0; i < u4Count; i++)
         {
             _Object_Create_Info objCreateInfo;
-            App_BuffPacketManager::instance()->GetCreateInfoList(i, objCreateInfo);
 
             if (CommandInfo.m_u1OutputType == 0)
             {
@@ -1844,7 +1843,7 @@ void Do_Message_BuffPacket(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPa
     }
 }
 
-void Do_Message_PoolSet(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacket, uint16& u2ReturnCommandID)
+void Do_Message_PoolSet(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
     _PoolName objPoolName;
 
@@ -1854,8 +1853,6 @@ void Do_Message_PoolSet(const _CommandInfo& CommandInfo, IBuffPacket* pBuffPacke
 
         if (objPoolName.m_strPoolName == "BuffPacket")
         {
-            App_BuffPacketManager::instance()->SetCreateFlag(objPoolName.m_blState);
-
             if (CommandInfo.m_u1OutputType == 0)
             {
                 (*pBuffPacket) << (uint8)0;

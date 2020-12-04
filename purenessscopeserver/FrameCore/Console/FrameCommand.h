@@ -10,7 +10,7 @@ public:
     CFrameCommand() = default;
     ~CFrameCommand() final = default;
 
-    int DoFrameCommand(const char* pCommand, IBuffPacket* pBuffPacket) final;
+    int DoFrameCommand(const char* pCommand, shared_ptr<IBuffPacket> pBuffPacket) final;
 };
 
 #endif

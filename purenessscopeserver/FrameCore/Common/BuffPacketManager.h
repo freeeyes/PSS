@@ -11,26 +11,13 @@
 #include "ObjectPoolManager.h"
 #include "XmlConfig.h"
 
-class CBuffPacketManager : public CObjectPoolManager<CBuffPacket, ACE_Recursive_Thread_Mutex>, public IPacketManager
+class CBuffPacketManager : public IPacketManager
 {
 public:
     CBuffPacketManager() = default;
     ~CBuffPacketManager() final = default;
 
-    static void Init_Callback(int nIndex, CBuffPacket* pBuffPacket);
-    static void Close_Callback(int nIndex, CBuffPacket* pBuffPacket);
-
-    uint32 GetBuffPacketUsedCount() final;
-    uint32 GetBuffPacketFreeCount() final;
-    void OutputCreateInfo() final;
-    void SetCreateFlag(bool blTagCreateInfo) final;
-
-    IBuffPacket* Create(const char* pFileName, uint32 u4Line) final;
-    bool Delete(IBuffPacket* pBuffPacket) final;
-    uint32 GetCreateInfoCount() final;
-    bool GetCreateInfoList(uint32 u4Index, _Object_Create_Info& objCreateInfo) final;
-private:
-    vector<_Object_Create_Info> m_objCreateList;
+    shared_ptr<IBuffPacket> Create(const char* pFileName, uint32 u4Line) final;
 };
 
 using App_BuffPacketManager = ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex>;

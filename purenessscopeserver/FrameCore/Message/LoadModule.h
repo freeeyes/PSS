@@ -25,7 +25,7 @@ public:
     const char* (*GetDesc)(void)                        = nullptr;
     const char* (*GetName)(void)                        = nullptr;
     const char* (*GetModuleKey)(void)                   = nullptr;
-    int (*DoModuleMessage)(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket) = nullptr;
+    int (*DoModuleMessage)(uint16 u2CommandID, shared_ptr<IBuffPacket>, shared_ptr<IBuffPacket>) = nullptr;
     bool (*GetModuleState)(uint32& u4AErrorID)          = nullptr;
 
     _ModuleInfo() = default;
@@ -61,7 +61,7 @@ public:
                         string strModulePath, string strModuleName, string strModuleParam);                           //将要卸载的插件放入缓冲列表
     int  UnloadListUpdate(uint32 u4UpdateIndex);                                                                      //工程线程回调接口，当所有工作线程回调结束，释放插件端口，这里返回0则什么都不做，返回1则是需要重新加载副本
 
-    int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
+    int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket);
 
     int  GetCurrModuleCount() const;
     int  GetModulePoolCount() const;

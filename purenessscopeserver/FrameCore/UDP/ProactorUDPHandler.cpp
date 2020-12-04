@@ -179,11 +179,6 @@ bool CProactorUDPHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint3
         SaveProSendInfo(objSendMessageInfo.pBuffPacket->GetPacketLen());
     }
 
-    //»ØÊÕIBuffPacket
-    if (true == objSendMessageInfo.blDelete)
-    {
-        App_BuffPacketManager::instance()->Delete(objSendMessageInfo.pBuffPacket);
-    }
 
     return true;
 }

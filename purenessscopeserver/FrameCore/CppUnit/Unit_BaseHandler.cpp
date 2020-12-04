@@ -26,7 +26,7 @@ void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
     //´æ·Å²âÊÔÊý¾Ý
     uint32 u4Data = 1;
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << u4Data;
 
@@ -40,7 +40,6 @@ void CUnit_Basehandler::Test_Tcp_Common_File_Message(void)
 
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_File_Message]Tcp_Common_File_Message is false.", true == blRet);
 
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
     m_nTestCount++;
 }
 
@@ -72,7 +71,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
 
     uint32 u4Data = 1;
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << u4Data;
 
@@ -96,8 +95,6 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
                                    u4PacketSize,
                                    pBuffPacket);
     OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Input_To_Cache]End,\n"));
-
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
 }
 
 void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void)
@@ -192,13 +189,13 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 
     auto pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(1);
 
-    CBuffPacket objtestBuffPacket;
+    auto ptestBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
-    objtestBuffPacket << (uint32)1;
+    (*ptestBuffPacket) << (uint32)1;
 
     //²âÊÔ´íÎóµÄIPµØÖ·
     bool blState = Udp_Common_Send_Message(obj_Send_Message_Param,
-        &objtestBuffPacket,
+        ptestBuffPacket,
         skRemote,
         pPacketParseInfo,
         pMbData);
@@ -214,7 +211,7 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
     sprintf_safe(szTestIP, MAX_BUFF_50, "127.0.0.1");
     obj_Send_Message_Param.m_strClientIP = szTestIP;
 	blState = Udp_Common_Send_Message(obj_Send_Message_Param,
-		&objtestBuffPacket,
+        ptestBuffPacket,
 		skRemote,
 		pPacketParseInfo,
 		pMbData);
@@ -235,7 +232,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
     bool blRet = false;
     ACE_Message_Block* pMbData       = nullptr;
     ACE_Message_Block* pBlockMessage = App_MessageBlockManager::instance()->Create(MAX_BUFF_200);
-    IBuffPacket* pBuffPacket         = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket         = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << (uint32)10;
 
@@ -281,7 +278,6 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
         return;
     }
 
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
     App_MessageBlockManager::instance()->Close(pMbData);
     App_MessageBlockManager::instance()->Close(pBlockMessage);
 

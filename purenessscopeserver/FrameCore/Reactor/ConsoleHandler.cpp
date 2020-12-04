@@ -269,7 +269,7 @@ uint8 CConsoleHandler::GetIsClosing() const
     return m_u1IsClosing;
 }
 
-bool CConsoleHandler::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
+bool CConsoleHandler::SendMessage(shared_ptr<IBuffPacket> pBuffPacket, uint8 u1OutputType)
 {
     ACE_Message_Block* pMbData = nullptr;
 
@@ -395,7 +395,7 @@ bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP) const
 bool CConsoleHandler::CheckMessage()
 {
     uint8 u1Output = 0;
-    IBuffPacket* pBuffPacket = nullptr;
+    shared_ptr<IBuffPacket> pBuffPacket = nullptr;
     bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
 
     //ªÿ ’ƒ⁄¥Ê

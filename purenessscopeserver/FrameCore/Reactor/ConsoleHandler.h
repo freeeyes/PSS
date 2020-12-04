@@ -28,7 +28,7 @@ public:
     int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
     int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask) final;
 
-    bool SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType);
+    bool SendMessage(shared_ptr<IBuffPacket> pBuffPacket, uint8 u1OutputType);
 
     void Close(int nIOCount = 1);
     bool ServerClose();

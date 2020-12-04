@@ -86,7 +86,7 @@ public:
     void SetHashID(int nHashID);                                             //设置Hash数组下标
     int  GetHashID() const;                                                  //得到Hash数组下标
 
-    bool Write_SendData_To_File(bool blDelete, IBuffPacket* pBuffPacket);                              //将发送数据写入文件
+    bool Write_SendData_To_File(bool blDelete, shared_ptr<IBuffPacket> pBuffPacket);                              //将发送数据写入文件
     bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
     bool Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);                 //将数据发送给对端
     bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;//发送数据

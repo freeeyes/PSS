@@ -142,12 +142,6 @@ bool CReactorUDPHander::SendMessage(CSendMessageInfo objSendMessageInfo, uint32&
         SaveSendInfo(objSendMessageInfo.pBuffPacket->GetPacketLen());
 	}
 
-	//»ØÊÕIBuffPacket
-	if (true == objSendMessageInfo.blDelete)
-	{
-		App_BuffPacketManager::instance()->Delete(objSendMessageInfo.pBuffPacket);
-	}
-
     return true;
 }
 

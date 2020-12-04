@@ -32,7 +32,7 @@ extern "C"
     DECLDIR const char* GetDesc();
     DECLDIR const char* GetName();
     DECLDIR const char* GetModuleKey();
-    DECLDIR int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket);
+    DECLDIR int DoModuleMessage(uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket);
     DECLDIR bool GetModuleState(uint32& u4ErrorID);
 }
 
@@ -141,7 +141,7 @@ const char* GetModuleKey()
 }
 
 //用于模块间的调用接口
-int DoModuleMessage(uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket)
+int DoModuleMessage(uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket)
 {
     OUR_DEBUG((LM_INFO, "[DoModuleMessage] u2CommandID=%d, size=%d, return=%d.\n",
                u2CommandID,

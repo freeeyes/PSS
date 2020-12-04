@@ -417,7 +417,7 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     //开始查看线程是否超时
     if(m_ThreadInfo.m_u4State == THREADSTATE::THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
     {
-        string strLog = fmt::format("[WorkThread_timeout] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d} {5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} TimeOut > {11}{12} QueueCount = {13} BuffPacketUsed = {14} BuffPacketFree = {15}.",
+        string strLog = fmt::format("[WorkThread_timeout] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d} {5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} TimeOut > {11}{12} QueueCount = {13}.",
             m_ThreadInfo.m_u4ThreadID,
             m_ThreadInfo.m_u4State,
             dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
@@ -426,9 +426,7 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
             m_ThreadInfo.m_u2PacketTime,
             m_u2ThreadTimeOut,
             tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec(),
-            (int)m_objThreadQueue.Size(),
-            App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
-            App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
+            (int)m_objThreadQueue.Size());
 
         AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_WORKTHREAD, strLog);
 
@@ -440,16 +438,14 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     }
     else
     {
-        string strLog = fmt::format("[WorkThread_nomal] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d} {5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} QueueCount = {11} BuffPacketUsed = {12} BuffPacketFree = {13}.",
+        string strLog = fmt::format("[WorkThread_nomal] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d} {5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} QueueCount = {11}.",
             m_ThreadInfo.m_u4ThreadID,
             m_ThreadInfo.m_u4State,
             dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
             m_ThreadInfo.m_u4RecvPacketCount,
             m_ThreadInfo.m_u2CommandID,
             m_ThreadInfo.m_u2PacketTime,
-            (int)m_objThreadQueue.Size(),
-            App_BuffPacketManager::instance()->GetBuffPacketUsedCount(),
-            App_BuffPacketManager::instance()->GetBuffPacketFreeCount());
+            (int)m_objThreadQueue.Size());
 
         AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_WORKTHREAD, strLog);
 
@@ -1137,18 +1133,14 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest) const
 #endif
 
         //获得相关Messageblock,BuffPacket,MessageCount,内存大小
-        uint32 u4MessageBlockUsedSize = App_MessageBlockManager::instance()->GetUsedSize();
-        uint32 u4BuffPacketCount = App_BuffPacketManager::instance()->GetBuffPacketUsedCount();
         uint32 u4MessageCount = GetUsedMessageCount();
 
-        if (u4CurrCpu > GetXmlConfigAttribute(xmlMonitor)->CpuMax || u4MessageBlockUsedSize > GetXmlConfigAttribute(xmlMonitor)->MemoryMax)
+        if (u4CurrCpu > GetXmlConfigAttribute(xmlMonitor)->CpuMax || u4MessageCount > GetXmlConfigAttribute(xmlMonitor)->MemoryMax)
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,MessageBlock=%d,u4BuffPacketCount=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageBlockUsedSize, u4BuffPacketCount, u4MessageCount));
+            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageCount));
 
-            string strLog = fmt::format("[Monitor] CPU Rote={0},MessageBlock={1},u4BuffPacketCount={2},u4MessageCount={3}.",
+            string strLog = fmt::format("[Monitor] CPU Rote={0},u4MessageCount={1}.",
                 u4CurrCpu, 
-                u4MessageBlockUsedSize, 
-                u4BuffPacketCount, 
                 u4MessageCount);
             AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_MONITOR, strLog);
         }

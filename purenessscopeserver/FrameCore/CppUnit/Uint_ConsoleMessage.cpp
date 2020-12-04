@@ -19,7 +19,7 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
     uint8 u1Output         = 0;
     ACE_Message_Block* pmb = nullptr;
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     //拼接命令字
     auto nCommandLen = (int)ACE_OS::strlen(pCommand);
@@ -58,9 +58,6 @@ bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnC
     //回收命令行内存
     pmb->release();
 
-    //回收BuffPacket模块
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
-
     return blRet;
 }
 
@@ -70,7 +67,7 @@ bool CUnit_ConsoleMessage::Create_Command_Error(const char* pCommand)
     uint8 u1Output = 0;
     ACE_Message_Block* pmb = nullptr;
 
-    IBuffPacket* pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     //拼接命令字
     int nCommandLen = (int)ACE_OS::strlen(pCommand);
@@ -94,9 +91,6 @@ bool CUnit_ConsoleMessage::Create_Command_Error(const char* pCommand)
 
     //回收命令行内存
     pmb->release();
-
-    //回收BuffPacket模块
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
 
     return blRet;
 }

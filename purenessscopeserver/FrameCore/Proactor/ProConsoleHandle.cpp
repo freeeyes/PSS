@@ -326,7 +326,7 @@ bool CProConsoleHandle::GetIsClosing()
     return m_blTimeClose;
 }
 
-bool CProConsoleHandle::SendMessage(IBuffPacket* pBuffPacket, uint8 u1OutputType)
+bool CProConsoleHandle::SendMessage(shared_ptr<IBuffPacket> pBuffPacket, uint8 u1OutputType)
 {
     ACE_Message_Block* pMbData = nullptr;
 
@@ -428,12 +428,12 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
 bool CProConsoleHandle::CheckMessage()
 {
     uint8 u1Output           = 0;
-    IBuffPacket* pBuffPacket = nullptr;
+    shared_ptr<IBuffPacket> pBuffPacket = nullptr;
     bool blRet = Console_Common_CheckMessage_Data(m_u4AllRecvSize, m_u4AllRecvCount, m_pPacketParse, u1Output, pBuffPacket);
 
     m_pPacketParse->Close();
 
-    if (true == blRet && false == SendMessage(dynamic_cast<IBuffPacket*>(pBuffPacket), u1Output))
+    if (true == blRet && false == SendMessage(pBuffPacket, u1Output))
     {
         OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]SendMessage error.\n"));
     }

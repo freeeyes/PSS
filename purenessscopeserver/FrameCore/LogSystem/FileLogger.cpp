@@ -158,7 +158,6 @@ int CLogFile::doLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
     //拼接实际的日志字符串
     string strBuffer = strDate + " " + pLogBlockInfo->m_strBlock;
 
-    size_t u4BufferLength = strBuffer.length();
     if (m_nDisplay == 0 && m_filestream)
     {
         //计入日志
@@ -224,12 +223,12 @@ bool CLogFile::SendMail(shared_ptr<_LogBlockInfo> pLogBlockInfo, const xmlMails:
     }
 }
 
-string CLogFile::GetLoggerName()
+string CLogFile::GetLoggerName() const
 {
     return m_strlogName;
 }
 
-string CLogFile::GetServerName()
+string CLogFile::GetServerName() const
 {
     return m_strServerName;
 }

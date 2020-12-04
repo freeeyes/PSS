@@ -301,7 +301,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
         return false;
     }
 
-    pModuleInfo->DoModuleMessage = (int(*)(uint16, IBuffPacket*, IBuffPacket*))ACE_OS::dlsym(pModuleInfo->hModule, "DoModuleMessage");
+    pModuleInfo->DoModuleMessage = (int(*)(uint16, shared_ptr<IBuffPacket>, shared_ptr<IBuffPacket>))ACE_OS::dlsym(pModuleInfo->hModule, "DoModuleMessage");
 
     if(nullptr == pModuleInfo->DoModuleMessage)
     {
@@ -327,7 +327,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
     return true;
 }
 
-int CLoadModule::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, IBuffPacket* pBuffPacket, IBuffPacket* pReturnBuffPacket)
+int CLoadModule::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket)
 {
     auto f = m_objHashModuleList.find(pModuleName);
 

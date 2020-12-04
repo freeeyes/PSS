@@ -9,7 +9,7 @@ class CControlListen : public IControlListen
 {
 public:
     CControlListen() = default;
-    virtual ~CControlListen() final = default ;
+    ~CControlListen() final = default ;
 
     bool   AddListen(const char* pListenIP, uint16 u2Port, uint8 u1IPType, int nPacketParseID) final;  //打开一个新的监听端口
     bool   DelListen(const char* pListenIP, uint16 u2Port) final;                                      //关闭一个已知的连接

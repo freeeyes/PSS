@@ -1,6 +1,6 @@
 #include "FrameCommand.h"
 
-int CFrameCommand::DoFrameCommand(const char* pCommand, IBuffPacket* pBuffPacket)
+int CFrameCommand::DoFrameCommand(const char* pCommand, shared_ptr<IBuffPacket> pBuffPacket)
 {
     if (EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_SUCCESS != App_ConsoleManager::instance()->ParsePlugInCommand(pCommand, pBuffPacket))
     {

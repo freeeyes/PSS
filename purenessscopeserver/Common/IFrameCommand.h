@@ -10,7 +10,7 @@ class IFrameCommand
 {
 public:
     virtual ~IFrameCommand() {}
-    virtual int DoFrameCommand(const char* pCommand, IBuffPacket* pBuffPacket) = 0;   //执行远程命令接口
+    virtual int DoFrameCommand(const char* pCommand, shared_ptr<IBuffPacket> pBuffPacket) = 0;   //执行远程命令接口
 };
 
 #endif

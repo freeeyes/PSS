@@ -22,8 +22,8 @@ void CUnit_ModuleMessageManager::Test_SendModuleMessage(void)
     sprintf_safe(szSession, 32, "freeeyes");
     sprintf_safe(szData, 30, "freeeyes");
 
-    IBuffPacket* pBuffPacket       = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
-    IBuffPacket* pReturnBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBuffPacket       = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pReturnBuffPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pBuffPacket) << (uint16)1;
     (*pBuffPacket) << u2Command;
@@ -35,8 +35,6 @@ void CUnit_ModuleMessageManager::Test_SendModuleMessage(void)
     {
         blRet = true;
     }
-
-    App_BuffPacketManager::instance()->Delete(pBuffPacket);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_SendModuleMessage]SendModuleMessage is fail.", true == blRet);
 }
@@ -51,8 +49,8 @@ void CUnit_ModuleMessageManager::Test_SendFrameMessage(void)
     sprintf_safe(szSession, 32, "freeeyes");
     sprintf_safe(szData, 30, "freeeyes");
 
-    IBuffPacket* pHeadPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
-    IBuffPacket* pBodyPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pHeadPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
+    auto pBodyPacket = App_BuffPacketManager::instance()->Create(__FILE__, __LINE__);
 
     (*pHeadPacket) << (uint16)1;
     (*pHeadPacket) << u2Command;
@@ -64,9 +62,6 @@ void CUnit_ModuleMessageManager::Test_SendFrameMessage(void)
     {
         blRet = true;
     }
-
-    App_BuffPacketManager::instance()->Delete(pHeadPacket);
-    App_BuffPacketManager::instance()->Delete(pBodyPacket);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_SendFrameMessage]SendModuleMessage is fail.", true == blRet);
 }

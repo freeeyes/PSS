@@ -39,7 +39,7 @@ public:
     CSend_Param 发送参数列表
     */
     //异步发送指定的数据包(经过PacketParse整理发送包) IBuffPacket 会在内部用完自行销毁
-    virtual bool PostMessage(uint32 u4ConnectID, uint16 u2CommandID, IBuffPacket*& pBuffPacket, CSend_Param objSendParam) = 0;
+    virtual bool PostMessage(uint32 u4ConnectID, uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, CSend_Param objSendParam) = 0;
 
     //服务器关闭连接
     virtual bool CloseConnect(uint32 u4ConnectID)                                                                = 0;
