@@ -11,8 +11,8 @@
 #include "smtps.h"
 #include "XmlConfig.h"
 #include <string>
-#include <sstream>
 #include <unordered_map>
+#include <fstream>
 
 const uint16 MAX_CMD_NUM = 100;
 const uint16 MAX_TIME_SIZE = 100;
@@ -39,29 +39,17 @@ public:
 class CLogFile
 {
 public:
-    CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxSize);
+    CLogFile() = default;
 
     virtual ~CLogFile() = default;
 
-    void Init();
+    void Init(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxSize);
 
     void Close();
 
     void SetFileRoot(const char* pFileRoot);
 
     const char* GetFileRoot() const;
-
-    void SetFileAddr(const ACE_FILE_Addr& objFileAddr);
-
-    ACE_FILE_Addr& GetFileAddr();
-
-    void SetConnector(const ACE_FILE_Connector& objConnector);
-
-    ACE_FILE_Connector& GetConnector();
-
-    void SetFileIO(const ACE_FILE_IO& objFile);
-
-    ACE_FILE_IO& GetFileIO();
 
     void SetLogTime(const char* pLogTime);
 
@@ -87,9 +75,9 @@ public:
 
     bool SendMail(shared_ptr<_LogBlockInfo> pLogBlockInfo, const xmlMails::_Mail* pMailInfo = nullptr) const;
 
-    ACE_TString& GetLoggerName();
+    string GetLoggerName();
 
-    ACE_TString& GetServerName();
+    string GetServerName();
 
     int GetDisPlay() const;
 
@@ -129,12 +117,10 @@ private:
     int                 m_nDisplay                 = 0;               //显示还是记录文件
     string              m_strLogTime;                                 //Log当前时间
     string              m_strFileRoot;                                //路径的主目录
-    ACE_TString         m_StrlogName;                                 //模块名字
-    ACE_TString         m_StrlogType               = "ServerError";   //日志类型
-    ACE_TString         m_StrServerName;                              //服务器前缀
-    ACE_FILE_Connector  m_Connector;                                  //I/O操作连接器
-    ACE_FILE_IO         m_File;
-    ACE_FILE_Addr       m_FileAddr;
+    string              m_strlogName;                                 //模块名字
+    string              m_strlogType               = "ServerError";   //日志类型
+    string              m_strServerName;                              //服务器前缀
+    ofstream            m_filestream;                                 //文件流
 };
 
 class CFileLogger : public IServerLogger

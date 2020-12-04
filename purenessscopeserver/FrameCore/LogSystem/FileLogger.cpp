@@ -1,13 +1,6 @@
 #include "FileLogger.h"
 
-CLogFile::CLogFile(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxSize)
-    : m_u4BufferSize(u4BufferSize),
-    m_u4FileMaxSize(u4FileMaxSize* MAX_BUFF_1024 * MAX_BUFF_1024),
-    m_strFileRoot(pFileRoot)
-{
-}
-
-void CLogFile::Init()
+void CLogFile::Init(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMaxSize)
 {
     //在这里初始化读取当前文件夹的文件最大序号和文件大小
     ACE_Date_Time dt;
@@ -17,15 +10,19 @@ void CLogFile::Init()
         dt.day(),
         m_u2CurrFileIndex);
 
+    m_u4BufferSize  = u4BufferSize;
+    m_u4FileMaxSize = u4FileMaxSize * MAX_BUFF_1024 * MAX_BUFF_1024;
+    m_strFileRoot   = pFileRoot;
+
     //首先判断文件是否存在
     while (true)
     {
-        ACE_TString strLogModulePath = m_strFileRoot.c_str();
-        ACE_TString strLogName = strLogModulePath + "/Log/" 
-            + m_StrlogType + "/" 
-            + m_StrlogName + "/" 
-            + m_StrServerName 
-            + m_StrlogName 
+        string strLogModulePath = m_strFileRoot.c_str();
+        string strLogName = strLogModulePath + "/Log/"
+            + m_strlogType + "/" 
+            + m_strlogName + "/" 
+            + m_strServerName 
+            + m_strlogName 
             + strDate.c_str();
 
         auto nRet = ACE_OS::access(strLogName.c_str(), R_OK);
@@ -75,9 +72,9 @@ void CLogFile::Init()
 
 void CLogFile::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CLogFile::Close]m_StrlogName=%s.\n", m_StrlogName.c_str()));
+    OUR_DEBUG((LM_INFO, "[CLogFile::Close]m_StrlogName=%s.\n", m_strlogName.c_str()));
     m_u4BufferSize = 0;
-    m_File.close();
+    m_filestream.close();
     OUR_DEBUG((LM_INFO, "[CLogFile::Close] End.\n"));
 }
 
@@ -89,36 +86,6 @@ void CLogFile::SetFileRoot(const char* pFileRoot)
 const char* CLogFile::GetFileRoot() const
 {
     return m_strFileRoot.c_str();
-}
-
-void CLogFile::SetFileAddr(const ACE_FILE_Addr& objFileAddr)
-{
-    m_FileAddr = objFileAddr;
-}
-
-ACE_FILE_Addr& CLogFile::GetFileAddr()
-{
-    return m_FileAddr;
-}
-
-void CLogFile::SetConnector(const ACE_FILE_Connector& objConnector)
-{
-    m_Connector = objConnector;
-}
-
-ACE_FILE_Connector& CLogFile::GetConnector()
-{
-    return m_Connector;
-}
-
-void CLogFile::SetFileIO(const ACE_FILE_IO& objFile)
-{
-    m_File = objFile;
-}
-
-ACE_FILE_IO& CLogFile::GetFileIO()
-{
-    return m_File;
 }
 
 void CLogFile::SetLogTime(const char* pLogTime)
@@ -189,18 +156,13 @@ int CLogFile::doLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
         dt.second());
 
     //拼接实际的日志字符串
-    string strBuffer = strDate + " " + pLogBlockInfo->m_strBlock + "\n";
+    string strBuffer = strDate + " " + pLogBlockInfo->m_strBlock;
 
     size_t u4BufferLength = strBuffer.length();
-    if (m_nDisplay == 0)
+    if (m_nDisplay == 0 && m_filestream)
     {
         //计入日志
-        auto u4Len = (uint32)m_File.send(strBuffer.c_str(), u4BufferLength);
-
-        if (u4Len != u4BufferLength)
-        {
-            OUR_DEBUG((LM_INFO, "[%s]Write error[%s].\n", m_StrlogName.c_str(), strBuffer.c_str()));
-        }
+        m_filestream << strBuffer << endl;
     }
     else
     {
@@ -211,7 +173,7 @@ int CLogFile::doLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
     //查看是否要发送邮件
     if (pLogBlockInfo->m_u2MailID > 0 && false == SendMail(pLogBlockInfo))
     {
-        OUR_DEBUG((LM_INFO, "[CLogFile::doLog](%s)Send mail fail.\n", m_StrlogName.c_str()));
+        OUR_DEBUG((LM_INFO, "[CLogFile::doLog](%s)Send mail fail.\n", m_strlogName.c_str()));
     }
 
     //检查是否超过了文件块，如果超过了，创建一个新日志文件。
@@ -241,9 +203,7 @@ bool CLogFile::SendMail(shared_ptr<_LogBlockInfo> pLogBlockInfo, const xmlMails:
         return false;
     }
 
-    stringstream ss_format;
-    ss_format << pMailAlert->MailUrl << ":" << pMailAlert->MailPort;
-    string szMailURL = ss_format.str();
+    string szMailURL = fmt::format("{0}:{1}", pMailAlert->MailUrl, pMailAlert->MailPort);
 
     //发送smtps邮件
     int nRet = Send_Mail_From_Ssl(pMailAlert->fromMailAddr.c_str(),
@@ -264,14 +224,14 @@ bool CLogFile::SendMail(shared_ptr<_LogBlockInfo> pLogBlockInfo, const xmlMails:
     }
 }
 
-ACE_TString& CLogFile::GetLoggerName()
+string CLogFile::GetLoggerName()
 {
-    return m_StrlogName;
+    return m_strlogName;
 }
 
-ACE_TString& CLogFile::GetServerName()
+string CLogFile::GetServerName()
 {
-    return m_StrServerName;
+    return m_strServerName;
 }
 
 int CLogFile::GetDisPlay() const
@@ -295,19 +255,19 @@ void CLogFile::SetLoggerClass(int nType)
 {
     if (nType == 1)  //如果是1，就是运营日志，否则就是错误日志
     {
-        m_StrlogType = LOGTYPE_OPERATION;
+        m_strlogType = LOGTYPE_OPERATION;
     }
     else
     {
-        m_StrlogType = LOGTYPE_ERROR;
+        m_strlogType = LOGTYPE_ERROR;
     }
 
-    OUR_DEBUG((LM_INFO, "[ServerLogger](%d)m_StrlogType=%s.\n", nType, m_StrlogType.c_str()));
+    OUR_DEBUG((LM_INFO, "[ServerLogger](%d)m_StrlogType=%s.\n", nType, m_strlogType.c_str()));
 }
 
 int CLogFile::GetLoggerClass() const
 {
-    if (LOGTYPE_OPERATION == m_StrlogType)
+    if (LOGTYPE_OPERATION == m_strlogType)
     {
         return 1;
     }
@@ -319,7 +279,7 @@ int CLogFile::GetLoggerClass() const
 
 void CLogFile::SetLoggerName(const char* szLoggerName)
 {
-    m_StrlogName = szLoggerName;
+    m_strlogName = szLoggerName;
 }
 
 void CLogFile::SetLoggerID(uint16 u2LogID)
@@ -344,7 +304,7 @@ uint16 CLogFile::GetLevel() const
 
 void CLogFile::SetServerName(const char* szServerName)
 {
-    m_StrServerName = szServerName;
+    m_strServerName = szServerName;
 }
 
 bool CLogFile::Run()
@@ -365,24 +325,21 @@ bool CLogFile::Run()
         dt.month(),
         dt.day());
 
-    ACE_TString strLogModulePath = m_strFileRoot.c_str();
-    ACE_TString strLogName = strLogModulePath 
+    string strLogModulePath = m_strFileRoot.c_str();
+    string strLogName = strLogModulePath
         + "/Log/" 
-        + m_StrlogType 
-        + "/" + m_StrlogName 
-        + "/" + m_StrServerName 
-        + m_StrlogName 
+        + m_strlogType 
+        + "/" + m_strlogName 
+        + "/" + m_strServerName 
+        + m_strlogName 
         + strDate.c_str();
 
-    m_File.close();
-
-    m_FileAddr.set(strLogName.c_str());
-
-    if (m_Connector.connect(m_File, m_FileAddr, nullptr, ACE_Addr::sap_any, 0, O_WRONLY | O_CREAT | O_APPEND) == -1)
+    if (m_filestream)
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger]Create file error[%s].\n", strLogName.c_str()));
-        return false;
+        m_filestream.close();
     }
+
+    m_filestream.open(strLogName.c_str(), ios::app);
 
     //设置当前文件大小是0
     m_u4CurrFileSize = 0;
@@ -404,7 +361,7 @@ void CLogFile::CheckTime()
 
     if (strDate != m_strLogTime && false == Run())
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_StrlogName.c_str()));
+        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_strlogName.c_str()));
     }
 }
 
@@ -418,7 +375,7 @@ void CLogFile::CheckLogFileBlock()
 
         if (false == Run())
         {
-            OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_StrlogName.c_str()));
+            OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_strlogName.c_str()));
         }
     }
 }
@@ -436,7 +393,7 @@ void CLogFile::CreatePath() const
         OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", strPath.c_str()));
     }
 
-    strPath = m_strFileRoot + "/Log/" + m_StrlogType.c_str();
+    strPath = m_strFileRoot + "/Log/" + m_strlogType.c_str();
     n4Return = ACE_OS::mkdir(strPath.c_str());
     nError = errno;
 
@@ -445,7 +402,7 @@ void CLogFile::CreatePath() const
         OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", strPath.c_str()));
     }
 
-    strPath = m_strFileRoot + "/Log/" + m_StrlogType.c_str() + "/" + m_StrlogName.c_str();
+    strPath = m_strFileRoot + "/Log/" + m_strlogType + "/" + m_strlogName;
     n4Return = ACE_OS::mkdir(strPath.c_str());
     nError = errno;
 
@@ -584,7 +541,7 @@ bool CFileLogger::Init()
     //创建对象列表
     for(const auto& objFileInfo : objvecLogFileInfo)
     {
-        auto pLogFile = std::make_shared<CLogFile>(m_strLogRoot.c_str(), m_u4BlockSize, u4FileMaxSize);
+        auto pLogFile = std::make_shared<CLogFile>();
 
         pLogFile->SetLoggerName(objFileInfo.m_strFileName.c_str());
         pLogFile->SetLoggerID(objFileInfo.m_u2LogID);
@@ -592,7 +549,7 @@ bool CFileLogger::Init()
         pLogFile->SetLevel(objFileInfo.m_u2LogLevel);
         pLogFile->SetServerName(strServerName.c_str());
         pLogFile->SetDisplay(objFileInfo.m_u1DisPlay);
-        pLogFile->Init();
+        pLogFile->Init(m_strLogRoot.c_str(), m_u4BlockSize, u4FileMaxSize);
 
         if (false == pLogFile->Run())
         {

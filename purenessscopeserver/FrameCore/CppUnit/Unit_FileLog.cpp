@@ -4,7 +4,7 @@
 
 void CUnit_FileLogger::setUp(void)
 {
-    m_pLogFile = std::make_shared<CLogFile>("./", 8192, 1024);
+    m_pLogFile = std::make_shared<CLogFile>();
 }
 
 void CUnit_FileLogger::tearDown(void)
@@ -16,7 +16,7 @@ void CUnit_FileLogger::Test_FileLogger(void)
 {
     bool blRet = false;
 
-    CLogFile ObjCopyLogFile("./", 8192, 1024);
+    CLogFile ObjCopyLogFile();
 
     m_pLogFile->SetFileRoot("./");
     m_pLogFile->SetLoggerName("CppunitTest");
@@ -25,58 +25,42 @@ void CUnit_FileLogger::Test_FileLogger(void)
     m_pLogFile->SetLevel(1);
     m_pLogFile->SetServerName("127_");
     m_pLogFile->SetDisplay(0);
-    m_pLogFile->Init();
+    m_pLogFile->Init("./", 8192, 1024);
 
-    ObjCopyLogFile = (*m_pLogFile);
 
-    if (ObjCopyLogFile.GetBufferSize() != m_pLogFile->GetBufferSize())
+    if (8192 != m_pLogFile->GetBufferSize())
     {
         OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetBufferSize() fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetBufferSize() fail.", true == blRet);
         return;
     }
 
-    if (ACE_OS::strcmp(ObjCopyLogFile.GetFileRoot(), m_pLogFile->GetFileRoot()) != 0)
+    if (ACE_OS::strcmp("./", m_pLogFile->GetFileRoot()) != 0)
     {
         OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetFileRoot() fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetFileRoot() fail.", true == blRet);
         return;
     }
+    
+    auto logTime = m_pLogFile->GetLogTime();
+    OUR_DEBUG((LM_INFO, "[Test_FileLogger]LogTime=%s.\n", logTime));
 
-    if (ACE_OS::strcmp(ObjCopyLogFile.GetLogTime(), m_pLogFile->GetLogTime()) != 0)
-    {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetLogTime() fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetLogTime() fail.", true == blRet);
-        return;
-    }
-
-    if (ObjCopyLogFile.GetFileMaxSize() != m_pLogFile->GetFileMaxSize())
+    if (MAX_BUFF_1024 * MAX_BUFF_1024 * 1024 != m_pLogFile->GetFileMaxSize())
     {
         OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetFileMaxSize() fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetFileMaxSize() fail.", true == blRet);
         return;
     }
 
-    if (ObjCopyLogFile.GetCurrFileIndex() != m_pLogFile->GetCurrFileIndex())
+    if (1 != m_pLogFile->GetCurrFileIndex())
     {
         OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetCurrFileIndex() fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetCurrFileIndex() fail.", true == blRet);
         return;
     }
 
-    if (ObjCopyLogFile.GetCurrFileIndex() != m_pLogFile->GetCurrFileIndex())
-    {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetCurrFileIndex() fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetCurrFileIndex() fail.", true == blRet);
-        return;
-    }
-
-    if (ObjCopyLogFile.GetCurrFileSize() != m_pLogFile->GetCurrFileSize())
-    {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetCurrFileSize() fail.\n"));
-        CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetCurrFileSize() fail.", true == blRet);
-        return;
-    }
+    auto fileSize = m_pLogFile->GetCurrFileSize();
+    OUR_DEBUG((LM_INFO, "[Test_FileLogger]fileSize=%d.\n", fileSize));
 
     if (false == m_pLogFile->Run())
     {
