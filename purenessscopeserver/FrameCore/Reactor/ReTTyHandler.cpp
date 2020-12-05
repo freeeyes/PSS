@@ -70,7 +70,7 @@ void CReTTyHandler::Close(uint32 u4ConnectID)
     }
 }
 
-bool CReTTyHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+bool CReTTyHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
 {
     if (nullptr != objSendMessageInfo.pBuffPacket &&
         objSendMessageInfo.pBuffPacket->GetHeadLen() > 0)

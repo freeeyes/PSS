@@ -148,7 +148,7 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
     m_Read.recv(pMb, stRecvLen, 0, PF_INET, m_szAct);
 }
 
-bool CProactorUDPHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+bool CProactorUDPHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
 {
     _ClientIPInfo objClientIPInfo = App_UDPConnectIDManager::instance()->GetConnectIP(objSendMessageInfo.u4ConnectID);
     if (objClientIPInfo.m_u2Port == 0)

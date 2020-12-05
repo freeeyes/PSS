@@ -352,7 +352,7 @@ CONNECTSTATE CConnectHandler::GetSendBuffState() const
     return m_u1SendBuffState;
 }
 
-bool CConnectHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+bool CConnectHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
 {
     //·¢ËÍÊý¾Ý
     if (EM_IO_TYPE::NET_INPUT == m_emIOType)
@@ -834,7 +834,7 @@ bool CConnectHandler::Write_SendData_To_File(bool blDelete, shared_ptr<IBuffPack
                                    m_strConnectName.c_str());
 }
 
-bool CConnectHandler::Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+bool CConnectHandler::Send_Input_To_Cache(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
 {
     _Input_To_Cache_Param obj_Input_To_Cache_Param;
     obj_Input_To_Cache_Param.m_blDelete            = objSendMessageInfo.blDelete;
@@ -850,7 +850,7 @@ bool CConnectHandler::Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, u
         objSendMessageInfo.pBuffPacket);
 }
 
-bool CConnectHandler::Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+bool CConnectHandler::Send_Input_To_TCP(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
 {
     _Send_Packet_Param obj_Send_Packet_Param;
     obj_Send_Packet_Param.m_blDelete            = objSendMessageInfo.blDelete;

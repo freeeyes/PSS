@@ -7,7 +7,7 @@
 class IBuffPacket
 {
 public:
-    virtual ~IBuffPacket() {}
+    virtual ~IBuffPacket() = default;
 
     virtual uint32 GetPacketSize()      = 0;    //得到数据包的格式化长度
     virtual uint32 GetPacketLen()       = 0;    //得到数据包的实际长度

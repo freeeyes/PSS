@@ -38,7 +38,6 @@ private:
     void Multiple_Process_Start();                                //多进程启动
     void Run_Child_Process_Start(int nNumChlid, const int& fd_lock);    //运行子进程
 
-private:
     ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;             //后台管理链接
     CFrameCommand           m_objFrameCommand;                    //框架命令
     CTMService              m_TMService;                          //TS定时器

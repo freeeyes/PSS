@@ -62,7 +62,7 @@ public:
 
 
     bool CheckSendMask(uint32 u4PacketLen) const;                            //检测指定的连接发送数据是否超过阻塞阀值
-    bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize) final;  //发送当前数据
+    bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize) final;  //发送当前数据
 
     bool SendTimeoutMessage() const;                                         //发送连接超时消息
 
@@ -87,8 +87,8 @@ public:
     int  GetHashID() const;                                                  //得到Hash数组下标
 
     bool Write_SendData_To_File(bool blDelete, shared_ptr<IBuffPacket> pBuffPacket);                              //将发送数据写入文件
-    bool Send_Input_To_Cache(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
-    bool Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);                 //将数据发送给对端
+    bool Send_Input_To_Cache(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
+    bool Send_Input_To_TCP(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize);                 //将数据发送给对端
     bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;//发送数据
 
 private:

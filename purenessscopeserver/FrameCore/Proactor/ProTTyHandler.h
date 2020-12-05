@@ -25,7 +25,7 @@ public:
     bool ConnectTTy();                          //连接指定的设备
 
     virtual void Close(uint32 u4ConnectID);
-    virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);
+    virtual bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize);
     virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend);
     virtual void SetIsLog(bool blIsLog);
 

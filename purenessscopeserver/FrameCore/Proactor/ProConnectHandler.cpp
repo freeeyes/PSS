@@ -317,7 +317,7 @@ CONNECTSTATE CProConnectHandler::GetSendBuffState()
     return m_u1SendBuffState;
 }
 
-bool CProConnectHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+bool CProConnectHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
 {
     if(nullptr == objSendMessageInfo.pBuffPacket)
     {

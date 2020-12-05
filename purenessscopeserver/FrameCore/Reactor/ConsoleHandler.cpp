@@ -173,7 +173,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     if (nDataLen <= 0)
     {
         m_u4CurrSize = 0;
-        uint32 u4Error = (uint32)errno;
+        auto u4Error = (uint32)errno;
         OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
         m_strError = fmt::format("[CConsoleHandler::handle_input] ConnectID = {0}, recv data is error[{1}].", GetConnectID(), nDataLen);
 

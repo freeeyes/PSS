@@ -394,7 +394,7 @@ bool CServerManager::Start_Udp_Listen()
         }
 
         //得到接收器
-        shared_ptr<CReactorUDPHander> pReactorUDPHandler = std::make_shared<CReactorUDPHander>();
+        auto pReactorUDPHandler = std::make_shared<CReactorUDPHander>();
 
         pReactorUDPHandler->SetPacketParseInfoID(GetXmlConfigAttribute(xmlUDPServerIPs)->vec[i].uPacketParseID);
         int nRet = pReactorUDPHandler->OpenAddress(listenAddr, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_CLIENTDEFINE));

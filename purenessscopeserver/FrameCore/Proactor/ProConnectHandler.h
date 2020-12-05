@@ -62,7 +62,7 @@ public:
 
     void Init(uint16 u2HandlerID);                                                           //Connect Pool初始化调用的函数
 
-    virtual bool SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize);     //发送给客户端数据的函数
+    virtual bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize);     //发送给客户端数据的函数
     virtual void Close(uint32 u4ConnectID);                                                  //当前连接对象关闭
     void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);                           //设置监听IP和端口信息
 

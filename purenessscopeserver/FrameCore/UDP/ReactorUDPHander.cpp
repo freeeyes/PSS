@@ -101,7 +101,7 @@ void CReactorUDPHander::SetPacketParseInfoID(uint32 u4PacketParseInfoID)
     m_u4PacketParseInfoID = u4PacketParseInfoID;
 }
 
-bool CReactorUDPHander::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+bool CReactorUDPHander::SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
 {
     ACE_Message_Block* pMbData = nullptr;
 

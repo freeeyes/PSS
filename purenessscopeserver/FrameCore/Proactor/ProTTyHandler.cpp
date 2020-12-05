@@ -78,7 +78,7 @@ void CProTTyHandler::Close(uint32 u4ConnectID)
     }
 }
 
-bool CProTTyHandler::SendMessage(CSendMessageInfo objSendMessageInfo, uint32& u4PacketSize)
+bool CProTTyHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
 {
     if (nullptr != objSendMessageInfo.pBuffPacket &&
         objSendMessageInfo.pBuffPacket->GetHeadLen() > 0)
