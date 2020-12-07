@@ -889,9 +889,9 @@ CMessageServiceGroup::CMessageServiceGroup()
     }
 }
 
-int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+int CMessageServiceGroup::timer_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    ACE_UNUSED_ARG(arg);
+    ACE_Time_Value tv = ACE_OS::gettimeofday();
 
     //检查超时的链接
     CheckRecvTimeout();
@@ -928,7 +928,21 @@ int CMessageServiceGroup::handle_timeout(const ACE_Time_Value& tv, const void* a
 		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
 		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
 
+    if (m_blTimerState)
+    {
+        //开启定时器
+        start_new_task(timerMgr);
+    }
+
     return 0;
+}
+
+void CMessageServiceGroup::start_new_task(brynet::TimerMgr::Ptr timerMgr)
+{
+    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::start_new_task]new timer(%d) is set.\n", m_u2ThreadTimeCheck));
+    auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2ThreadTimeCheck), [this, timerMgr]() {
+        timer_task(timerMgr);
+        });
 }
 
 bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 u4LowMask)
@@ -1062,13 +1076,9 @@ bool CMessageServiceGroup::StartTimer()
 {
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::StartTimer] begin....\n"));
 
-    m_u4TimerID = (uint32)App_TimerManager::instance()->schedule(this, nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(MAX_MSG_STARTTIME), ACE_Time_Value(m_u2ThreadTimeCheck));
+    m_blTimerState = true;
 
-    if(0 == m_u4TimerID)
-    {
-        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::StartTimer] Start thread time error.\n"));
-        return false;
-    }
+    timer_task(App_TimerManager::instance()->GetTimerPtr());
 
     return true;
 }
@@ -1077,10 +1087,9 @@ bool CMessageServiceGroup::KillTimer()
 {
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] begin....\n"));
 
-    if(m_u4TimerID > 0)
+    if(m_blTimerState == true)
     {
-        App_TimerManager::instance()->cancel(m_u4TimerID);
-        m_u4TimerID = 0;
+        m_blTimerState = false;
     }
 
     OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] end....\n"));

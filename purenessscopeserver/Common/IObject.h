@@ -12,7 +12,6 @@
 #include "IConnectManager.h"
 #include "IPacketManager.h"
 #include "IClientManager.h"
-#include "ITimerManager.h"
 #include "IModuleMessageManager.h"
 #include "IControlListen.h"
 #include "IModuleInfo.h"
@@ -38,7 +37,6 @@ public:
         m_pContorlListen        = nullptr;
         m_pIServerManager       = nullptr;
         m_pMessageBlockManager  = nullptr;
-        m_pTimerManager         = nullptr;
         m_pIModuleInfo          = nullptr;
         m_pFrameCommand         = nullptr;
         m_pTMService            = nullptr;
@@ -66,10 +64,6 @@ public:
     void SetClientManager(IClientManager* pClientManager)
     {
         m_pClientManager = pClientManager;
-    }
-    void SetTimerManager(ActiveTimer* pTimerManager)
-    {
-        m_pTimerManager = pTimerManager;
     }
     void SetModuleMessageManager(IModuleMessageManager* pModuleMessageManager)
     {
@@ -168,11 +162,6 @@ public:
         return m_pTTyClientManager;
     }
 
-    ActiveTimer* GetAceTimerManager()
-    {
-        return m_pTimerManager;
-    }
-
     IEchartlog* GetEchartlog()
     {
         return m_pEchartlog;
@@ -184,7 +173,6 @@ private:
     IConnectManager*       m_pConnectManager;
     IPacketManager*        m_pPacketManager;
     IClientManager*        m_pClientManager;
-    ActiveTimer*           m_pTimerManager;
     IModuleMessageManager* m_pModuleMessageManager;
     IControlListen*        m_pContorlListen;
     IModuleInfo*           m_pIModuleInfo;

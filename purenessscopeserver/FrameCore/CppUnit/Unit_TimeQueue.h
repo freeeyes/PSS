@@ -7,12 +7,15 @@
 #include "TimerManager.h"
 
 //定时器处理函数
-class CTimeTask : public ACE_Task<ACE_MT_SYNCH>
+class CTimeTask
 {
 public:
     CTimeTask(void) = default;
 
-    int handle_timeout(const ACE_Time_Value& tv, const void* arg) final;
+    void Test_Timer_Task()
+    {
+        std::cout << "[Test_Timer_Task]Test" << std::endl;
+    }
 };
 
 class CUnit_TimerManager : public CppUnit::TestFixture

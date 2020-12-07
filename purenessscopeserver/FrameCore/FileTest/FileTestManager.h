@@ -12,18 +12,16 @@
 #include <sstream>
 #include <unordered_map>
 
-class CFileTestManager : public ACE_Task<ACE_MT_SYNCH>, public IFileTestManager
+class CFileTestManager : public IFileTestManager
 {
 public:
     CFileTestManager(void) = default;
 
     //文件测试方法
     FileTestResultInfoSt FileTestStart(const char* szXmlFileTestName);      //开始文件测试
-    int FileTestEnd();                                                      //结束文件测试
+    int FileTestEnd() const;                                                //结束文件测试
     void HandlerServerResponse(uint32 u4ConnectID) final;                   //当前连接发送数据包的回调方法
     void Close();                                                           //清理
-
-    int handle_timeout(const ACE_Time_Value& tv, const void* arg) final;
 
 private:
     bool LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult);        //读取测试配置文件
@@ -34,7 +32,7 @@ private:
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
     //文件测试变量
     bool m_bFileTesting       = false;       //是否正在进行文件测试
-    int32 m_n4TimerID         = 0;           //定时器ID
+    bool m_blTimerState       = true;        //定时器检测
 
     CXmlOpeation m_MainConfig;
     string m_strProFilePath;

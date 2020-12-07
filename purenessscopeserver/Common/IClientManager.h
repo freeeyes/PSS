@@ -55,9 +55,9 @@ public:
     //发送一个TCP的数据包，发送完数据blIsDelete来决定是否由框架回收，还是逻辑回收，不能使用CBuffPacket，因为是内存池，所以这里不能删除
     virtual bool SendData(int nServerID, char*& pData, int nSize, bool blIsDelete = true)                                             = 0;
     //发送一个UDP的数据包，发送完数据blIsDelete来决定是否由框架回收，还是逻辑回收，不能使用CBuffPacket，因为是内存池，所以这里不能删除
-    virtual bool SendDataUDP(int nServerID, const char* pIP, uint16 u2Port, char*& pMessage, uint32 u4Len, bool blIsDelete = true)  = 0;
+    virtual bool SendDataUDP(int nServerID, const char* pIP, uint16 u2Port, char*& pMessage, uint32 u4Len, bool blIsDelete = true)    = 0;
     //链接存活检查，如果发现链接在不发送数据包的时候断开了，则会自动重建
-    virtual bool StartConnectTask(int nIntervalTime)                                                                                  = 0;
+    virtual bool StartConnectTask(uint16 u2IntervalTime)                                                                              = 0;
     //关闭连接存活检查
     virtual void CancelConnectTask()                                                                                                  = 0;
     //关闭所有对外链接包括TCP和UDP

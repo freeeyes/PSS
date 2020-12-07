@@ -10,7 +10,7 @@
 #include "HashTable.h"
 #include "XmlConfig.h"
 
-class CProTTyClientManager : public ACE_Task<ACE_MT_SYNCH>, public ITTyClientManager
+class CProTTyClientManager : public ITTyClientManager
 {
 public:
     CProTTyClientManager();
@@ -34,14 +34,16 @@ public:
 
     virtual bool SendMessage(uint16 u2ConnectID, char*& pMessage, uint32 u4Len);                         // 发送数据
 
-    virtual int handle_timeout(const ACE_Time_Value& tv, const void* arg);                               //定时检测
+    int timer_task(brynet::TimerMgr::Ptr timerMgr);
+    void start_new_task(brynet::TimerMgr::Ptr timerMgr);
+
 private:
     CHashTable<CProTTyHandler> m_objTTyClientHandlerList;            //连接设备列表
     ACE_Recursive_Thread_Mutex m_ThreadWritrLock;                    //线程锁
     ACE_Proactor*              m_pProactor;                          //反应器句柄
     uint16                     m_u2MaxListCount;                     //最大设备数量
     uint16                     m_u2TimeCheck;                        //定时器检测时间
-    int                        m_nTaskID;                            //定时器ID
+    bool                       m_blTimerState = true;                //定时器检测
 };
 
 typedef ACE_Singleton<CProTTyClientManager, ACE_Recursive_Thread_Mutex> App_ProTTyClientManager;

@@ -16,36 +16,13 @@ FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestNa
         {
             OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]Loading config file error filename:%s.\n", szXmlFileTestName));
         }
-        else
-        {
-            m_n4TimerID = (uint32)App_TimerManager::instance()->schedule(this, (void*)nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(m_u4TimeInterval), ACE_Time_Value(m_u4TimeInterval));
-
-            if(-1 == m_n4TimerID)
-            {
-                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Start timer error\n"));
-                objFileTestResult.n4Result = FILE_TEST_RESULT::RESULT_ERR_UNKOWN;
-            }
-            else
-            {
-                OUR_DEBUG((LM_ERROR, "[CMainConfig::LoadXmlCfg]Start timer OK.\n"));
-                objFileTestResult.n4Result = FILE_TEST_RESULT::RESULT_OK;
-                m_bFileTesting = true;
-            }
-        }
     }
 
     return objFileTestResult;
 }
 
-int CFileTestManager::FileTestEnd()
+int CFileTestManager::FileTestEnd() const 
 {
-    if(m_n4TimerID > 0)
-    {
-        App_TimerManager::instance()->cancel(m_n4TimerID);
-        m_n4TimerID = 0;
-        m_bFileTesting = false;
-    }
-
     return 0;
 }
 
@@ -86,14 +63,6 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
 
 void CFileTestManager::Close()
 {
-    //关闭定时器
-    if (m_n4TimerID > 0)
-    {
-        App_TimerManager::instance()->cancel(m_n4TimerID);
-        m_n4TimerID = 0;
-        m_bFileTesting = false;
-    }
-
     //清理m_objResponseRecordList
     m_objResponseRecordList.clear();
 }
@@ -280,16 +249,6 @@ bool CFileTestManager::AddResponseRecordList(uint32 u4ConnectID, const ACE_Time_
         OUR_DEBUG((LM_INFO, "[CMainConfig::AddResponseRecordList]AddResponseRecordList error\n"));
         return false;
     }
-}
-
-int CFileTestManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
-{
-    ACE_UNUSED_ARG(arg);
-    ACE_UNUSED_ARG(tv);
-
-    //暂不实现
-
-    return 0;
 }
 
 

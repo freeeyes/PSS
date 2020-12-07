@@ -225,7 +225,6 @@ void CProactorClientInfo::SetLocalAddr( const char* pIP, uint16 u2Port, uint8 u1
 
 CClientProConnectManager::CClientProConnectManager(void)
 {
-    m_nTaskID                = -1;
     m_blProactorFinish       = false;
     m_u4MaxPoolCount         = 0;
     m_u4ConnectServerTimeout = 0;
@@ -706,28 +705,22 @@ bool CClientProConnectManager::SendDataUDP(int nServerID,const char* pIP, uint16
     return blSendRet;
 }
 
-bool CClientProConnectManager::StartConnectTask(int nIntervalTime)
+bool CClientProConnectManager::StartConnectTask(uint16 u2IntervalTime)
 {
     CancelConnectTask();
-    m_nTaskID = App_TimerManager::instance()->schedule(this, (void* )nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
 
-    if(m_nTaskID == -1)
-    {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::StartConnectTask].StartConnectTask is fail, time is (%d).\n", nIntervalTime));
-        return false;
-    }
+    m_u2ThreadTimeCheck = u2IntervalTime;
+
+    m_blTimerState = true;
+
+    timer_task(App_TimerManager::instance()->GetTimerPtr());
 
     return true;
 }
 
 void CClientProConnectManager::CancelConnectTask()
 {
-    if(m_nTaskID != -1)
-    {
-        //杀死之前的定时器，重新开启新的定时器
-        App_TimerManager::instance()->cancel(m_nTaskID);
-        m_nTaskID = -1;
-    }
+    m_blTimerState = false;
 }
 
 void CClientProConnectManager::Close()
@@ -770,10 +763,9 @@ void CClientProConnectManager::Close()
     m_u4MaxPoolCount = 0;
 }
 
-int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+int CClientProConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    ACE_UNUSED_ARG(arg);
-    ACE_UNUSED_ARG(tv);
+    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
 
     if(m_ProAsynchConnect.GetConnectState() == true)
     {
@@ -800,8 +792,6 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
             else
             {
                 //检查当前连接，是否已挂起或死锁
-                ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
                 //如果是异步模式，则需要检查处理线程是否被挂起
                 if(GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
                 {
@@ -811,7 +801,20 @@ int CClientProConnectManager::handle_timeout(const ACE_Time_Value& tv, const voi
         }
     }
 
+    if (true == m_blTimerState)
+    {
+        start_new_task(timerMgr);
+    }
+
     return 0;
+}
+
+void CClientProConnectManager::start_new_task(brynet::TimerMgr::Ptr timerMgr)
+{
+    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::start_new_task]new timer is set.\n"));
+    auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2ThreadTimeCheck), [this, timerMgr]() {
+        timer_task(timerMgr);
+        });
 }
 
 bool CClientProConnectManager::ConnectTcpInit(int nServerID, const char* pIP, uint16 u2Port, uint8 u1IPType, const char* pLocalIP, int nLocalPort, uint8 u1LocalIPType, IClientMessage* pClientMessage, CProactorClientInfo*& pClientInfo, uint32 u4PacketParseID)

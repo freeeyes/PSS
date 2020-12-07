@@ -194,12 +194,13 @@ private:
 
 //add by freeeyes
 //添加线程管理，用户可以创建若干个ACE_Task，每个Task对应一个线程，一个Connectid只对应一个线程。
-class CMessageServiceGroup : public ACE_Task<ACE_MT_SYNCH>
+class CMessageServiceGroup
 {
 public:
     CMessageServiceGroup();
 
-    int handle_timeout(const ACE_Time_Value& tv, const void* arg) final;
+    int timer_task(brynet::TimerMgr::Ptr timerMgr);
+    void start_new_task(brynet::TimerMgr::Ptr timerMgr);
 
     bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK);
     bool PutMessage(shared_ptr<CWorkThreadMessage> pMessage);                                //发送到相应的线程去处理
@@ -252,10 +253,10 @@ private:
     uint32                                              m_u4MaxQueue           = 0;              //线程中最大消息对象个数
     uint32                                              m_u4HighMask           = 0;              //线程高水位
     uint32                                              m_u4LowMask            = 0;              //线程低水位
-    uint32                                              m_u4TimerID            = 0;              //定时器ID
     uint16                                              m_u2ThreadTimeCheck    = 0;              //线程自检时间
     uint16                                              m_u2CurrThreadID       = 0;              //当前轮询到的线程ID
     uint16                                              m_u2CpuNumber          = 0;              //当前CPU的核数
+    bool                                                m_blTimerState         = true;           //定时器是否运行
     CMessageDyeingManager                               m_objMessageDyeingManager; //数据染色类
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
 };

@@ -755,29 +755,22 @@ bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, uint16
     return blSendRet;
 }
 
-bool CClientReConnectManager::StartConnectTask(int nIntervalTime)
+bool CClientReConnectManager::StartConnectTask(uint16 u2IntervalTime)
 {
     CancelConnectTask();
-    m_nTaskID = (int)App_TimerManager::instance()->schedule(this, (void*)nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(nIntervalTime), ACE_Time_Value(nIntervalTime));
 
-    if (m_nTaskID == -1)
-    {
-        OUR_DEBUG((LM_ERROR, "[CProConnectManager::StartConnectTask].StartConnectTask is fail, time is (%d).\n", nIntervalTime));
-        return false;
-    }
+    m_u2ThreadTimeCheck = u2IntervalTime;
+    m_blReactorFinish   = true;
+    m_blTimerState      = true;
 
-    m_blReactorFinish = true;
+    timer_task(App_TimerManager::instance()->GetTimerPtr());
+
     return true;
 }
 
 void CClientReConnectManager::CancelConnectTask()
 {
-    if (m_nTaskID != -1)
-    {
-        //杀死之前的定时器，重新开启新的定时器
-        App_TimerManager::instance()->cancel(m_nTaskID);
-        m_nTaskID = -1;
-    }
+    m_blTimerState = false;
 }
 
 void CClientReConnectManager::Close()
@@ -856,10 +849,11 @@ shared_ptr<CReactorUDPClient> CClientReConnectManager::ConnectUdpInit(int nServe
     return pReactorUDPClient;
 }
 
-int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+int CClientReConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-    ACE_UNUSED_ARG(arg);
+    
+    ACE_Time_Value tv = ACE_OS::gettimeofday();
 
     for_each(m_objClientTCPList.begin(), m_objClientTCPList.end(), [this, tv](const std::pair<int, shared_ptr<CReactorClientInfo>>& iter) {
         auto pClientInfo = iter.second;
@@ -882,7 +876,20 @@ int CClientReConnectManager::handle_timeout(const ACE_Time_Value& tv, const void
         }
         });
 
+    if (true == m_blTimerState)
+    {
+        start_new_task(timerMgr);
+    }
+
     return 0;
+}
+
+void CClientReConnectManager::start_new_task(brynet::TimerMgr::Ptr timerMgr)
+{
+    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::start_new_task]new timer is set.\n"));
+    auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2ThreadTimeCheck), [this, timerMgr]() {
+        timer_task(timerMgr);
+        });
 }
 
 void CClientReConnectManager::GetConnectInfo(vecClientConnectInfo& VecClientConnectInfo)

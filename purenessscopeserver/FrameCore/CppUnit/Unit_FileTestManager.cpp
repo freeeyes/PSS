@@ -52,6 +52,7 @@ void CUnit_FileTestManager::Test_handle_timeout(void)
 {
     //测试完整文件命令运行情况
     bool blRet = false;
+    int  nRet = 0;
 
     FileTestResultInfoSt objInfo = m_pFileTestManager->FileTestStart("./FileTestCfg.xml");
 
@@ -60,14 +61,6 @@ void CUnit_FileTestManager::Test_handle_timeout(void)
         OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pFileTestManager->FileTestStart() fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pFileTestManager->FileTestStart() fail.", true == blRet);
         return;
-    }
-
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-    int nRet = m_pFileTestManager->handle_timeout(tvNow, nullptr);
-
-    if (0 == nRet)
-    {
-        blRet = true;
     }
 
     ACE_Time_Value tvSleep(0, 10000);

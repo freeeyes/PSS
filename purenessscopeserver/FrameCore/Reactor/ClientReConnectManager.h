@@ -50,7 +50,7 @@ private:
     EM_Server_Connect_State    m_emConnectState  = EM_Server_Connect_State::SERVER_CONNECT_READY;  //连接状态
 };
 
-class CClientReConnectManager : public ACE_Event_Handler, public IClientManager
+class CClientReConnectManager : public IClientManager
 {
 public:
     CClientReConnectManager(void) = default;
@@ -72,7 +72,7 @@ public:
     bool SendDataUDP(int nServerID, const char* pIP, uint16 u2Port, char*& pMessage, uint32 u4Len, bool blIsDelete = true) final;   //发送数据（UDP）
     bool SetHandler(int nServerID, CConnectClient* pConnectClient);                                                                 //将指定的CProConnectClient*绑定给nServerID
     IClientMessage* GetClientMessage(int nServerID) final;                                                                          //获得ClientMessage对象
-    bool StartConnectTask(int nIntervalTime = CONNECT_LIMIT_RETRY) final;                                                           //设置自动重连的定时器
+    bool StartConnectTask(uint16 u2IntervalTime = CONNECT_LIMIT_RETRY) final;                                                           //设置自动重连的定时器
     void CancelConnectTask() final;                                                                                                 //关闭重连定时器
     void Close() final;                                                                                                             //关闭所有连接
     ACE_INET_Addr GetServerAddr(int nServerID);                                                                                     //得到指定服务器的远程地址连接信息
@@ -85,7 +85,9 @@ public:
     EM_Server_Connect_State GetConnectState(int nServerID) final;         //得到一个当前连接状态
     uint32 GetPacketParseID(int nServerID) final;                         //得到当前的PacketParseID
 
-    int handle_timeout(const ACE_Time_Value& current_time, const void* act) final;               //定时器执行
+    int timer_task(brynet::TimerMgr::Ptr timerMgr);                       //定时任务
+    void start_new_task(brynet::TimerMgr::Ptr timerMgr);                  //设置定时器
+
 
 private:
     shared_ptr<CReactorClientInfo> ConnectTcpInit(int nServerID);
@@ -98,9 +100,10 @@ public:
     hashmapClientUDPList            m_objClientUDPList;                            //UDP客户端链接
     CConnectClientConnector         m_ReactorConnect;                              //Reactor连接客户端对象
     ACE_Recursive_Thread_Mutex      m_ThreadWritrLock;                             //线程锁
-    int                             m_nTaskID                = -1;                 //定时检测工具
     ACE_Reactor*                    m_pReactor               = nullptr;            //当前的反应器
     bool                            m_blReactorFinish        = false;              //Reactor是否已经注册
+    bool                            m_blTimerState           = true;               //定时器是否运行
+    uint16                          m_u2ThreadTimeCheck = CONNECT_LIMIT_RETRY;     //定时器的间隔时间
     uint32                          m_u4ConnectServerTimeout = 0;                  //连接间隔时间
     uint32                          m_u4MaxPoolCount         = 0;                  //连接池的上限
     EM_S2S_Run_State                m_emS2SRunState          = EM_S2S_Run_State::S2S_Run_State_Init; //当前服务连接状态

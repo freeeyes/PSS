@@ -119,6 +119,9 @@ bool CProServerManager::Init()
 
 bool CProServerManager::Start()
 {
+    //启动定时器
+    App_TimerManager::instance()->Start();
+
     //启动TCP监听
     int nServerPortCount = (int)GetXmlConfigAttribute(xmlTCPServerIPs)->vec.size();
 
@@ -284,13 +287,6 @@ bool CProServerManager::Start()
         AppLogManager::instance()->WriteLog_i(LOG_SYSTEM, "[CProServerManager::Init]AppLogManager is OK.");
     }
 
-    //启动定时器
-    if(0 != App_TimerManager::instance()->activate())
-    {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_TimerManager::instance()->Start() is error.\n"));
-        return false;
-    }
-
     //启动反应器(其他的反应器，因为插件第三方需要)
     if(!App_ProactorManager::instance()->StartOtherProactor())
     {
@@ -383,8 +379,7 @@ bool CProServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectAcceptManager OK.\n"));
 
     m_ProConsoleConnectAcceptor.cancel();
-    App_TimerManager::instance()->deactivate();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_TimerManager OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close Acceptor OK.\n"));
 
     App_ClientProConnectManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ClientProConnectManager OK.\n"));
@@ -424,7 +419,8 @@ bool CProServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConnectHandlerPool OK.\n"));
     App_ConsoleManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConsoleManager OK.\n"));
-
+    App_TimerManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_TimerManager OK.\n"));
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
 
     //等待所有资源释放完毕

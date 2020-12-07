@@ -34,10 +34,6 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
     ACE_Time_Value tvConnectSleep(0, 10000);
     ACE_OS::sleep(tvConnectSleep);
 
-    //测试定时执行程序
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-    App_ClientReConnectManager::instance()->handle_timeout(tvNow, nullptr);
-
     //获得当前连接信息
     vecClientConnectInfo VecClientConnectInfo;
     App_ClientReConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);

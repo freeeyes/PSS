@@ -188,6 +188,9 @@ bool CServerManager::Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode) c
 
 bool CServerManager::Run()
 {
+    //启动定时器
+    App_TimerManager::instance()->Start();
+
     //对应多进程，epoll必须在子进程里进行初始化
     if (NETWORKMODE::NETWORKMODE_RE_EPOLL == GetXmlConfigAttribute(xmlNetWorkMode)->Mode
         || NETWORKMODE::NETWORKMODE_RE_EPOLL_ET == GetXmlConfigAttribute(xmlNetWorkMode)->Mode)
@@ -243,13 +246,6 @@ bool CServerManager::Run()
     if (false == App_ClientReConnectManager::instance()->StartConnectTask(GetXmlConfigAttribute(xmlConnectServer)->TimeCheck))
     {
         OUR_DEBUG((LM_INFO, "[CServerManager::Run]StartConnectTask error.\n"));
-        return false;
-    }
-
-    //启动定时器
-    if (0 != App_TimerManager::instance()->activate())
-    {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_TimerManager::instance()->Start() is error.\n"));
         return false;
     }
 
@@ -586,9 +582,7 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close m_TSThread OK.\n"));
     App_ConnectAcceptorManager::instance()->Close();
     m_ConnectConsoleAcceptor.close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]AppLogManager OK\n"));
-    App_TimerManager::instance()->deactivate();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ModuleLoader OK.\n"));
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close Acceptor OK\n"));
     App_ClientReConnectManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ClientReConnectManager OK.\n"));
     App_ReTTyClientManager::instance()->Close();
@@ -625,6 +619,8 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));
     App_ConsoleManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConsoleManager OK.\n"));
+    App_TimerManager::instance()->Close();
+    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_TimerManager OK.\n"));
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
 
     return true;

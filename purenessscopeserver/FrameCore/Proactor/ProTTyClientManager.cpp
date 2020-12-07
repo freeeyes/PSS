@@ -1,6 +1,6 @@
 #include "ProTTyClientManager.h"
 
-CProTTyClientManager::CProTTyClientManager(): m_pProactor(nullptr), m_u2MaxListCount(MAX_BUFF_100), m_u2TimeCheck(120), m_nTaskID(-1)
+CProTTyClientManager::CProTTyClientManager(): m_pProactor(nullptr), m_u2MaxListCount(MAX_BUFF_100), m_u2TimeCheck(120)
 {
 
 }
@@ -13,25 +13,17 @@ CProTTyClientManager::~CProTTyClientManager()
 bool CProTTyClientManager::StartConnectTask()
 {
     CancelConnectTask();
-    m_nTaskID = App_TimerManager::instance()->schedule(this, (void*)nullptr, ACE_OS::gettimeofday() + ACE_Time_Value(m_u2TimeCheck), ACE_Time_Value(m_u2TimeCheck));
+    
+    m_blTimerState = true;
 
-    if (m_nTaskID == -1)
-    {
-        OUR_DEBUG((LM_ERROR, "[CReTTyClientManager::StartConnectTask].StartConnectTask is fail, time is (%d).\n", m_u2TimeCheck));
-        return false;
-    }
+    timer_task(App_TimerManager::instance()->GetTimerPtr());
 
     return true;
 }
 
 void CProTTyClientManager::CancelConnectTask()
 {
-    if (m_nTaskID != -1)
-    {
-        //杀死之前的定时器，重新开启新的定时器
-        App_TimerManager::instance()->cancel(m_nTaskID);
-        m_nTaskID = -1;
-    }
+    m_blTimerState = false;
 }
 
 bool CProTTyClientManager::Init(ACE_Proactor* pProactor, uint16 u2MaxTTyCount, uint16 u2TimeCheck)
@@ -163,12 +155,9 @@ bool CProTTyClientManager::SendMessage(uint16 u2ConnectID, char*& pMessage, uint
     }
 }
 
-int CProTTyClientManager::handle_timeout(const ACE_Time_Value& tv, const void* arg)
+int CProTTyClientManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-
-    ACE_UNUSED_ARG(tv);
-    ACE_UNUSED_ARG(arg);
 
     OUR_DEBUG((LM_INFO, "[CProTTyClientManager::handle_timeout](%d) Run.\n", m_objTTyClientHandlerList.Get_Count()));
 
@@ -186,7 +175,20 @@ int CProTTyClientManager::handle_timeout(const ACE_Time_Value& tv, const void* a
         }
     }
 
+    if (true == m_blTimerState)
+    {
+        start_new_task(timerMgr);
+    }
+
     return 0;
+}
+
+void CProTTyClientManager::start_new_task(brynet::TimerMgr::Ptr timerMgr)
+{
+    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::start_new_task]new timer is set(%d).\n", m_u2TimeCheck));
+    auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2TimeCheck), [this, timerMgr]() {
+        timer_task(timerMgr);
+        });
 }
 
 int CProTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDevParam& inParam, ITTyMessage* pMessageRecv)

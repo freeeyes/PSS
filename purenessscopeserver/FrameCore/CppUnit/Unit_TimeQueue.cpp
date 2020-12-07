@@ -2,16 +2,6 @@
 
 #ifdef _CPPUNIT_TEST
 
-int CTimeTask::handle_timeout(const ACE_Time_Value& tv, const void* arg)
-{
-    ACE_UNUSED_ARG(tv);
-    ACE_UNUSED_ARG(arg);
-
-    OUR_DEBUG((LM_INFO, "[CTimeTask::handle_timeout]!!!!!!!!!!!!!!!!!!!!!!!!.\n"));
-
-    return 0;
-}
-
 void CUnit_TimerManager::setUp(void)
 {
     m_pTimeTask = new CTimeTask();
@@ -24,26 +14,17 @@ void CUnit_TimerManager::tearDown(void)
 
 void CUnit_TimerManager::Test_TimerManager(void)
 {
-    bool blRet = false;
-    ActiveTimer objActiveTimer;
-    objActiveTimer.activate();
+    auto timerMgr = App_TimerManager::instance()->GetTimerPtr();
 
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-    long lTimerID = objActiveTimer.schedule(m_pTimeTask, nullptr, tvNow + ACE_Time_Value(0, 1000));
+    timerMgr->addTimer(std::chrono::microseconds(500), []() {
+        CTimeTask Time_Task;
+        Time_Task.Test_Timer_Task();
+        });
 
-    if (-1 == lTimerID)
-    {
-        CPPUNIT_ASSERT_MESSAGE("[Test_TimerManager]schedule is fail.", true == blRet);
-    }
+    std::this_thread::sleep_for(std::chrono::microseconds(600));
 
-    ACE_Time_Value tvSleep(0, 2000);
-    ACE_OS::sleep(tvSleep);
+    cout << "[Test_Timer]End" << endl;
 
-    objActiveTimer.deactivate();
-    objActiveTimer.close();
-
-    ACE_Time_Value tvSleepClose(0, 1000);
-    ACE_OS::sleep(tvSleepClose);
     OUR_DEBUG((LM_INFO, "[CUnit_TimerManager]objActiveTimer is close.\n"));
 }
 
