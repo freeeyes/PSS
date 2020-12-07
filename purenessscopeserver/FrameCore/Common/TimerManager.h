@@ -19,6 +19,9 @@
 #include <condition_variable>
 #include <thread>
 
+//当定时器中没有数据，最多等待的时间
+const uint16 timer_default_wait = 300;
+
 //定时器组件
 namespace brynet {
 
@@ -143,12 +146,17 @@ namespace brynet {
                 if (mTimers.empty())
                 {
                     //当前没有定时器，等待唤醒
-                    cv.wait(lck);
+                    cv.wait_for(lck, std::chrono::microseconds(timer_default_wait));
                 }
 
                 if (!timer_run_)
                 {
                     break;
+                }
+
+                if (mTimers.empty())
+                {
+                    continue;
                 }
 
                 auto tmp = mTimers.top();
