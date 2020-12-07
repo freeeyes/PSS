@@ -88,7 +88,6 @@ namespace brynet {
             }
         }
 
-    private:
         std::once_flag                                  mExecuteOnceFlag;
         Callback                                        mCallback;
         const std::chrono::steady_clock::time_point     mStartTime;
@@ -182,7 +181,7 @@ namespace brynet {
                 timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_EXECUTE_TIMER;
             }
 
-            std::cout << "Time manager is end" << std::endl;
+            OUR_DEBUG((LM_INFO, "[TimerMgr::schedule]Time manager is end.\n"));
         }
 
         bool isEmpty() const
@@ -245,7 +244,7 @@ public:
 
     void Close();
 
-    brynet::TimerMgr::Ptr GetTimerPtr();
+    brynet::TimerMgr::Ptr GetTimerPtr() const;
 
 private:
     brynet::TimerMgr::Ptr m_timerMgr;

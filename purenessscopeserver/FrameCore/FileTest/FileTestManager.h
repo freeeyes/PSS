@@ -32,7 +32,6 @@ private:
     ACE_Recursive_Thread_Mutex  m_ThreadWriteLock;
     //文件测试变量
     bool m_bFileTesting       = false;       //是否正在进行文件测试
-    bool m_blTimerState       = true;        //定时器检测
 
     CXmlOpeation m_MainConfig;
     string m_strProFilePath;

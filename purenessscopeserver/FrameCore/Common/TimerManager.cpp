@@ -18,7 +18,7 @@ void PSS_Timer_Manager::Close()
     m_ttTimerThread.join();
 }
 
-brynet::TimerMgr::Ptr PSS_Timer_Manager::GetTimerPtr()
+brynet::TimerMgr::Ptr PSS_Timer_Manager::GetTimerPtr() const
 {
     return m_timerMgr;
 }
