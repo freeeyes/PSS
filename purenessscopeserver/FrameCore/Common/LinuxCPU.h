@@ -13,6 +13,6 @@ int32 GetProcessCPU_Idel_Linux();
 
 int32 GetProcessMemorySize_Linux();
 
-string GetFileContent(string strFileName);
+string GetFileContent(const string& strFileName);
 
 #endif

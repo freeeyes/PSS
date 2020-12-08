@@ -65,7 +65,7 @@ void CIPAccount::Init(uint32 u4IPCount)
     m_u2CurrTime = (uint16)dtNowTime.minute();
 }
 
-bool CIPAccount::AddIP(string strIP)
+bool CIPAccount::AddIP(const string& strIP)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> WGuard(m_ThreadLock);
 

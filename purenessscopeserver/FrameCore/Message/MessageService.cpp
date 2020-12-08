@@ -117,8 +117,6 @@ int CMessageService::svc(void)
         {
             break;
         }
-
-        //使用内存池，这块内存不必再释放
     }
 
 	//关闭所有的链接
@@ -196,6 +194,12 @@ bool CMessageService::ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage
         pWorkThread_Handler_info->m_u4ConnectID  = pMessage->m_u4ConnectID;
         pWorkThread_Handler_info->m_pHandler     = pMessage->m_pHandler;
         pWorkThread_Handler_info->m_emPacketType = pMessage->m_emPacketType;
+
+        //寻找对象是否已经存在
+        if (f != m_objHandlerList.end())
+        {
+            m_objHandlerList.erase(f);
+        }
 
         m_objHandlerList[pMessage->m_u4ConnectID] = pWorkThread_Handler_info;
 
@@ -304,10 +308,7 @@ bool CMessageService::ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage
         m_objHandlerList.erase(f);
     }
 
-	if (true == blDeleteFlag)
-	{
-		DeleteMessage(pMessage);
-	}
+    DeleteMessage(pMessage);
 
     m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
 

@@ -104,7 +104,7 @@ bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
     }
 }
 
-bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex, uint32 u4ThreadCount, uint8 u1UnLoadState, string strModulePath, string strModuleName, string strModuleParam)
+bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex, uint32 u4ThreadCount, uint8 u1UnLoadState, const string& strModulePath, const string& strModuleName, const string& strModuleParam)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_tmModule);
     OUR_DEBUG((LM_ERROR, "[CLoadModule::MoveUnloadList]szResourceName=%s.\n", szModuleName));

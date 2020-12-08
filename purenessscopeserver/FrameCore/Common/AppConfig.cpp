@@ -125,7 +125,7 @@ bool CAppConfig::WriteConfig()
     }
 }
 
-bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, string strRoot)
+bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, const string& strRoot)
 {
     try
     {
@@ -166,7 +166,7 @@ bool CAppConfig::GetValue(const char* szName, ACE_TString& strValue, string strR
     }
 }
 
-bool CAppConfig::SetValue(const char* szName, const ACE_TString& strValue, string strRoot)
+bool CAppConfig::SetValue(const char* szName, const ACE_TString& strValue, const string& strRoot)
 {
     try
     {

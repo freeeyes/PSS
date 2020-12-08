@@ -46,16 +46,16 @@ public:
     uint16 GetLogInfoByLogLevel(uint16 u2LogID) const;
 
     //对内写日志的接口
-    int WriteLog_i(uint16 u2LogType, string strLog);
+    int WriteLog_i(uint16 u2LogType, const string& strLog);
 
-    int WriteToMail_i(uint16 u2LogType, uint16 u2MailID, string strTitle, string strLog);
+    int WriteToMail_i(uint16 u2LogType, uint16 u2MailID, const string& strTitle, const string& strLog);
 
     //对外写日志的接口
-    int WriteLogBinary(uint16 u2LogType, string strLog) final;
+    int WriteLogBinary(uint16 u2LogType, const string& strText) final;
 
-    int WriteLog_r(uint16 u2LogType, string strLog) final;
+    int WriteLog_r(uint16 u2LogType, const string& strLog) final;
 
-    int WriteToMail_r(uint16 u2LogType, uint16 u2MailID, string strTitle, string strLog) final;
+    int WriteToMail_r(uint16 u2LogType, uint16 u2MailID, const string& strTitle, const string& strLog) final;
 
 private:
     bool Dispose_Queue(shared_ptr<_LogBlockInfo> msg) const;

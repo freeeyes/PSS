@@ -58,7 +58,7 @@ public:
     bool LoadModule(const char* pModulePath, const char* pModuleName, const char* pModuleParam);
     bool UnLoadModule(const char* szModuleName, bool blIsDelete = true);
     bool MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex, uint32 u4ThreadCount, uint8 u1UnLoadState,
-                        string strModulePath, string strModuleName, string strModuleParam);                           //将要卸载的插件放入缓冲列表
+                        const string& strModulePath, const string& strModuleName, const string& strModuleParam);                           //将要卸载的插件放入缓冲列表
     int  UnloadListUpdate(uint32 u4UpdateIndex);                                                                      //工程线程回调接口，当所有工作线程回调结束，释放插件端口，这里返回0则什么都不做，返回1则是需要重新加载副本
 
     int  SendModuleMessage(const char* pModuleName, uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket);

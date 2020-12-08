@@ -154,7 +154,7 @@ int CLogManager::ProcessLog(shared_ptr<_LogBlockInfo> msg) const
     return 0;
 }
 
-int CLogManager::WriteToMail_i(uint16 u2LogType, uint16 u2MailID, string strTitle, string strLog)
+int CLogManager::WriteToMail_i(uint16 u2LogType, uint16 u2MailID, const string& strTitle, const string& strLog)
 {
     auto msg = std::make_shared<_LogBlockInfo>();
 
@@ -168,7 +168,7 @@ int CLogManager::WriteToMail_i(uint16 u2LogType, uint16 u2MailID, string strTitl
     return 0;
 }
 
-int CLogManager::WriteLogBinary(uint16 u2LogType, string strText)
+int CLogManager::WriteLogBinary(uint16 u2LogType, const string& strText)
 {
     //将数据转换为二进制
     string strHex = buffer_to_Hex_string(strText);
@@ -176,12 +176,12 @@ int CLogManager::WriteLogBinary(uint16 u2LogType, string strText)
     return  WriteLog_i(u2LogType, strHex);
 }
 
-int CLogManager::WriteLog_r(uint16 u2LogType, string strLog)
+int CLogManager::WriteLog_r(uint16 u2LogType, const string& strLog)
 {
     return WriteLog_i(u2LogType, strLog);
 }
 
-int CLogManager::WriteToMail_r(uint16 u2LogType, uint16 u2MailID, string strTitle, string strLog)
+int CLogManager::WriteToMail_r(uint16 u2LogType, uint16 u2MailID, const string& strTitle, const string& strLog)
 {
     return WriteToMail_i(u2LogType, u2MailID, strTitle, strLog);
 }
@@ -292,7 +292,7 @@ uint16 CLogManager::GetLogInfoByLogLevel(uint16 u2LogID) const
     }
 }
 
-int CLogManager::WriteLog_i(uint16 u2LogType, string strLog)
+int CLogManager::WriteLog_i(uint16 u2LogType, const string& strLog)
 {
     //从日志块池里面找到一块空余的日志块
     auto msg = std::make_shared<_LogBlockInfo>();

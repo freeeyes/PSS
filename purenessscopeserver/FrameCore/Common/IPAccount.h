@@ -42,7 +42,7 @@ public:
 
     void Init(uint32 u4IPCount);
 
-    bool AddIP(string strIP);
+    bool AddIP(const string& strIP);
 
     int32 GetCount() const;
 

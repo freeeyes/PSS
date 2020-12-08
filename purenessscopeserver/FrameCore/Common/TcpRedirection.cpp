@@ -116,7 +116,7 @@ void CForwardManager::DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_
     Check_Connect_IP(pName, em_type, 0);
 }
 
-void CForwardManager::SendData(string strTarget, ACE_Message_Block* pmb)
+void CForwardManager::SendData(const string& strTarget, ACE_Message_Block* pmb)
 {
     if (0 == m_nActive)
     {
@@ -132,7 +132,7 @@ void CForwardManager::SendData(string strTarget, ACE_Message_Block* pmb)
     }
 }
 
-void CForwardManager::AddForward(string strSource, string strTarget)
+void CForwardManager::AddForward(const string& strSource, const string& strTarget)
 {
     if (0 == m_nActive)
     {
@@ -178,7 +178,7 @@ string CForwardManager::Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em
     }
 }
 
-IHandler* CForwardManager::Get_Device_Handler(string strTarget)
+IHandler* CForwardManager::Get_Device_Handler(const string& strTarget)
 {
     mapForwardConnectList::iterator f = m_mapForwardConnectList.find(strTarget);
 

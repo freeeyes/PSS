@@ -479,7 +479,8 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
                 return -1;
             }
 
-            auto nDataLen = (int)this->peer().send(pmbSendData->rd_ptr(),(int)(nSendLen - nIsSendSize), &nowait);
+            int nCurrSendSize = nSendLen - nIsSendSize;
+            auto nDataLen = (int)this->peer().send(pmbSendData->rd_ptr(), nCurrSendSize, &nowait);
 
             if (nDataLen <= 0)
             {

@@ -790,8 +790,8 @@ bool CProConnectHandler::CheckMessage()
 
         Send_MakePacket_Queue(objMakePacket);
 
-        /*
         //²âÊÔ´úÂë
+        /*
         uint32 u4Size = (uint32)(m_pPacketParse->GetMessageHead()->length() + m_pPacketParse->GetMessageBody()->length());
         ACE_Message_Block* pSendmb = App_MessageBlockManager::instance()->Create(u4Size);
 
@@ -801,7 +801,7 @@ bool CProConnectHandler::CheckMessage()
         App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
         App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 
-        PutSendPacket(pSendmb, pSendmb->length(), m_atvInput);
+        PutSendPacket(GetConnectID(), pSendmb, pSendmb->length(), m_atvInput);
 
         App_MessageBlockManager::instance()->Close(pSendmb);
         */

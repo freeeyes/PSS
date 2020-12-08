@@ -27,8 +27,8 @@ public:
     bool WriteConfig(const char* szConfigname);
     bool WriteConfig();
 
-    bool GetValue(const char* szName, ACE_TString& strValue, string strRoot);
-    bool SetValue(const char* szName, const ACE_TString& strValue, string strRoot);
+    bool GetValue(const char* szName, ACE_TString& strValue, const string& strRoot);
+    bool SetValue(const char* szName, const ACE_TString& strValue, const string& strRoot);
 
     const char* GetError() const;
 

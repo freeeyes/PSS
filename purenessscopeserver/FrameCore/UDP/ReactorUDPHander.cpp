@@ -323,7 +323,7 @@ void CReactorUDPHander::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, co
 	Send_MakePacket_Queue(objMakePacket);
 }
 
-void CReactorUDPHander::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
+void CReactorUDPHander::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut) const
 {
     u4FlowIn  = 0;
     u4FlowOut = 0;

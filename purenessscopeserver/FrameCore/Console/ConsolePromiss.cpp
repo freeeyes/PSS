@@ -45,7 +45,7 @@ void CConsolePromissions::Close()
     m_objHashCommandList.clear();
 }
 
-int CConsolePromissions::Check_Promission(string pCommandName, string pUser)
+int CConsolePromissions::Check_Promission(const string& pCommandName, const string& pUser)
 {
     auto f = m_objHashCommandList.find(pCommandName);
     
@@ -60,7 +60,7 @@ int CConsolePromissions::Check_Promission(string pCommandName, string pUser)
     return Check_Split_User(pUser, pConsole_Command_Info->m_strUser);
 }
 
-int CConsolePromissions::Check_Split_User(string pUser, string pUserList) const
+int CConsolePromissions::Check_Split_User(const string& pUser, const string& pUserList) const
 {
     vector<string> strUserList;
 

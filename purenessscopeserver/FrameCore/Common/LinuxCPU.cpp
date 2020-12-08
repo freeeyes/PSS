@@ -17,7 +17,7 @@ void trim(string& s)
     s.erase(s.find_last_not_of("kB") + 1);
 }
 
-string GetFileContent(string strFileName)
+string GetFileContent(const string& strFileName)
 {
     string strContent;
 #if PSS_PLATFORM != PLATFORM_WIN

@@ -33,7 +33,7 @@ public:
     void SetIsLog(bool blIsLog) final;
     bool Device_Send_Data(const char* pData, ssize_t nLen) final;
     _ClientConnectInfo GetClientConnectInfo() const;
-    void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut);                    //得到所有的出口流量
+    void GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut) const;                    //得到所有的出口流量
 
 private:
     bool CheckMessage(uint32 u4ConnectID, const char* pData, uint32 u4Len, const ACE_INET_Addr& addrRemote); //这里解析数据包并放入数据队列

@@ -66,14 +66,14 @@ public:
 
     void DisConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type);
 
-    void SendData(string strTarget, ACE_Message_Block* pmb);
+    void SendData(const string& strTarget, ACE_Message_Block* pmb);
 
-    void AddForward(string strSource, string strTarget);
+    void AddForward(const string& strSource, const string& strTarget);
 
 private:
     string Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState, IHandler* pHandler = nullptr);
 
-    IHandler* Get_Device_Handler(string strTarget);
+    IHandler* Get_Device_Handler(const string& strTarget);
 
     using mapForwardConnectList = unordered_map<string, shared_ptr<CForwardConnectInfo>>;
     vector<CForwardInfo> m_vecForwardInfo;          //需要关注的转发接口信息
