@@ -13,10 +13,9 @@
 #include "MessageBlockManager.h"
 #include "BaseHander.h"
 #include "TcpRedirection.h"
-#include "IDeviceHandler.h"
 #include "IHandler.h"
 
-class CProTTyHandler : public ACE_Handler, public IDeviceHandler, public IHandler
+class CProTTyHandler : public ACE_Handler, public IHandler
 {
 public:
     CProTTyHandler();

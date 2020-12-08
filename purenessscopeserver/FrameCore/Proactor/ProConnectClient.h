@@ -16,12 +16,11 @@
 #include "LogManager.h"
 #include "BaseHander.h"
 #include "TcpRedirection.h"
-#include "IDeviceHandler.h"
 
 #define MAX_BUFF_1024 1024
 #define MAX_IP_LEN    16
 
-class CProConnectClient : public ACE_Service_Handler, public IDeviceHandler
+class CProConnectClient : public ACE_Service_Handler, public IHandler
 {
 public:
     CProConnectClient(void);
@@ -32,6 +31,11 @@ public:
     virtual void handle_write_stream(const ACE_Asynch_Write_Stream::Result& result);                   //发送用户数据
     virtual void addresses(const ACE_INET_Addr& remote_address, const ACE_INET_Addr& local_address);   //获得链接地址
     virtual bool Device_Send_Data(const char* pData, ssize_t nLen);                                    //透传数据接口
+
+    void Close(uint32 u4ConnectID) final;
+    bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize) final;
+    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;
+    void SetIsLog(bool blIsLog) final;
 
     void Close();                                          //链接关闭
     void ClientClose(EM_s2s& ems2s);                       //客户端自我关闭

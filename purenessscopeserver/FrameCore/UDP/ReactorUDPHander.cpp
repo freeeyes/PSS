@@ -190,6 +190,12 @@ void CReactorUDPHander::SetIsLog(bool blIsLog)
     ACE_UNUSED_ARG(blIsLog);
 }
 
+bool CReactorUDPHander::Device_Send_Data(const char* pData, ssize_t nLen)
+{
+    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::Device_Send_Data]0x%08x, size=%d", pData, nLen));
+    return true;
+}
+
 _ClientConnectInfo CReactorUDPHander::GetClientConnectInfo() const
 {
     _ClientConnectInfo ClientConnectInfo;

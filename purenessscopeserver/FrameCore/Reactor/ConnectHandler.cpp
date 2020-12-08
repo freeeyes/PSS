@@ -148,7 +148,7 @@ int CConnectHandler::open(void*)
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
         m_addrRemote.get_port_number(),
         ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_CLINET,
-        dynamic_cast<IDeviceHandler*>(this));
+        dynamic_cast<IHandler*>(this));
 
     //初始化参数设置
     if (-1 == Init_Open_Connect())

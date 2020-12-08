@@ -58,6 +58,35 @@ void CConnectClient::Close()
 
 }
 
+void CConnectClient::Close(uint32 u4ConnectID)
+{
+    OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]u4ConnectID=%d.\n", u4ConnectID));
+    Close();
+}
+
+bool CConnectClient::SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
+{
+    ACE_UNUSED_ARG(objSendMessageInfo);
+    ACE_UNUSED_ARG(u4PacketSize);
+
+    return true;
+}
+
+bool CConnectClient::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
+{
+    ACE_UNUSED_ARG(u4ConnectID);
+    ACE_UNUSED_ARG(pMbData);
+    ACE_UNUSED_ARG(u4Size);
+    ACE_UNUSED_ARG(tvSend);
+
+    return true;
+}
+
+void CConnectClient::SetIsLog(bool blIsLog)
+{
+    ACE_UNUSED_ARG(blIsLog);
+}
+
 void CConnectClient::ClientClose()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
@@ -183,7 +212,7 @@ int CConnectClient::open(void* p)
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
         m_addrRemote.get_port_number(),
         ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_S2S,
-        dynamic_cast<IDeviceHandler*>(this));
+        dynamic_cast<IHandler*>(this));
 
     int nRet = this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK | ACE_Event_Handler::WRITE_MASK);
 

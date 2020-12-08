@@ -228,6 +228,12 @@ void CProactorUDPHandler::SetIsLog(bool blIsLog)
     //UDP‘›≤ª µœ÷
 }
 
+bool CProactorUDPHandler::Device_Send_Data(const char* pData, ssize_t nLen)
+{
+    OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::Device_Send_Data]0x%08x, size=%d", pData, nLen));
+    return true;
+}
+
 _ClientConnectInfo CProactorUDPHandler::GetClientConnectInfo()
 {
     _ClientConnectInfo ClientConnectInfo;

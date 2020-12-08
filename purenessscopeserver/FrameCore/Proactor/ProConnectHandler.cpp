@@ -212,7 +212,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
         m_addrRemote.get_port_number(),
         ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_CLINET,
-        dynamic_cast<IDeviceHandler*>(this));
+        dynamic_cast<IHandler*>(this));
 
     //获得接收缓冲区大小
     Get_Recv_length();

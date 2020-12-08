@@ -143,7 +143,7 @@ bool CReTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Seri
     //查看是否存在转发接口
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(pName,
         ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_TTY,
-        dynamic_cast<IDeviceHandler*>(this));
+        dynamic_cast<IHandler*>(this));
 
     return blRet;
 }

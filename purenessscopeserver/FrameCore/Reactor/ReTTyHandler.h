@@ -16,10 +16,9 @@
 #include "MessageBlockManager.h"
 #include "BaseHander.h"
 #include "TcpRedirection.h"
-#include "IDeviceHandler.h"
 #include "IHandler.h"
 
-class CReTTyHandler : public ACE_Event_Handler, public IDeviceHandler, public IHandler
+class CReTTyHandler : public ACE_Event_Handler, public IHandler
 {
 public:
     CReTTyHandler();

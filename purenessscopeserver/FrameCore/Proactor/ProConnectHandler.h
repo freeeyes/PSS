@@ -44,7 +44,7 @@
 #include "PerformanceCounter.h"
 #include "ConnectCounter.h"
 
-class CProConnectHandler : public ACE_Service_Handler, public IDeviceHandler, public IHandler
+class CProConnectHandler : public ACE_Service_Handler, public IHandler
 {
 public:
     CProConnectHandler(void);

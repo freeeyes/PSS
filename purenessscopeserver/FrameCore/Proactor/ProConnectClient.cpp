@@ -84,6 +84,35 @@ void CProConnectClient::Close()
     }
 }
 
+void CProConnectClient::Close(uint32 u4ConnectID)
+{
+    OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]u4ConnectID=%d.\n", u4ConnectID));
+    Close();
+}
+
+bool CProConnectClient::SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize)
+{
+    ACE_UNUSED_ARG(objSendMessageInfo);
+    ACE_UNUSED_ARG(u4PacketSize);
+
+    return true;
+}
+
+bool CProConnectClient::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
+{
+    ACE_UNUSED_ARG(u4ConnectID);
+    ACE_UNUSED_ARG(pMbData);
+    ACE_UNUSED_ARG(u4Size);
+    ACE_UNUSED_ARG(tvSend);
+
+    return true;
+}
+
+void CProConnectClient::SetIsLog(bool blIsLog)
+{
+    ACE_UNUSED_ARG(blIsLog);
+}
+
 void CProConnectClient::ClientClose(EM_s2s& ems2s)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
@@ -177,7 +206,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_AddrRemote.get_host_addr(),
         m_AddrRemote.get_port_number(),
         ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_S2S,
-        dynamic_cast<IDeviceHandler*>(this));
+        dynamic_cast<IHandler*>(this));
 
     if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, nullptr))
     {

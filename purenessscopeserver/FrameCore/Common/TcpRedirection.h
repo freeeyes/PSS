@@ -12,7 +12,7 @@
 #include "ClientCommand.h"
 #include "IClientManager.h"
 #include "IConnectManager.h"
-#include "IDeviceHandler.h"
+#include "IHandler.h"
 #include <unordered_map>
 #include <string>
 #include <sstream>
@@ -46,7 +46,7 @@ public:
     uint32            m_u4ConnectID    = 0;
     ENUM_FORWARD_TYPE m_emForwardType  = ENUM_FORWARD_TYPE::ENUM_FORWARD_TCP_UNKNOW;
     uint8             m_u1ConnectState = 0;  //0是关闭，1是打开
-    IDeviceHandler*   m_pDeviceHandler = nullptr;  //驱动指针
+    IHandler*         m_pHandler       =  nullptr;  //驱动指针
 };
 
 class CForwardManager
@@ -58,9 +58,9 @@ public:
 
     int Init();
 
-    string ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler);
+    string ConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type, IHandler* pHandler);
 
-    string ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type, IDeviceHandler* pDeviceHandler);
+    string ConnectRegedit(const char* pName, ENUM_FORWARD_TYPE em_type, IHandler* pHandler);
 
     void DisConnectRegedit(const char* pIP, int nPort, ENUM_FORWARD_TYPE em_type);
 
@@ -71,9 +71,9 @@ public:
     void AddForward(string strSource, string strTarget);
 
 private:
-    string Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState, IDeviceHandler* pDeviceHandler = nullptr);
+    string Check_Connect_IP(const char* pName, ENUM_FORWARD_TYPE em_type, int ConnectState, IHandler* pHandler = nullptr);
 
-    IDeviceHandler* Get_Device_Handler(string strTarget);
+    IHandler* Get_Device_Handler(string strTarget);
 
     using mapForwardConnectList = unordered_map<string, shared_ptr<CForwardConnectInfo>>;
     vector<CForwardInfo> m_vecForwardInfo;          //需要关注的转发接口信息

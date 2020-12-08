@@ -145,10 +145,12 @@ matrix:
       - sleep 10
       - cd $TRAVIS_BUILD_DIR/CppUnitTest/Test
       - make -j 4
-      - ./Test_Pss
+      # - ./Test_Pss
       # - cd $TRAVIS_BUILD_DIR/Build/Linux/
       # - tail -f -n 10 pssout.file
+      - cd $TRAVIS_BUILD_DIR/Build/Linux/
       - killall -9 PurenessScopeServer  
+      - cat pssout.file
       
       - cd $TRAVIS_BUILD_DIR
       - git init

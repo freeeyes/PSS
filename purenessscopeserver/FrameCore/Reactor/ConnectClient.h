@@ -20,9 +20,8 @@
 #include "LogManager.h"
 #include "BaseHander.h"
 #include "TcpRedirection.h"
-#include "IDeviceHandler.h"
 
-class CConnectClient : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>, public IDeviceHandler
+class CConnectClient : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>, public IHandler
 {
 public:
     CConnectClient(void) = default;
@@ -33,6 +32,11 @@ public:
     int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask) final;
     int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
     bool Device_Send_Data(const char* pData, ssize_t nLen) final; //透传数据接口
+
+    void Close(uint32 u4ConnectID) final;
+    bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize) final;
+    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;
+    void SetIsLog(bool blIsLog) final;
 
     void SetClientMessage(IClientMessage* pClientMessage); //设置消息接收处理类
     void SetServerID(int nServerID);                       //设置当前的ServerID
