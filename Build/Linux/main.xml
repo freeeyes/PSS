@@ -16,7 +16,7 @@
 	
 	<PacketParse ParseID="1" ModulePath="./" ModuleName="libPacketParse_Interface.so" Type="HB" OrgLength="40" />
 	
-	<Console support="1" sip="INADDR_ANY" sport="10010" desc="维护端口是否开启，support为1是开启，0是关闭，后面对应IP和端口" />
+	<Console support="1" sip="INADDR_ANY" sport="10021" desc="维护端口是否开启，support为1是开启，0是关闭，后面对应IP和端口" />
 	<ConsoleKey Key="freeeyes" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
 	<ConsoleKey Key="guest" desc="维护端允许登录的Key值,可以是多个，key值中不能包含空格" />
 	<!-- <ConsoleClient cip="127.0.0.1" desc="维护端口可以访问的对应的客户端IP地址，可以支持多个" /> -->

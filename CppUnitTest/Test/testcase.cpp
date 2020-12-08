@@ -1047,7 +1047,7 @@ bool CheckConsolePacket(_ResultInfo& objResultInfo)
 
     memset(&sockaddr, 0, sizeof(sockaddr));
     sockaddr.sin_family = AF_INET;
-    sockaddr.sin_port   = htons(10010);
+    sockaddr.sin_port   = htons(10021);
     sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     sckClient = socket(AF_INET, SOCK_STREAM, 0);
@@ -1063,7 +1063,7 @@ bool CheckConsolePacket(_ResultInfo& objResultInfo)
     if(0 != nErr)
     {
         gettimeofday(&ttEnd, NULL);
-        sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]connnect server fail.[%s]。", strerror(errno));
+        sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10021]connnect server fail.[%s]。", strerror(errno));
         objResultInfo.m_nRet          = 1;
         objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
         return false;
@@ -1093,7 +1093,7 @@ bool CheckConsolePacket(_ResultInfo& objResultInfo)
         {
             close(sckClient);
             gettimeofday(&ttEnd, NULL);
-            sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]send server fail.[%s]。", strerror(errno));
+            sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10021]send server fail.[%s]。", strerror(errno));
             objResultInfo.m_nRet          = 1;
             objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
             return false;
@@ -1119,7 +1119,7 @@ bool CheckConsolePacket(_ResultInfo& objResultInfo)
     {
         close(sckClient);
         gettimeofday(&ttEnd, NULL);
-        sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]send buff size not equal, buffer size[%d], send size[%d]", nSendDataLen, nTotalSendLen);
+        sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10021]send buff size not equal, buffer size[%d], send size[%d]", nSendDataLen, nTotalSendLen);
         objResultInfo.m_nRet          = 1;
         objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
         return false;
@@ -1139,7 +1139,7 @@ bool CheckConsolePacket(_ResultInfo& objResultInfo)
             {
                 close(sckClient);
                 gettimeofday(&ttEnd, NULL);
-                sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10010]client recv data error.[%s]", strerror(errno));
+                sprintf(objResultInfo.m_szResult, "[e][127.0.0.1:10021]client recv data error.[%s]", strerror(errno));
                 objResultInfo.m_nRet = 1;
                 objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
                 return false;
@@ -1152,7 +1152,7 @@ bool CheckConsolePacket(_ResultInfo& objResultInfo)
         }
     }
 
-    sprintf(objResultInfo.m_szResult, "[s][127.0.0.1:10010]success.");
+    sprintf(objResultInfo.m_szResult, "[s][127.0.0.1:10021]success.");
     gettimeofday(&ttEnd, NULL);
     objResultInfo.m_nRet = 0;
     objResultInfo.m_fMilliseconds = (float)(1000000*(ttEnd.tv_sec - ttStart.tv_sec) + (ttEnd.tv_usec - ttStart.tv_usec))/1000.0f;
