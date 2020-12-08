@@ -393,7 +393,7 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
             OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectTcpInit]Close error.\n"));
         }
 
-        return nullptr;
+        return false;
     }
 
     //设置本地IP和端口
@@ -446,7 +446,7 @@ bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint1
             OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectTcpInit]Close error.\n"));
         }
 
-        return nullptr;
+        return false;
     }
 
     //添加进hash
@@ -490,7 +490,7 @@ bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint1
             OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectTcpInit]Close error.\n"));
         }
 
-        return nullptr;
+        return false;
     }
 
     //设置本地IP和端口
