@@ -21,7 +21,6 @@ CProConnectHandler::CProConnectHandler(void) : m_u2LocalPort(0), m_u4SendCheckTi
     m_szLocalIP[0]         = '\0';
     m_u4PacketParseInfoID  = 0;
     m_u4PacketDebugSize    = 0;
-    m_pPacketDebugData     = nullptr;
     m_emIOType             = EM_IO_TYPE::NET_INPUT;
     m_pFileTest            = nullptr;
 }
@@ -38,7 +37,6 @@ CProConnectHandler::~CProConnectHandler(void)
         m_pBlockRecv->release();
     }
 
-    SAFE_DELETE_ARRAY(m_pPacketDebugData);
     m_u4PacketDebugSize = 0;
 }
 
@@ -58,11 +56,12 @@ void CProConnectHandler::Init(uint16 u2HandlerID)
 
     m_u4SendMaxBuffSize = GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize;
 
-    m_pPacketDebugData = new char[GetXmlConfigAttribute(xmlServerType)->DebugSize];
     m_u4PacketDebugSize = GetXmlConfigAttribute(xmlServerType)->DebugSize / 5;
 
     m_pBlockMessage = new ACE_Message_Block(m_u4SendMaxBuffSize);
     m_pBlockRecv    = new ACE_Message_Block(m_u4MaxPacketSize);
+
+    m_pPacketParse = std::make_shared<CPacketParse>();
 
     m_RecvCounter.init("RecvThread", 10000);
     m_SendCounter.init("SendThread", 10000);
@@ -416,7 +415,7 @@ bool CProConnectHandler::Dispose_Recv_buffer()
                 }
 
                 //判断处理后的数据包体长度是否包含
-                uint32 u4BodyLength = m_objPacketParse.GetPacketBodySrcLen();
+                uint32 u4BodyLength = m_pPacketParse->GetPacketBodySrcLen();
                 uint32 u4AllPacketLength = u4BodyLength + m_pPacketParseInfo->m_u4OrgLength;
                 if (u4AllPacketLength <= (uint32)m_pBlockRecv->length())
                 {
@@ -538,17 +537,17 @@ int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
             OUR_DEBUG((LM_ERROR, "[CProConnectHandler::RecvData]ConnectID=%d, objHeadInfo.m_pmbHead is nullptr.\n", GetConnectID()));
         }
 
-        m_objPacketParse.SetPacket_IsHandleHead(false);
-        m_objPacketParse.SetPacket_Head_Src_Length(m_pPacketParseInfo->m_u4OrgLength);
-        m_objPacketParse.SetPacket_Head_Message(objHeadInfo.m_pmbHead);
-        m_objPacketParse.SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
-        m_objPacketParse.SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
-        m_objPacketParse.SetPacket_CommandID(objHeadInfo.m_u2PacketCommandID);
+        m_pPacketParse->SetPacket_IsHandleHead(false);
+        m_pPacketParse->SetPacket_Head_Src_Length(m_pPacketParseInfo->m_u4OrgLength);
+        m_pPacketParse->SetPacket_Head_Message(objHeadInfo.m_pmbHead);
+        m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
+        m_pPacketParse->SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
+        m_pPacketParse->SetPacket_CommandID(objHeadInfo.m_u2PacketCommandID);
     }
 
     //这里添加只处理包头的数据
     //如果数据只有包头，不需要包体，在这里必须做一些处理，让数据只处理包头就扔到DoMessage()
-    uint32 u4PacketBodyLen = m_objPacketParse.GetPacketBodySrcLen();
+    uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodySrcLen();
 
     if (u4PacketBodyLen == 0)
     {
@@ -604,12 +603,12 @@ int CProConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb, uint3
     }
     else
     {
-        m_objPacketParse.SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
-        m_objPacketParse.SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
+        m_pPacketParse->SetPacket_Body_Message(obj_Body_Info.m_pmbBody);
+        m_pPacketParse->SetPacket_Body_Curr_Length(obj_Body_Info.m_u4BodyCurrLen);
 
         if (obj_Body_Info.m_u2PacketCommandID > 0)
         {
-            m_objPacketParse.SetPacket_CommandID(obj_Body_Info.m_u2PacketCommandID);
+            m_pPacketParse->SetPacket_CommandID(obj_Body_Info.m_u2PacketCommandID);
         }
     }
 
@@ -630,7 +629,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMes
     while (true)
     {
         //处理消息
-        uint8 n1Ret = Tcp_Common_Recv_Stream(GetConnectID(), pCurrMessage, &m_objPacketParse, m_u4PacketParseInfoID);
+        uint8 n1Ret = Tcp_Common_Recv_Stream(GetConnectID(), pCurrMessage, m_pPacketParse, m_u4PacketParseInfoID);
 
         if (PACKET_GET_NO_ENOUGH == n1Ret)
         {
@@ -664,7 +663,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Stream(ACE_Message_Block* pCurrMes
         else
         {
             //数据包为错误包，丢弃处理
-            m_objPacketParse.Clear();
+            m_pPacketParse->Clear();
 
 			//关闭当前连接
 			Send_Hander_Event(PACKET_SDISCONNECT);
@@ -767,22 +766,22 @@ bool CProConnectHandler::RecvClinetPacket()
 
 bool CProConnectHandler::CheckMessage()
 {
-    if(m_objPacketParse.GetMessageHead() != nullptr)
+    if(m_pPacketParse->GetMessageHead() != nullptr)
     {
-        if(m_objPacketParse.GetMessageBody() == nullptr)
+        if(m_pPacketParse->GetMessageBody() == nullptr)
         {
-            m_u4AllRecvSize += (uint32)m_objPacketParse.GetMessageHead()->length();
+            m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length();
         }
         else
         {
-            m_u4AllRecvSize += (uint32)m_objPacketParse.GetMessageHead()->length() + (uint32)m_objPacketParse.GetMessageBody()->length();
+            m_u4AllRecvSize += (uint32)m_pPacketParse->GetMessageHead()->length() + (uint32)m_pPacketParse->GetMessageBody()->length();
         }
 
         //组织数据
 		_MakePacket objMakePacket;
 
 		objMakePacket.m_u4ConnectID     = GetConnectID();
-		objMakePacket.m_pPacketParse    = &m_objPacketParse;
+		objMakePacket.m_pPacketParse    = m_pPacketParse;
 		objMakePacket.m_u1Option        = PACKET_PARSE;
 		objMakePacket.m_AddrRemote      = m_addrRemote;
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
@@ -793,21 +792,21 @@ bool CProConnectHandler::CheckMessage()
 
         /*
         //测试代码
-        uint32 u4Size = (uint32)(m_objPacketParse.GetMessageHead()->length() + m_objPacketParse.GetMessageBody()->length());
+        uint32 u4Size = (uint32)(m_pPacketParse->GetMessageHead()->length() + m_pPacketParse->GetMessageBody()->length());
         ACE_Message_Block* pSendmb = App_MessageBlockManager::instance()->Create(u4Size);
 
-        pSendmb->copy(m_objPacketParse.GetMessageHead()->rd_ptr(), m_objPacketParse.GetMessageHead()->length());
-        pSendmb->copy(m_objPacketParse.GetMessageBody()->rd_ptr(), m_objPacketParse.GetMessageBody()->length());
+        pSendmb->copy(m_pPacketParse->GetMessageHead()->rd_ptr(), m_pPacketParse->GetMessageHead()->length());
+        pSendmb->copy(m_pPacketParse->GetMessageBody()->rd_ptr(), m_pPacketParse->GetMessageBody()->length());
 
-        App_MessageBlockManager::instance()->Close(m_objPacketParse.GetMessageHead());
-        App_MessageBlockManager::instance()->Close(m_objPacketParse.GetMessageBody());
+        App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageHead());
+        App_MessageBlockManager::instance()->Close(m_pPacketParse->GetMessageBody());
 
         PutSendPacket(pSendmb, pSendmb->length(), m_atvInput);
 
         App_MessageBlockManager::instance()->Close(pSendmb);
         */
 
-		m_objPacketParse.Clear();
+        m_pPacketParse->Clear();
 		
 #ifdef SET_PROFILE_OUTPUT        
         m_RecvCounter.counter();

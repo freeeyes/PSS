@@ -255,12 +255,6 @@
     <ClCompile Include="PacketParse\PacketConsoleParse.cpp" />
     <ClCompile Include="PacketParse\PacketParse.cpp" />
     <ClCompile Include="PacketParse\PacketParseBase.cpp" />
-    <ClCompile Include="PacketParse\PacketParsePool.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="LogSystem\FileLogger.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -633,7 +627,6 @@
     <ClInclude Include="PacketParse\PacketConsoleParse.h" />
     <ClInclude Include="PacketParse\PacketParse.h" />
     <ClInclude Include="PacketParse\PacketParseBase.h" />
-    <ClInclude Include="PacketParse\PacketParsePool.h" />
     <ClInclude Include="LogSystem\FileLogger.h" />
     <ClInclude Include="LogSystem\LogManager.h" />
     <ClInclude Include="Message\LoadModule.h" />

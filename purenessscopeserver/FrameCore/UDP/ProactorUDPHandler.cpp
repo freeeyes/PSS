@@ -14,7 +14,6 @@ CProactorUDPHandler::CProactorUDPHandler(void)
 
 CProactorUDPHandler::~CProactorUDPHandler(void)
 {
-	m_objPacketParse.Clear();
 	m_Read.cancel();
 	m_Write.cancel();
 
@@ -98,6 +97,8 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
                            GetXmlConfigAttribute(xmlClientData)->RecvDataMax,
                            GetXmlConfigAttribute(xmlClientData)->SendPacketCount,
                            GetXmlConfigAttribute(xmlClientData)->SendDataMax);
+    //初始化PacketParse
+    m_pPacketParse = std::make_shared<CPacketParse>();
 
     size_t stRecvLen = m_pBlockRecv->size();
     int nRecvSize = (int)m_Read.recv(m_pBlockRecv, stRecvLen, 0, PF_INET, m_szAct);
@@ -247,19 +248,19 @@ bool CProactorUDPHandler::CheckMessage(uint32 u4ConnectID, ACE_Message_Block* pM
 
     if(m_pPacketParseInfo->m_u1PacketParseType == PACKET_WITHHEAD)
     {
-        m_objPacketParse.SetPacket_Head_Src_Length(m_pPacketParseInfo->m_u4OrgLength);
+        m_pPacketParse->SetPacket_Head_Src_Length(m_pPacketParseInfo->m_u4OrgLength);
 
-        if(u4Len < m_objPacketParse.GetPacketHeadSrcLen())
+        if(u4Len < m_pPacketParse->GetPacketHeadSrcLen())
         {
             return false;
         }
 
         //将完整的数据包转换为PacketParse对象
-        ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_objPacketParse.GetPacketHeadSrcLen());
-        memcpy_safe((char* )pMbData->rd_ptr(), m_objPacketParse.GetPacketHeadSrcLen(), (char* )pMBHead->wr_ptr(), m_objPacketParse.GetPacketHeadSrcLen());
-        pMBHead->wr_ptr(m_objPacketParse.GetPacketHeadSrcLen());
+        ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
+        memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketHeadSrcLen(), (char* )pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadSrcLen());
+        pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadSrcLen());
 
-        bool blRet = Udp_Common_Recv_Head(u4ConnectID, pMBHead, &m_objPacketParse, m_pPacketParseInfo, u4Len);
+        bool blRet = Udp_Common_Recv_Head(u4ConnectID, pMBHead, m_pPacketParse, m_pPacketParseInfo, u4Len);
 
         if (false == blRet)
         {
@@ -268,23 +269,23 @@ bool CProactorUDPHandler::CheckMessage(uint32 u4ConnectID, ACE_Message_Block* pM
         }
 
         //读指针向后移动
-        pMbData->rd_ptr(m_objPacketParse.GetPacketHeadSrcLen());
+        pMbData->rd_ptr(m_pPacketParse->GetPacketHeadSrcLen());
 
         //如果包含包体
-        if(m_objPacketParse.GetPacketBodySrcLen() > 0)
+        if(m_pPacketParse->GetPacketBodySrcLen() > 0)
         {
-            ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_objPacketParse.GetPacketBodySrcLen());
-            memcpy_safe((char* )pMbData->rd_ptr(), m_objPacketParse.GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_objPacketParse.GetPacketBodySrcLen());
-            pMBBody->wr_ptr(m_objPacketParse.GetPacketBodySrcLen());
+            ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
+            memcpy_safe((char* )pMbData->rd_ptr(), m_pPacketParse->GetPacketBodySrcLen(), (char* )pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
+            pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
 
-            bool blStateBody = Udp_Common_Recv_Body(u4ConnectID, pMBBody, &m_objPacketParse, m_pPacketParseInfo);
+            bool blStateBody = Udp_Common_Recv_Body(u4ConnectID, pMBBody, m_pPacketParse, m_pPacketParseInfo);
 
             if(false  == blStateBody)
             {
                 App_MessageBlockManager::instance()->Close(pMBHead);
                 App_MessageBlockManager::instance()->Close(pMBBody);
 
-                m_objPacketParse.Clear();
+                m_pPacketParse->Clear();
                 return false;
             }
 
@@ -293,14 +294,14 @@ bool CProactorUDPHandler::CheckMessage(uint32 u4ConnectID, ACE_Message_Block* pM
     else
     {
         //以数据流处理
-        if (false == Udp_Common_Recv_Stream(u4ConnectID, pMbData, &m_objPacketParse, m_pPacketParseInfo))
+        if (false == Udp_Common_Recv_Stream(u4ConnectID, pMbData, m_pPacketParse, m_pPacketParseInfo))
         {
             return false;
         }
     }
 
 	//处理数据包
-	if (false == Udp_Common_Send_WorkThread(u4ConnectID, &m_objPacketParse, addrRemote, m_addrLocal, m_atvInput))
+	if (false == Udp_Common_Send_WorkThread(u4ConnectID, m_pPacketParse, addrRemote, m_addrLocal, m_atvInput))
 	{
 		return false;
 	}

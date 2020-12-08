@@ -130,7 +130,7 @@ private:
     ACE_Time_Value     m_atvInput;                     //最后一次接收数据时间
     ACE_Time_Value     m_atvOutput;                    //最后一次发送数据时间
     ACE_Time_Value     m_atvSendAlive;                 //链接存活时间
-    CPacketParse       m_objPacketParse;               //数据包解析类
+    shared_ptr<CPacketParse> m_pPacketParse;           //数据包解析类
     char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
     char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP
     string             m_strDeviceName;                //转发接口名称
@@ -139,8 +139,7 @@ private:
     ACE_Message_Block*  m_pBlockRecv       = nullptr;  //接收数据缓冲块
     shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo = nullptr;  //PacketParse的解析器
 
-    CPacketParse        m_objSendPacketParse;          //发送数据包组织结构
-    char*               m_pPacketDebugData;            //记录数据包的Debug缓冲字符串
+    shared_ptr<CPacketParse> m_objSendPacketParse;          //发送数据包组织结构
 
     EM_IO_TYPE          m_emIOType;                    //当前IO入口类型
     IFileTestManager*   m_pFileTest;                   //文件测试接口入口

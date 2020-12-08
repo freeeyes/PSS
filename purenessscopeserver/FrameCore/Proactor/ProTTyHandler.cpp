@@ -244,7 +244,7 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
                 if (PACKET_GET_ENOUGH == n1Ret)
                 {
                     //发送消息给消息框架
-                    CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+                    auto pPacketParse = std::make_shared<CPacketParse>();
                     pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
                     pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
                     pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
@@ -266,8 +266,6 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
 
 					Send_MakePacket_Queue(objMakePacket);
 
-                    //清理用完的m_pPacketParse
-                    App_PacketParsePool::instance()->Delete(pPacketParse);
                 }
             }
         }

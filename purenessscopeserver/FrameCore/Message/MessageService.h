@@ -19,7 +19,6 @@
 #include "ObjectLru.h"
 #include "PerformanceCounter.h"
 #include "BuffPacketManager.h"
-#include "PacketParsePool.h"
 
 #if PSS_PLATFORM == PLATFORM_WIN
 #include "WindowsCPU.h"
@@ -245,7 +244,6 @@ private:
 
     bool CheckRecvTimeout() const;                                                            //检查所有的超时链接
     bool CheckWorkThread(const ACE_Time_Value& tvNow) const;                                  //检查所有的工作线程状态
-    bool CheckPacketParsePool() const;                                                        //检查正在使用的消息解析对象
     bool CheckPlugInState() const;                                                            //检查所有插件状态
    
 	using vecMessageService = vector<shared_ptr<CMessageService>>;

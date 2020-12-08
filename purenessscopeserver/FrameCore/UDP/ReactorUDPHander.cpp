@@ -35,6 +35,8 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
 		return -1;
 	}
 
+    m_pPacketParse = std::make_shared<CPacketParse>();
+
     return Init_Open_Address(AddrRemote);
 }
 
@@ -208,19 +210,19 @@ bool CReactorUDPHander::CheckMessage(uint32 u4ConnectID, const char* pData, uint
 
     if(m_pPacketParseInfo->m_u1PacketParseType == PACKET_WITHHEAD)
     {
-        m_objPacketParse.SetPacket_Head_Src_Length(m_pPacketParseInfo->m_u4OrgLength);
+        m_pPacketParse->SetPacket_Head_Src_Length(m_pPacketParseInfo->m_u4OrgLength);
 
-        if(u4Len < m_objPacketParse.GetPacketHeadSrcLen())
+        if(u4Len < m_pPacketParse->GetPacketHeadSrcLen())
         {
             return false;
         }
 
         //将完整的数据包转换为PacketParse对象
-        ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_objPacketParse.GetPacketHeadSrcLen());
-        memcpy_safe(pData, m_objPacketParse.GetPacketHeadSrcLen(), pMBHead->wr_ptr(), m_objPacketParse.GetPacketHeadSrcLen());
-        pMBHead->wr_ptr(m_objPacketParse.GetPacketHeadLen());
+        ACE_Message_Block* pMBHead = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketHeadSrcLen());
+        memcpy_safe(pData, m_pPacketParse->GetPacketHeadSrcLen(), pMBHead->wr_ptr(), m_pPacketParse->GetPacketHeadSrcLen());
+        pMBHead->wr_ptr(m_pPacketParse->GetPacketHeadLen());
 
-        bool blRet = Udp_Common_Recv_Head(u4ConnectID, pMBHead, &m_objPacketParse, m_pPacketParseInfo, u4Len);
+        bool blRet = Udp_Common_Recv_Head(u4ConnectID, pMBHead, m_pPacketParse, m_pPacketParseInfo, u4Len);
 
         if (false == blRet)
         {
@@ -229,14 +231,14 @@ bool CReactorUDPHander::CheckMessage(uint32 u4ConnectID, const char* pData, uint
         }
 
         //如果包含包体
-        if(m_objPacketParse.GetPacketBodySrcLen() > 0)
+        if(m_pPacketParse->GetPacketBodySrcLen() > 0)
         {
-            const char* pBody = pData + m_objPacketParse.GetPacketHeadSrcLen();
-            ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_objPacketParse.GetPacketBodySrcLen());
-            memcpy_safe(pBody, m_objPacketParse.GetPacketBodySrcLen(), pMBBody->wr_ptr(), m_objPacketParse.GetPacketBodySrcLen());
-            pMBBody->wr_ptr(m_objPacketParse.GetPacketBodySrcLen());
+            const char* pBody = pData + m_pPacketParse->GetPacketHeadSrcLen();
+            ACE_Message_Block* pMBBody = App_MessageBlockManager::instance()->Create(m_pPacketParse->GetPacketBodySrcLen());
+            memcpy_safe(pBody, m_pPacketParse->GetPacketBodySrcLen(), pMBBody->wr_ptr(), m_pPacketParse->GetPacketBodySrcLen());
+            pMBBody->wr_ptr(m_pPacketParse->GetPacketBodySrcLen());
 
-            bool blStateBody = Udp_Common_Recv_Body(u4ConnectID, pMBBody, &m_objPacketParse, m_pPacketParseInfo);
+            bool blStateBody = Udp_Common_Recv_Body(u4ConnectID, pMBBody, m_pPacketParse, m_pPacketParseInfo);
 
             if (false == blStateBody)
             {
@@ -253,7 +255,7 @@ bool CReactorUDPHander::CheckMessage(uint32 u4ConnectID, const char* pData, uint
         pMbData->wr_ptr(u4Len);
 
         //以数据流处理
-        if (false == Udp_Common_Recv_Stream(u4ConnectID, pMbData, &m_objPacketParse, m_pPacketParseInfo))
+        if (false == Udp_Common_Recv_Stream(u4ConnectID, pMbData, m_pPacketParse, m_pPacketParseInfo))
         {
             return false;
         }
@@ -262,7 +264,7 @@ bool CReactorUDPHander::CheckMessage(uint32 u4ConnectID, const char* pData, uint
     }
 
 	//处理数据包
-	if (false == Udp_Common_Send_WorkThread(u4ConnectID, &m_objPacketParse, addrRemote, m_addrLocal, m_atvInput))
+	if (false == Udp_Common_Send_WorkThread(u4ConnectID, m_pPacketParse, addrRemote, m_addrLocal, m_atvInput))
 	{
 		return false;
 	}
@@ -276,15 +278,6 @@ bool CReactorUDPHander::CheckMessage(uint32 u4ConnectID, const char* pData, uint
 int CReactorUDPHander::Init_Open_Address(const ACE_INET_Addr& AddrRemote)
 {
     m_addrLocal = AddrRemote;
-
-    //按照线程初始化统计模块的名字
-    string strName = "发送线程";
-    m_CommandAccount.InitName(strName.c_str(), GetXmlConfigAttribute(xmlCommandAccount)->MaxCommandCount);
-
-    //初始化统计模块功能
-    m_CommandAccount.Init(GetXmlConfigAttribute(xmlCommandAccount)->Account,
-                          GetXmlConfigAttribute(xmlCommandAccount)->FlowAccount,
-                          GetXmlConfigAttribute(xmlThreadInfo)->DisposeTimeout);
 
 	m_pBlockMessage = App_MessageBlockManager::instance()->Create(GetXmlConfigAttribute(xmlSendInfo)->MaxBlockSize);
 	m_pBlockRecv    = App_MessageBlockManager::instance()->Create(GetXmlConfigAttribute(xmlRecvInfo)->RecvBuffSize);
@@ -326,6 +319,6 @@ void CReactorUDPHander::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, co
 
 void CReactorUDPHander::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)
 {
-    u4FlowIn  = m_CommandAccount.GetFlowIn();
-    u4FlowOut = m_CommandAccount.GetFlowOut();
+    u4FlowIn  = 0;
+    u4FlowOut = 0;
 }

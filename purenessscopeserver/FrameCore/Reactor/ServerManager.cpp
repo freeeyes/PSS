@@ -605,8 +605,6 @@ bool CServerManager::Close()
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_IPAccount OK.\n"));
     App_MessageBlockManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageBlockManager OK.\n"));
-    App_PacketParsePool::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_PacketParsePool OK.\n"));
     App_FileTestManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_FileTestManager OK.\n"));
     for (auto UdpServer : m_vecUDPList)

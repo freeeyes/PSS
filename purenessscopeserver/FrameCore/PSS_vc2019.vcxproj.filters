@@ -67,9 +67,6 @@
     <ClCompile Include="PacketParse\PacketParseBase.cpp">
       <Filter>PacketParse\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="PacketParse\PacketParsePool.cpp">
-      <Filter>PacketParse\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="UDP\ProactorUDPHandler.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
@@ -469,9 +466,6 @@
       <Filter>PacketParse\hfile</Filter>
     </ClInclude>
     <ClInclude Include="PacketParse\PacketParseBase.h">
-      <Filter>PacketParse\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketParse\PacketParsePool.h">
       <Filter>PacketParse\hfile</Filter>
     </ClInclude>
     <ClInclude Include="UDP\ProactorUDPClient.h">

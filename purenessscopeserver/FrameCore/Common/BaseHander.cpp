@@ -80,7 +80,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
     return true;
 }
 
-bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, uint32 u4Len)
+bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, shared_ptr<CPacketParse> pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, uint32 u4Len)
 {
     _Head_Info obj_Head_Info;
     bool blStateHead = pPacketParseInfo->Parse_Packet_Head_Info(u4ConnectID, pMBHead, App_MessageBlockManager::instance(), &obj_Head_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
@@ -106,7 +106,7 @@ bool Udp_Common_Recv_Head(uint32 u4ConnectID, ACE_Message_Block* pMBHead, CPacke
     return true;
 }
 
-bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo)
+bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, shared_ptr<CPacketParse> pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo)
 {
     _Body_Info obj_Body_Info;
     bool blStateBody = pPacketParseInfo->Parse_Packet_Body_Info(u4ConnectID, pMBBody, App_MessageBlockManager::instance(), &obj_Body_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
@@ -124,7 +124,7 @@ bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, CPacke
     return true;
 }
 
-bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo)
+bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shared_ptr<CPacketParse> pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo)
 {
     //以数据流处理
     _Packet_Info obj_Packet_Info;
@@ -142,14 +142,13 @@ bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPac
     else
     {
         OUR_DEBUG((LM_ERROR, "[Udp_Common_Recv_Stream]m_pPacketParse GetPacketStream is error.\n"));
-        App_PacketParsePool::instance()->Delete(pPacketParse);
         return false;
     }
 
     return true;
 }
 
-bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, CPacketParse* pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck)
+bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck)
 {
     //组织数据包
     _MakePacket objMakePacket;
@@ -164,7 +163,6 @@ bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, CPacketParse* pPacketParse, 
     if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, tvCheck))
     {
         OUR_DEBUG((LM_ERROR, "[Udp_Common_Send_WorkThread]PutMessageBlock is error.\n"));
-        App_PacketParsePool::instance()->Delete(pPacketParse);
         return false;
     }
 
@@ -200,7 +198,7 @@ void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool 
     Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 }
 
-uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPacketParse* pPacketParse, uint32 u4PacketParseInfoID)
+uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shared_ptr<CPacketParse> pPacketParse, uint32 u4PacketParseInfoID)
 {
     _Packet_Info obj_Packet_Info;
     uint8 n1Ret = App_PacketParseLoader::instance()->GetPacketParseInfo(u4PacketParseInfoID)->Parse_Packet_Stream(u4ConnectID, pMbData, dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()), &obj_Packet_Info, EM_CONNECT_IO_TYPE::CONNECT_IO_UDP);
@@ -218,7 +216,6 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, CPa
     else
     {
         OUR_DEBUG((LM_ERROR, "[Udp_Common_Recv_Stream]m_pPacketParse GetPacketStream is error.\n"));
-        App_PacketParsePool::instance()->Delete(pPacketParse);
     }
 
     return n1Ret;

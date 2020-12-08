@@ -40,9 +40,9 @@ private:
     void SaveSendInfo(uint32 u4Len);                                                                         //记录发送信息
     void Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, const ACE_INET_Addr& addrRemote);             //发送链接建立消息
 
-    ACE_SOCK_Dgram          m_skRemote;
-    ACE_INET_Addr           m_addrLocal;                            //监听方的IP信息
-    CPacketParse            m_objPacketParse;                       //数据包解析类
+    ACE_SOCK_Dgram           m_skRemote;
+    ACE_INET_Addr            m_addrLocal;                          //监听方的IP信息
+    shared_ptr<CPacketParse> m_pPacketParse;                       //数据包解析类
 
     ACE_Time_Value          m_atvInput;                             //接收包的时间
     ACE_Time_Value          m_atvOutput;                            //发送包的时间
@@ -51,7 +51,6 @@ private:
     uint32                  m_u4RecvSize          = 0;              //接收数据的总大小
     uint32                  m_u4SendSize          = 0;              //发送数据的总大小
     uint32                  m_u4PacketParseInfoID = 0;              //对应处理packetParse的模块ID
-    CCommandAccount         m_CommandAccount;                       //数据包统计
 	ACE_Message_Block*      m_pBlockMessage            = nullptr;   //当前发送缓冲等待数据块
 	ACE_Message_Block*      m_pBlockRecv               = nullptr;   //接收数据缓冲块
     shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo  = nullptr;   //PacketParse解析器

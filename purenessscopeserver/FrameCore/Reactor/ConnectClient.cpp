@@ -316,7 +316,7 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
             {
 
                 //发送消息给消息框架
-                CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+                auto pPacketParse = std::make_shared<CPacketParse>();
                 pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
                 pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
                 pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
@@ -336,9 +336,6 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 				objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
 
                 Send_MakePacket_Queue(objMakePacket);
-
-                //清理用完的m_pPacketParse
-                App_PacketParsePool::instance()->Delete(pPacketParse);
 
                 m_emRecvState = EM_Server_Recv_State::SERVER_RECV_END;
                 m_pCurrMessage->reset();
@@ -453,7 +450,7 @@ int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
                 return -1;
             }
 
-            auto nDataLen = (int)this->peer().send(pmbSendData->rd_ptr(), nSendLen - nIsSendSize, &nowait);
+            auto nDataLen = (int)this->peer().send(pmbSendData->rd_ptr(),(int)(nSendLen - nIsSendSize), &nowait);
 
             if (nDataLen <= 0)
             {

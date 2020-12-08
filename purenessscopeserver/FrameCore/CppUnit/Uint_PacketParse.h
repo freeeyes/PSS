@@ -4,7 +4,7 @@
 #ifdef _CPPUNIT_TEST
 
 #include "Unit_Common.h"
-#include "PacketParsePool.h"
+#include "PacketParse.h"
 
 class CUnit_PacketParse : public CppUnit::TestFixture
 {

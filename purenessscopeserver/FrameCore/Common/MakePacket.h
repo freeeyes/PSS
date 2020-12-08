@@ -15,7 +15,7 @@
 #include "ace/Thread_Mutex.h"
 #include "ace/Date_Time.h"
 
-#include "PacketParsePool.h"
+#include "PacketParse.h"
 #include "MessageService.h"
 #include "ProfileTime.h"
 #include "HashTable.h"

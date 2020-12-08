@@ -133,7 +133,7 @@ private:
     ACE_Time_Value             m_atvConnect;                                   //当前链接建立时间
     ACE_Time_Value             m_atvInput;                                     //最后一次接收数据时间
     ACE_Time_Value             m_atvOutput;                                    //最后一次发送数据时间
-    CPacketParse               m_objPacketParse;                               //数据包解析类
+    shared_ptr<CPacketParse>   m_pPacketParse;                               //数据包解析类
     ACE_Message_Block*         m_pBlockRecv           = nullptr;               //接收数据缓冲块
     ACE_Message_Block*         m_pBlockMessage        = nullptr;               //当前发送缓冲等待数据块
     EM_IO_TYPE                 m_emIOType             = EM_IO_TYPE::NET_INPUT; //当前IO入口类型

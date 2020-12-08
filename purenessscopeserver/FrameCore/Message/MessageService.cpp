@@ -902,12 +902,6 @@ int CMessageServiceGroup::timer_task(brynet::TimerMgr::Ptr timerMgr)
         OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckWorkThread is fail.\n"));
     }
 
-    //记录PacketParse的统计过程
-    if (false == CheckPacketParsePool())
-    {
-        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPacketParsePool is fail.\n"));
-    }
-
     //记录统计CPU和内存的使用
     if (false == CheckCPUAndMemory())
     {
@@ -1118,16 +1112,6 @@ bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow) const
         //目前在工作线程发生阻塞的时候不在杀死工程线程，杀了工作线程会导致一些内存问题。
     }
 
-    return true;
-}
-
-bool CMessageServiceGroup::CheckPacketParsePool() const
-{
-    string strLog = fmt::format("[CMessageService::handle_timeout] UsedCount = {0}, FreeCount= {1}.",
-        App_PacketParsePool::instance()->GetUsedCount(), 
-        App_PacketParsePool::instance()->GetFreeCount());
-
-    AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_PACKETTHREAD, strLog);
     return true;
 }
 

@@ -1865,8 +1865,6 @@ void Do_Message_PoolSet(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket>
         }
         else if (objPoolName.m_strPoolName == "PacketParse")
         {
-            App_PacketParsePool::instance()->SetCreateFlag(objPoolName.m_blState);
-
             if (CommandInfo.m_u1OutputType == 0)
             {
                 (*pBuffPacket) << (uint8)0;

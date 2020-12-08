@@ -153,16 +153,12 @@ void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
 
     auto pPacketParseInfo = App_PacketParseLoader::instance()->GetPacketParseInfo(1);
 
-    CPacketParse* pPacketParse = App_PacketParsePool::instance()->Create(__FILE__, __LINE__);
+    auto pPacketParse = std::make_shared<CPacketParse>();
 
     if (false == Udp_Common_Recv_Stream(1, pmb, pPacketParse, pPacketParseInfo))
     {
         OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.\n"));
         CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.", true == blRet);
-    }
-    else
-    {
-        App_PacketParsePool::instance()->Delete(pPacketParse);
     }
 
     App_MessageBlockManager::instance()->Close(pmb);

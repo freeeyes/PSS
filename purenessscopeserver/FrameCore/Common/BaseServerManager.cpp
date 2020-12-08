@@ -40,17 +40,6 @@ bool Server_Manager_Common_Pool()
     //初始化服务器间异步接收队列
     App_ServerMessageInfoPool::instance()->Init(GetXmlConfigAttribute(xmlConnectServer)->Count);
 
-    if (GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount <= 0)
-    {
-        //初始化PacketParse对象池
-        App_PacketParsePool::instance()->Init(MAX_HANDLE_POOL, CPacketParsePool::Init_Callback);
-    }
-    else
-    {
-        //初始化PacketParse对象池
-        App_PacketParsePool::instance()->Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount, CPacketParsePool::Init_Callback);
-    }
-
     //初始化消息处理线程
     App_MessageServiceGroup::instance()->Init(GetXmlConfigAttribute(xmlMessage)->Msg_Thread,
             GetXmlConfigAttribute(xmlMessage)->Msg_MaxQueue,
