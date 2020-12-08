@@ -4,12 +4,12 @@
 
 void CUnit_PacketParse::setUp(void)
 {
-    m_pPacketParsePool = std::make_shared<CPacketParsePool>();
-    m_pPacketParsePool->Init(1, CPacketParsePool::Init_Callback);
+    nCount = 1;
 }
 
 void CUnit_PacketParse::tearDown(void)
 {
+    nCount = 0;
     OUR_DEBUG((LM_INFO, "[CUnit_PacketParse::tearDown]Finish.\n"));
 }
 

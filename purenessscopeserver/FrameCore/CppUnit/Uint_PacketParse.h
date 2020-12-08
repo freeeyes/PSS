@@ -22,7 +22,7 @@ public:
     void Test_PacketParsePool(void);
 
 private:
-    shared_ptr<CPacketParsePool> m_pPacketParsePool = nullptr;
+    int nCount = 0;
 };
 
 #endif
