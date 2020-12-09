@@ -185,7 +185,7 @@ int CProTTyClientManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 
 void CProTTyClientManager::start_new_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::start_new_task]new timer is set(%d).\n", m_u2TimeCheck));
+    OUR_DEBUG((LM_ERROR, "[CProTTyClientManager::start_new_task]new timer is set(%d).\n", m_u2TimeCheck));
     auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2TimeCheck), [this, timerMgr]() {
         timer_task(timerMgr);
         });

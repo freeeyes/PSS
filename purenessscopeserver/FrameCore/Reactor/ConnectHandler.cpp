@@ -495,6 +495,77 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
     }
 }
 
+ENUM_WHILE_STATE CConnectHandler::Recv_Packet_Cut(bool& blRet)
+{
+    if (m_pPacketParseInfo->m_u1PacketParseType == PACKET_WITHHEAD)
+    {
+        //如果是包头模式
+        if (m_pBlockRecv->length() < m_pPacketParseInfo->m_u4OrgLength)
+        {
+            //没有收全包头，继续接收
+            Move_Recv_buffer();
+            blRet = true;
+            return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
+        }
+        else
+        {
+            //处理包头
+            ACE_Message_Block* pHead = App_MessageBlockManager::instance()->Create(m_pPacketParseInfo->m_u4OrgLength);
+            memcpy_safe(m_pBlockRecv->rd_ptr(),
+                m_pPacketParseInfo->m_u4OrgLength,
+                pHead->wr_ptr(),
+                m_pPacketParseInfo->m_u4OrgLength);
+            pHead->wr_ptr(m_pPacketParseInfo->m_u4OrgLength);
+
+            if (0 != Dispose_Paceket_Parse_Head(pHead))
+            {
+                blRet = false;
+                return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
+            }
+
+            //判断处理后的数据包体长度是否包含
+            uint32 u4BodyLength = m_pPacketParse->GetPacketBodySrcLen();
+            uint32 u4AllPacketLength = u4BodyLength + m_pPacketParseInfo->m_u4OrgLength;
+            if (u4AllPacketLength <= (uint32)m_pBlockRecv->length())
+            {
+                ACE_Message_Block* pBody = App_MessageBlockManager::instance()->Create(u4BodyLength);
+                memcpy_safe(m_pBlockRecv->rd_ptr() + m_pPacketParseInfo->m_u4OrgLength,
+                    u4BodyLength,
+                    pBody->wr_ptr(),
+                    u4BodyLength);
+                pBody->wr_ptr(u4BodyLength);
+
+                if (0 != Dispose_Paceket_Parse_Body(pBody, u4BodyLength))
+                {
+                    blRet = false;
+                    return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
+                }
+
+                //处理完成了一个完整的包，整体偏移一下
+                m_pBlockRecv->rd_ptr(u4AllPacketLength);
+            }
+            else
+            {
+                //没接收完全，继续接收
+                //处理接收的包头结构体的回收,下一次会重新组织包头
+                pHead->release();
+
+                Move_Recv_buffer();
+                blRet = true;
+                return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
+            }
+        }
+    }
+    else
+    {
+        //如果是流模式
+        Dispose_Paceket_Parse_Stream(m_pBlockRecv);
+        m_pBlockRecv->reset();
+    }
+
+    return ENUM_WHILE_STATE::WHILE_STATE_CONTINUE;
+}
+
 bool CConnectHandler::Dispose_Recv_buffer()
 {
 	bool blRet = true;
@@ -502,71 +573,15 @@ bool CConnectHandler::Dispose_Recv_buffer()
 	//处理数据切包
 	while (true)
 	{
-		if (m_pPacketParseInfo->m_u1PacketParseType == PACKET_WITHHEAD)
-		{
-			//如果是包头模式
-			if (m_pBlockRecv->length() < m_pPacketParseInfo->m_u4OrgLength)
-			{
-				//没有收全包头，继续接收
-				Move_Recv_buffer();
-				blRet = true;
-				break;
-			}
-			else
-			{
-				//处理包头
-				ACE_Message_Block* pHead = App_MessageBlockManager::instance()->Create(m_pPacketParseInfo->m_u4OrgLength);
-				memcpy_safe(m_pBlockRecv->rd_ptr(),
-					m_pPacketParseInfo->m_u4OrgLength,
-					pHead->wr_ptr(),
-					m_pPacketParseInfo->m_u4OrgLength);
-				pHead->wr_ptr(m_pPacketParseInfo->m_u4OrgLength);
-
-				if (0 != Dispose_Paceket_Parse_Head(pHead))
-				{
-					blRet = false;
-					break;
-				}
-
-				//判断处理后的数据包体长度是否包含
-				uint32 u4BodyLength = m_pPacketParse->GetPacketBodySrcLen();
-				uint32 u4AllPacketLength = u4BodyLength + m_pPacketParseInfo->m_u4OrgLength;
-				if (u4AllPacketLength <= (uint32)m_pBlockRecv->length())
-				{
-					ACE_Message_Block* pBody = App_MessageBlockManager::instance()->Create(u4BodyLength);
-					memcpy_safe(m_pBlockRecv->rd_ptr() + m_pPacketParseInfo->m_u4OrgLength,
-						u4BodyLength,
-						pBody->wr_ptr(),
-						u4BodyLength);
-					pBody->wr_ptr(u4BodyLength);
-
-					if (0 != Dispose_Paceket_Parse_Body(pBody, u4BodyLength))
-					{
-						blRet = false;
-						break;
-					}
-
-					//处理完成了一个完整的包，整体偏移一下
-					m_pBlockRecv->rd_ptr(u4AllPacketLength);
-				}
-				else
-				{
-					//没接收完全，继续接收
-                    //处理接收的包头结构体的回收,下一次会重新组织包头
-                    pHead->release();
-
-					Move_Recv_buffer();
-					blRet = true;
-					break;
-				}
-			}
-		}
-		else
-		{
-			//如果是流模式
-			Dispose_Paceket_Parse_Stream(m_pBlockRecv);
-			m_pBlockRecv->reset();
-		}
+        auto while_State = Recv_Packet_Cut(blRet);
+        if (while_State == ENUM_WHILE_STATE::WHILE_STATE_BREAK)
+        {
+            break;
+        }
+        else
+        {
+            continue;
+        }
 	}
 
 	return blRet;

@@ -1417,6 +1417,12 @@ enum class ENUM_CHAR_ORDER
     SYSTEM_BIG_ORDER,          //´ó¶Ë×ÖÐò
 };
 
+enum class ENUM_WHILE_STATE
+{
+    WHILE_STATE_CONTINUE = 0,
+    WHILE_STATE_BREAK,
+};
+
 const unsigned int O32_LITTLE_ENDIAN = 0x03020100ul;
 const unsigned int O32_BIG_ENDIAN    = 0x00010203ul;
 const unsigned int O32_PDP_ENDIAN    = 0x01000302ul;

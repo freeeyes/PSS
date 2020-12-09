@@ -135,50 +135,67 @@ namespace brynet {
             cv.notify_one();
         }
 
-        void schedule()
+        ENUM_WHILE_STATE timer_run()
         {
             std::unique_lock <std::mutex> lck(mtx);
+
+            if (mTimers.empty())
+            {
+                //当前没有定时器，等待唤醒
+                cv.wait_for(lck, std::chrono::microseconds(timer_default_wait));
+            }
+
+            if (!timer_run_)
+            {
+                return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
+            }
+
+            if (mTimers.empty())
+            {
+                return ENUM_WHILE_STATE::WHILE_STATE_CONTINUE;
+            }
+
+            auto tmp = mTimers.top();
+            auto timer_wait = tmp->getLeftTime();
+            if (timer_wait > std::chrono::nanoseconds::zero())
+            {
+                //还需要等待下一个到期时间
+                cv.wait_for(lck, timer_wait);
+
+                if (timer_wakeup_state == EM_TIMER_STATE::TIMER_STATE_ADD_TIMER)
+                {
+                    return ENUM_WHILE_STATE::WHILE_STATE_CONTINUE;
+                }
+            }
+
+            if (!timer_run_)
+            {
+                return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
+            }
+
+            mTimers.pop();
+            (*tmp)();
+            timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_EXECUTE_TIMER;
+
+            return ENUM_WHILE_STATE::WHILE_STATE_CONTINUE;
+        }
+
+        void schedule()
+        {
             timer_run_ = true;
 
             while (timer_run_)
             {
-                if (mTimers.empty())
-                {
-                    //当前没有定时器，等待唤醒
-                    cv.wait_for(lck, std::chrono::microseconds(timer_default_wait));
-                }
+                auto while_result = timer_run();
 
-                if (!timer_run_)
+                if (while_result == ENUM_WHILE_STATE::WHILE_STATE_BREAK)
                 {
                     break;
                 }
-
-                if (mTimers.empty())
+                else
                 {
                     continue;
                 }
-
-                auto tmp = mTimers.top();
-                auto timer_wait = tmp->getLeftTime();
-                if (timer_wait > std::chrono::nanoseconds::zero())
-                {
-                    //还需要等待下一个到期时间
-                    cv.wait_for(lck, timer_wait);
-
-                    if (timer_wakeup_state == EM_TIMER_STATE::TIMER_STATE_ADD_TIMER)
-                    {
-                        continue;
-                    }
-                }
-
-                if (!timer_run_)
-                {
-                    break;
-                }
-
-                mTimers.pop();
-                (*tmp)();
-                timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_EXECUTE_TIMER;
             }
 
             OUR_DEBUG((LM_INFO, "[TimerMgr::schedule]Time manager is end.\n"));

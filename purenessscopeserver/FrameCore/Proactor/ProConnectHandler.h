@@ -87,6 +87,7 @@ public:
     virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend);       //将发送数据发送出去
 
 private:
+    ENUM_WHILE_STATE Recv_Packet_Cut(bool& blRet);                           //数据切包
     bool Dispose_Recv_buffer();                                              //处理接收到数据，切包
     void Move_Recv_buffer();                                                 //整理接收内存缓冲区
     void Send_Hander_Event(uint8 u1Option);                                  //发送Handler的事件通知业务线程

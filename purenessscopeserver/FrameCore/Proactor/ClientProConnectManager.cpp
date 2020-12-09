@@ -811,7 +811,7 @@ int CClientProConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 
 void CClientProConnectManager::start_new_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::start_new_task]new timer is set.\n"));
+    OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::start_new_task]new timer is set(%d).\n", m_u2ThreadTimeCheck));
     auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2ThreadTimeCheck), [this, timerMgr]() {
         timer_task(timerMgr);
         });
