@@ -214,7 +214,6 @@
     <ClCompile Include="CppUnit\Uint_TcpRedirection.cpp" />
     <ClCompile Include="CppUnit\Uint_ThreadInfo.cpp" />
     <ClCompile Include="CppUnit\Unit_Aes.cpp" />
-    <ClCompile Include="CppUnit\Unit_AppConfig.cpp" />
     <ClCompile Include="CppUnit\Unit_BaseConnectClient.cpp" />
     <ClCompile Include="CppUnit\Unit_BaseHandler.cpp" />
     <ClCompile Include="CppUnit\Unit_BuffPacket.cpp" />
@@ -374,12 +373,6 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="UDP\ProactorUDPHandler.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Common\AppConfig.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -593,7 +586,6 @@
     <ClInclude Include="CppUnit\Uint_TcpRedirection.h" />
     <ClInclude Include="CppUnit\Uint_ThreadInfo.h" />
     <ClInclude Include="CppUnit\Unit_Aes.h" />
-    <ClInclude Include="CppUnit\Unit_AppConfig.h" />
     <ClInclude Include="CppUnit\Unit_BaseConnectClient.h" />
     <ClInclude Include="CppUnit\Unit_BaseHandler.h" />
     <ClInclude Include="CppUnit\Unit_BuffPacket.h" />
@@ -663,7 +655,6 @@
     <ClInclude Include="Reactor\WaitQuitSignal.h" />
     <ClInclude Include="UDP\ProactorUDPClient.h" />
     <ClInclude Include="UDP\ProactorUDPHandler.h" />
-    <ClInclude Include="Common\AppConfig.h" />
     <ClInclude Include="Common\BuffPacket.h" />
     <ClInclude Include="Common\BuffPacketManager.h" />
     <ClInclude Include="Common\CommandAccount.h" />
