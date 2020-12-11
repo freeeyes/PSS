@@ -47,42 +47,48 @@ using namespace std;
 
 BEGIN_NAMESPACE
 
+//基础类型定义
+using uint8   = uint8_t;
+using uint16  = uint16_t;
+using uint32  = uint32_t;
+using uint64  = uint64_t;
+using int8    = int8_t;
+using int16   = int16_t;
+using int32   = int32_t;
+using int64   = int64_t;
+using float32 = float;
+using float64 = double;
+
 //自动判定操作系统
-#define PLATFORM_WIN     0
-#define PLATFORM_UNIX    1
-#define PLATFORM_APPLE   2
+const uint8 PLATFORM_WIN   = 0;
+const uint8 PLATFORM_UNIX  = 1;
+const uint8 PLATFORM_APPLE = 2;
 
 #if defined(__WIN32__) || defined(WIN32) || defined(_WIN32) || defined(__WIN64__) || defined(WIN64) || defined(_WIN64)
-#  define PSS_PLATFORM PLATFORM_WIN
+const uint8 PSS_PLATFORM = PLATFORM_WIN;
 #elif defined(__APPLE_CC__)
-#  define PSS_PLATFORM PLATFORM_APPLE
+const uint8 PSS_PLATFORM = PLATFORM_APPLE;
 #else
-#  define PSS_PLATFORM PLATFORM_UNIX
+const uint8 PSS_PLATFORM = PLATFORM_UNIX;
 #endif
 
-#ifndef NULL
-#define NULL 0
-#endif
+#define SET_PROFILE_OUTPUT 1;   //是否打开性能监控选项
 
-#define SET_PROFILE_OUTPUT    1   //是否打开性能监控选项
+static const char MAINCONFIG[]       = "main.xml";
+static const char ALERTCONFIG[]      = "alert.xml";
+static const char FORBIDDENIP_FILE[] = "forbiddenIP.xml";
+static const char CONSOLECONFIG[]    = "ConsoleCommand.xml";
 
-#define MAINCONFIG            "main.xml"
-#define ALERTCONFIG           "alert.xml"
-#define FORBIDDENIP_FILE      "forbiddenIP.xml"
-#define CONSOLECONFIG         "ConsoleCommand.xml"
-
-#define MAX_BUFF_9    9
-#define MAX_BUFF_20   20
-#define MAX_BUFF_50   50
-#define MAX_BUFF_100  100
-#define MAX_BUFF_200  200
-#define MAX_BUFF_300  300
-#define MAX_BUFF_500  500
-#define MAX_BUFF_1000 1000
-#define MAX_BUFF_1024 1024
-#define MAX_BUFF_10240 10240
-
-#define INT32 int32_t
+const uint16 MAX_BUFF_9     = 9;
+const uint16 MAX_BUFF_20    = 20;
+const uint16 MAX_BUFF_50    = 50;
+const uint16 MAX_BUFF_100   = 100;
+const uint16 MAX_BUFF_200   = 200;
+const uint16 MAX_BUFF_300   = 300;
+const uint16 MAX_BUFF_500   = 500;
+const uint16 MAX_BUFF_1000  = 1000;
+const uint16 MAX_BUFF_1024  = 1024;
+const uint16 MAX_BUFF_10240 = 10240;
 
 #define THREAD_PARAM THR_NEW_LWP | THR_BOUND | THR_DETACHED
 
@@ -107,109 +113,109 @@ static bool Convert_Version(int nTagVserion)
 
 #define CONVERT_ACE_VERSION Convert_Version(6200)
 */
-#define CONSOLE_PACKET_MAX_SIZE  200 //声明console的数据包大小
+const uint16 CONSOLE_PACKET_MAX_SIZE = 200; //声明console的数据包大小
 
 //根据不同的操作系统，定义不同的recv接收参数类型
 #if PSS_PLATFORM == PLATFORM_WIN
-#define MSG_NOSIGNAL          0            //信号量参数（WINDOWS）
+const uint8 MSG_NOSIGNAL = 0;            //信号量参数（WINDOWS）
 #endif
 
-#define SERVER_ACTOR_REACTOR  0
-#define SERVER_ACTOR_PROACTOR 1
+const uint8 SERVER_ACTOR_REACTOR  = 0;
+const uint8 SERVER_ACTOR_PROACTOR = 1;
 
-#define SERVER_ACTOR_TYPE     SERVER_ACTOR_PROACTOR         //当前服务器所用的架构类型，可以是Proactor，也可以是Reactor
+const uint8 SERVER_ACTOR_TYPE = SERVER_ACTOR_PROACTOR;         //当前服务器所用的架构类型，可以是Proactor，也可以是Reactor
 
-#define MAX_DEV_POLL_COUNT    5000         //Devpoll处理链接的最大个数
+const uint16 MAX_DEV_POLL_COUNT = 5000;         //Devpoll处理链接的最大个数
 
-#define CONSOLE_ENABLE        1            //打开后台端口
-#define CONSOLE_DISABLE       0            //关闭后台端口
+const uint8 CONSOLE_ENABLE  = 1;            //打开后台端口
+const uint8 CONSOLE_DISABLE = 0;            //关闭后台端口
 
-#define CONNECT_CLOSE_TIME    2            //链接缓冲关闭时间延迟
+const uint8 CONNECT_CLOSE_TIME = 2;         //链接缓冲关闭时间延迟
 
-#define MAX_MSG_THREADCOUNT   1            //默认的逻辑线程处理数
-#define MAX_MSG_THREADQUEUE   60000        //处理线程的消息队列数
-#define MAX_MSG_TIMEDELAYTIME 60           //逻辑线程自检时间间隔
-#define MAX_MSG_STARTTIME     1            //逻辑线程处理开始时间
-#define MAX_MSG_MASK          64000        //逻辑Mark的线程数
-#define MAX_MSG_PUTTIMEOUT    100          //放入逻辑的延迟
-#define MAX_MSG_SENDPACKET    10           //最多缓冲发送包的个数,多于这个数字报警并丢弃下一个发送数据包
-#define MAX_MSG_SNEDTHRESHOLD 10           //发送阀值(消息包的个数)
-#define MAX_MSG_SENDCHECKTIME 100          //每隔多少毫秒进行一次发送的阀值
-#define MAX_MSG_THREADTIMEOUT 30           //线程判定超时
-#define MAX_MSG_PACKETTIMEOUT 5            //处理数据包超时时间
-#define MAX_MSG_SOCKETBUFF    50*1024      //接收数据缓存大小
-#define MAX_MSG_SENDTIMEOUT   5            //发送超时时间
-#define MAX_MSG_HANDLETIME    120          //统计当前连接数的间隔
-#define MAX_MSG_SENDALIVETIME 60           //发送存活包的时间间隔
-#define MAX_MSG_SENDALCOUNT   5            //判定链接是否存活的极限
-#define MAX_MSG_PACKETLENGTH  20*1024      //最大单一数据包长度限制 
-#define MAX_MP_POOL           5000         //_MakePacket交换池里面的大小
-#define MAX_HANDLE_POOL       1000         //默认Handler对象池的大小
-#define MAX_ASYNCH_BACKLOG    100          //默认设置的BACKLOG数量
-#define MAX_LOADMODEL_CLOSE   5            //默认等待模块关闭时间
-#define MAX_CONNECT_COUNT     10000        //默认单位时间最大链接重连次数
-#define MAX_BLOCK_SIZE        2048         //默认阻塞缓冲数据块的大小
-#define MAX_BLOCK_COUNT       3            //默认最大的Block次数
-#define MAX_BLOCK_TIME        1            //默认等待重发时间（单位是秒）
-#define MAX_QUEUE_TIMEOUT     20           //默认队列超时处理时间
-#define MAX_RECV_UDP_TIMEOUT  3            //最大接收超时时间(UDP) 
+const uint16 MAX_MSG_THREADCOUNT = 1;            //默认的逻辑线程处理数
+const uint32 MAX_MSG_THREADQUEUE = 60000;        //处理线程的消息队列数
+const uint16 MAX_MSG_TIMEDELAYTIME = 60;           //逻辑线程自检时间间隔
+const uint8  MAX_MSG_STARTTIME = 1;            //逻辑线程处理开始时间
+const uint32 MAX_MSG_MASK = 64000;        //逻辑Mark的线程数
+const uint16 MAX_MSG_PUTTIMEOUT = 100;          //放入逻辑的延迟
+const uint16 MAX_MSG_SENDPACKET = 10;           //最多缓冲发送包的个数,多于这个数字报警并丢弃下一个发送数据包
+const uint16 MAX_MSG_SNEDTHRESHOLD = 10;           //发送阀值(消息包的个数)
+const uint16 MAX_MSG_SENDCHECKTIME = 100;          //每隔多少毫秒进行一次发送的阀值
+const uint16 MAX_MSG_THREADTIMEOUT = 30;           //线程判定超时
+const uint16 MAX_MSG_PACKETTIMEOUT = 5;            //处理数据包超时时间
+const uint32 MAX_MSG_SOCKETBUFF = 50 * 1024;      //接收数据缓存大小
+const uint16 MAX_MSG_SENDTIMEOUT = 5;            //发送超时时间
+const uint16 MAX_MSG_HANDLETIME = 120;          //统计当前连接数的间隔
+const uint16 MAX_MSG_SENDALIVETIME = 60;           //发送存活包的时间间隔
+const uint16 MAX_MSG_SENDALCOUNT = 5;            //判定链接是否存活的极限
+const uint32 MAX_MSG_PACKETLENGTH = 20 * 1024;      //最大单一数据包长度限制 
+const uint16 MAX_MP_POOL = 5000;         //_MakePacket交换池里面的大小
+const uint16 MAX_HANDLE_POOL = 1000;         //默认Handler对象池的大小
+const uint16 MAX_ASYNCH_BACKLOG = 100;          //默认设置的BACKLOG数量
+const uint16 MAX_LOADMODEL_CLOSE = 5;            //默认等待模块关闭时间
+const uint16 MAX_CONNECT_COUNT = 10000;        //默认单位时间最大链接重连次数
+const uint16 MAX_BLOCK_SIZE = 2048;         //默认阻塞缓冲数据块的大小
+const uint16 MAX_BLOCK_COUNT = 3;            //默认最大的Block次数
+const uint16 MAX_BLOCK_TIME = 1;            //默认等待重发时间（单位是秒）
+const uint16 MAX_QUEUE_TIMEOUT = 20;           //默认队列超时处理时间
+const uint16 MAX_RECV_UDP_TIMEOUT = 3;            //最大接收超时时间(UDP) 
 
-#define PACKET_PARSE          1            //消息处理包标志
-#define PACKET_CONNECT        2            //链接建立事件消息标志
-#define PACKET_CDISCONNECT    3            //客户端断开事件消息标志
-#define PACKET_SDISCONNECT    4            //服务器断开事件消息标志
-#define PACKET_SEND_ERROR     5            //数据发送失败事件 
-#define PACKET_SEND_TIMEOUT   6            //服务器发送时间超过阀值的标志
-#define PACKET_CHEK_TIMEOUT   7            //服务器心跳检测超时事件
-#define PACKET_SEND_OK        8            //发送成功回执
-#define PACKET_TTY_CONNECT    9            //TTy设备连接
-#define PACKET_TTY_DISCONNECT 10           //TTy设备断开连接
-#define PACKET_SERVER_TCP_CONNECT 11       //服务器间通讯Tcp连接建立
-#define PACKET_SERVER_TCP_DISCONNECT 12    //服务器间通讯Tcp连接断开
-#define PACKET_SERVER_UDP_CONNECT 13       //服务器间通讯Tcp连接建立
-#define PACKET_SERVER_UDP_DISCONNECT 14    //服务器间通讯Tcp连接断开
+const uint8 PACKET_PARSE = 1;            //消息处理包标志
+const uint8 PACKET_CONNECT = 2;            //链接建立事件消息标志
+const uint8 PACKET_CDISCONNECT = 3;            //客户端断开事件消息标志
+const uint8 PACKET_SDISCONNECT = 4;            //服务器断开事件消息标志
+const uint8 PACKET_SEND_ERROR = 5;            //数据发送失败事件 
+const uint8 PACKET_SEND_TIMEOUT = 6;            //服务器发送时间超过阀值的标志
+const uint8 PACKET_CHEK_TIMEOUT = 7;            //服务器心跳检测超时事件
+const uint8 PACKET_SEND_OK = 8;            //发送成功回执
+const uint8 PACKET_TTY_CONNECT = 9;            //TTy设备连接
+const uint8 PACKET_TTY_DISCONNECT = 10;           //TTy设备断开连接
+const uint8 PACKET_SERVER_TCP_CONNECT = 11;       //服务器间通讯Tcp连接建立
+const uint8 PACKET_SERVER_TCP_DISCONNECT = 12;    //服务器间通讯Tcp连接断开
+const uint8 PACKET_SERVER_UDP_CONNECT = 13;       //服务器间通讯Tcp连接建立
+const uint8 PACKET_SERVER_UDP_DISCONNECT = 14;    //服务器间通讯Tcp连接断开
 
-#define MAX_PACKET_PARSE      5000         //PACKETPARSE对象池个数
-#define MAX_MESSAGE_POOL      5000         //Message对象池个数
+const uint16 MAX_PACKET_PARSE = 5000;         //PACKETPARSE对象池个数
+const uint16 MAX_MESSAGE_POOL = 5000;         //Message对象池个数
 
-#define BUFFPACKET_MAX_COUNT  5000         //初始化BuffPacket包缓冲池的个数
-#define SENDQUEUECOUNT        1            //默认发送线程队列的数量
+const uint16 BUFFPACKET_MAX_COUNT = 5000;         //初始化BuffPacket包缓冲池的个数
+const uint16 SENDQUEUECOUNT       = 1;            //默认发送线程队列的数量
 
-#define MAX_POSTMESSAGE_SIZE  65536        //最大的PostMessage循环
+const uint32 MAX_POSTMESSAGE_SIZE = 65536;        //最大的PostMessage循环
 
-#define MAX_TIMERMANAGER_THREADCOUNT      1   //Timer管理器的最大线程数
+const uint16 MAX_TIMERMANAGER_THREADCOUNT = 1;   //Timer管理器的最大线程数
 
-#define PARM_CONNECTHANDLE_CHECK          2   //定时器发送包检测
-#define PARM_HANDLE_CLOSE                 1   //定时器句柄关闭
+const uint16 PARM_CONNECTHANDLE_CHECK = 2;   //定时器发送包检测
+const uint16 PARM_HANDLE_CLOSE = 1;   //定时器句柄关闭
 
-#define HANDLE_ISCLOSE_NO                 0      //连接已经关闭
-#define HANDLE_ISCLOSE_YES                1      //连接目前正常
+const uint16 HANDLE_ISCLOSE_NO = 0;      //连接已经关闭
+const uint16 HANDLE_ISCLOSE_YES = 1;      //连接目前正常
 
-#define TYPE_IPV4                         1      //IPv4标准
-#define TYPE_IPV6                         2      //IPv6标准
+const uint8 TYPE_IPV4 = 1;      //IPv4标准
+const uint8 TYPE_IPV6 = 2;      //IPv6标准
 
-#define MAX_UDP_PACKET_LEN                1024   //UDP数据包的最大大小
-#define UDP_HANDER_ID                     0      //默认UDP的ConnectID
+const uint16 MAX_UDP_PACKET_LEN = 1024;   //UDP数据包的最大大小
+const uint16 UDP_HANDER_ID = 0;      //默认UDP的ConnectID
 
-#define COMMAND_TYPE_IN                   0      //进入服务器命令包状态（用于CommandData，统计命令信息类）
-#define COMMAND_TYPE_OUT                  1      //出服务器的命令包状态（用于CommandData，统计命令信息类）
+const uint16 COMMAND_TYPE_IN = 0;      //进入服务器命令包状态（用于CommandData，统计命令信息类）
+const uint16 COMMAND_TYPE_OUT = 1;      //出服务器的命令包状态（用于CommandData，统计命令信息类）
 
-#define PACKET_WITHSTREAM                 0      //不带包头的数据流模式
-#define PACKET_WITHHEAD                   1      //带包头的数据包模式
+const uint16 PACKET_WITHSTREAM = 0;      //不带包头的数据流模式
+const uint16 PACKET_WITHHEAD = 1;      //带包头的数据包模式
 
-#define PACKET_GET_ENOUGH                 0      //得到完整的数据包，需要继续接收
-#define PACKET_GET_NO_ENOUGH             1      //得到的数据包不完整
-#define PACKET_GET_ERROR                  2      //数据包格式错误
+const uint16 PACKET_GET_ENOUGH = 0;      //得到完整的数据包，需要继续接收
+const uint16 PACKET_GET_NO_ENOUGH = 1;      //得到的数据包不完整
+const uint16 PACKET_GET_ERROR = 2;      //数据包格式错误
 
-#define MAX_PACKET_SIZE     1024*1024            //最大允许的包尺寸
+const uint32 MAX_PACKET_SIZE = 1024 * 1024;            //最大允许的包尺寸
 
-#define PACKET_IS_FRAMEWORK_RECYC         true   //框架回收（数据包回收机制）
-#define PACKET_IS_SELF_RECYC              false  //由逻辑自己回收（数据包回收机制）
+const bool PACKET_IS_FRAMEWORK_RECYC = true;   //框架回收（数据包回收机制）
+const bool PACKET_IS_SELF_RECYC = false;  //由逻辑自己回收（数据包回收机制）
 
-#define CONNECT_LIMIT_RETRY 30                   //初始化中间服务器链接后定期检查，单位是秒
+const uint16 CONNECT_LIMIT_RETRY = 30;                   //初始化中间服务器链接后定期检查，单位是秒
 
-#define TCP_NODELAY_ON      0                    //TCP Nagle算法开关开关打开
-#define TCP_NODELAY_OFF     1                    //TCP Nagle算法开关开关关闭
+const uint8 TCP_NODELAY_ON = 0;                    //TCP Nagle算法开关开关打开
+const uint8 TCP_NODELAY_OFF = 1;                    //TCP Nagle算法开关开关关闭
 
 //输出json的内容
 #define OUTPUT_CHART_JSON_X "{\"type\": \"category\",\"data\": [%s]}\n"
@@ -312,7 +318,7 @@ enum class EM_Server_Connect_State
 };
 
 //服务器间通讯数据接收状态
-#define SERVER_RECV_TIMEOUT    20   //服务器间接收数据超时时间
+const uint16 SERVER_RECV_TIMEOUT = 20;   //服务器间接收数据超时时间
 enum class EM_Server_Recv_State
 {
     SERVER_RECV_INIT = 0,     //未接收数据
@@ -414,88 +420,31 @@ const int DEBUG_OFF = 0;
 #define OUR_DEBUG(X) { ACE_DEBUG((LM_INFO, "[%D %P|%t][%N,%l]")); ACE_DEBUG(X); }
 
 //*****************************************************************
-//增加两个特殊的命令头，一个是链接建立，一个是链接退出
-#define CLIENT_LINK_CONNECT        0x0001      //用户链接
-#define CLIENT_LINK_CDISCONNET     0x0002      //客户端退出
-#define CLIENT_LINK_SDISCONNET     0x0003      //服务器退出
-#define CLINET_LINK_SENDTIMEOUT    0x0004      //服务器发送客户端时间超过阀值
-#define CLINET_LINK_SENDERROR      0x0005      //客户端发送失败消息 
-#define CLINET_LINK_CHECKTIMEOUT   0x0006      //服务器心跳检测超时消息  
-#define CLIENT_LINK_SENDOK         0x0007      //服务器发送成功回执
-#define CLINET_LINK_TTY_CONNECT    0x0008      //tty建立连接
-#define CLINET_LINK_TTY_DISCONNECT 0x0009      //tty断开建立连接
-#define CLINET_LINK_ST_CONNECT     0x000a      //服务器间TCP连接
-#define CLINET_LINK_ST_DISCONNECT  0x000b      //服务器间TCP连接断开
-#define CLINET_LINK_SU_CONNECT     0x000c      //服务器间UDP连接
-#define CLINET_LINK_SU_DISCONNECT  0x000d      //服务器间UDP连接断开
-#define CLINET_LINK_HANDLER_CLOSE  0x000e      //发送服务器断开指令 
-#define CLINET_LINK_IS_LOG         0x000f      //发送日志开启和关闭指令 
-#define CLIENT_LINK_USER           0x0100      //用户信令开始序列头部
-//*****************************************************************
-
-//*****************************************************************
 //位操作运算符
 #define BIT_SET(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) |= ((long long)1<<(b))); }
 #define BIT_CLEAR(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) &= ~((long long)1<<(b))); }
 #define BIT_FLIP(a,b) if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) ^= ((long long)1<<(b))); }
 #define BIT_CHECK(a,b)  if((int)(sizeof(a)) * 8 > b && b >= 0) { ((a) & ((long long)1<<(b))); }
-//*****************************************************************
 
 //*****************************************************************
-
-//定义一个内存管理分配器
-typedef  ACE_Malloc<ACE_LOCAL_MEMORY_POOL, ACE_SYNCH_MUTEX> MUTEX_MALLOC;
-typedef ACE_Allocator_Adapter<MUTEX_MALLOC> Mutex_Allocator;
-
-#ifndef uint8
-typedef ACE_UINT8 uint8;
-#endif
-
-#ifndef uint16
-typedef ACE_UINT16 uint16;
-#endif
-
-#ifndef uint32
-typedef ACE_UINT32 uint32;
-#endif
-
-#ifndef uint64
-typedef ACE_UINT64 uint64;
-#endif
-
-#ifndef int8
-typedef char int8;
-#endif
-
-#ifndef int16
-typedef short int16;
-#endif
-
-#ifndef int32
-typedef INT32 int32;
-#endif
-
-#ifndef int64
-typedef ACE_INT64 int64;
-#endif
-
-#ifndef float32
-typedef float float32;
-#endif
-
-#ifndef float64
-typedef double float64;
-#endif
-
-#ifdef UNICODE
-typedef wofstream _tofstream;
-typedef wifstream _tifstream;
-typedef std::wstring _tstring;
-#else
-typedef ofstream _tofstream;
-typedef ifstream _tifstream;
-typedef std::string _tstring;
-#endif // UNICODE
+//增加两个特殊的命令头，一个是链接建立，一个是链接退出
+const uint16 CLIENT_LINK_CONNECT        = 0x0001;      //用户链接
+const uint16 CLIENT_LINK_CDISCONNET     = 0x0002;      //客户端退出
+const uint16 CLIENT_LINK_SDISCONNET     = 0x0003;      //服务器退出
+const uint16 CLINET_LINK_SENDTIMEOUT    = 0x0004;      //服务器发送客户端时间超过阀值
+const uint16 CLINET_LINK_SENDERROR      = 0x0005;      //客户端发送失败消息 
+const uint16 CLINET_LINK_CHECKTIMEOUT   = 0x0006;      //服务器心跳检测超时消息  
+const uint16 CLIENT_LINK_SENDOK         = 0x0007;      //服务器发送成功回执
+const uint16 CLINET_LINK_TTY_CONNECT    = 0x0008;      //tty建立连接
+const uint16 CLINET_LINK_TTY_DISCONNECT = 0x0009;      //tty断开建立连接
+const uint16 CLINET_LINK_ST_CONNECT     = 0x000a;      //服务器间TCP连接
+const uint16 CLINET_LINK_ST_DISCONNECT  = 0x000b;      //服务器间TCP连接断开
+const uint16 CLINET_LINK_SU_CONNECT     = 0x000c;      //服务器间UDP连接
+const uint16 CLINET_LINK_SU_DISCONNECT  = 0x000d;      //服务器间UDP连接断开
+const uint16 CLINET_LINK_HANDLER_CLOSE  = 0x000e;      //发送服务器断开指令 
+const uint16 CLINET_LINK_IS_LOG         = 0x000f;      //发送日志开启和关闭指令 
+const uint16 CLIENT_LINK_USER           = 0x0100;      //用户信令开始序列头部
+//*****************************************************************
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(x) if( (x) != NULL ) {delete (x); (x) = NULL; }
@@ -506,18 +455,6 @@ typedef std::string _tstring;
 #endif
 
 const uint32 PSS_INADDR_ANY = (uint32)INADDR_ANY;
-
-template<typename T>
-struct item_return
-{
-    using type = T && ;
-};
-
-template<typename T>
-inline typename item_return<T>::type convert(T&& arg)
-{
-    return static_cast<T&&>(arg);
-}
 
 //定义一个函数，可以支持内存越界检查
 inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
@@ -530,7 +467,7 @@ inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)
     va_list ap;
     va_start(ap, fmt);
 
-    ACE_OS::vsnprintf(szText, nLen, fmt, ap);
+    vsnprintf(szText, nLen, fmt, ap);
     szText[nLen - 1] = '\0';
 
     va_end(ap);
@@ -545,7 +482,7 @@ inline bool memcpy_safe(const char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4
     }
     else
     {
-        ACE_OS::memcpy((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
+        memcpy((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
 
         if (u4DesLen > u4SrcLen && true == blIsString)
         {
@@ -560,7 +497,11 @@ inline bool memcpy_safe(const char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4
 //支持strcpy边界检查
 inline bool strcpy_safe(const char* pSrc, char* pDes, int nDesLen)
 {
-    int nSrcLen = (int)ACE_OS::strlen(pSrc);
+#if PSS_PLATFORM == PLATFORM_WIN
+    strcpy_s(pDes, nDesLen, pSrc);
+    return true;
+#else
+    auto nSrcLen = (int)strlen(pSrc);
 
     if(nSrcLen <= 0 || nDesLen <= 0 || nSrcLen > nDesLen)
     {
@@ -568,16 +509,21 @@ inline bool strcpy_safe(const char* pSrc, char* pDes, int nDesLen)
     }
     else
     {
-        ACE_OS::strcpy(pDes, (const char* )pSrc);
+        strcpy(pDes, pSrc);
         return true;
     }
+#endif
 }
 
 //支持strcat边界检查
 inline bool strcat_safe(const char* pSrc, char* pDes, int nDesLen)
 {
-    int nCurrSrcLen = (int)ACE_OS::strlen(pSrc);
-    int nCurrDesLen = (int)ACE_OS::strlen(pDes);
+#if PSS_PLATFORM == PLATFORM_WIN
+    strcat_s(pDes, nDesLen, pSrc);
+    return true;
+#else
+    auto nCurrSrcLen = (int)strlen(pSrc);
+    auto nCurrDesLen = (int)strlen(pDes);
 
     if(nDesLen <= 0 || nDesLen <= nCurrSrcLen + nCurrDesLen)
     {
@@ -585,45 +531,29 @@ inline bool strcat_safe(const char* pSrc, char* pDes, int nDesLen)
     }
     else
     {
-        ACE_OS::strcat(pDes, (const char* )pSrc);
+        strcat(pDes, (const char* )pSrc);
         return true;
     }
+#endif
 }
 
 //支持memmove边界检查
 inline bool memmove_safe(char* pSrc, uint32 u4SrcLen, char* pDes, uint32 u4DesLen)
 {
+#if PSS_PLATFORM == PLATFORM_WIN
+    memmove_s(pDes, u4DesLen, pSrc, u4SrcLen);
+    return true;
+#else
     if(u4SrcLen > u4DesLen)
     {
         return false;
     }
     else
     {
-        ACE_OS::memmove((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
+        memmove((void* )pDes, (void* )pSrc, (size_t)u4SrcLen);
         return true;
     }
-}
-
-//打印指定的Messahe_Block中的信息到屏幕
-inline void Print_Binary(ACE_Message_Block* pMessageBlock)
-{
-    if(NULL != pMessageBlock)
-    {
-        char* pData = pMessageBlock->rd_ptr();
-        int32 nLen = (int32)pMessageBlock->length();
-        OUR_DEBUG((LM_INFO, "[Print_Binary]"));
-
-        for(int32 i = 0; i < nLen; i++)
-        {
-            OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
-        }
-
-        OUR_DEBUG((LM_INFO, "\n"));
-    }
-    else
-    {
-        OUR_DEBUG((LM_INFO, "[Print_Binary]pMessageBlock is NULL.\n"));
-    }
+#endif
 }
 
 //打印指定的Messahe_Block中的信息到屏幕
@@ -755,7 +685,7 @@ typedef struct FILETESTDATAINFO
 
     FILETESTDATAINFO(const FILETESTDATAINFO& ar)
     {
-        ACE_OS::memset(m_szData, 0, MAX_BUFF_10240);
+        memset(m_szData, 0, MAX_BUFF_10240);
 
         if (false == memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240))
         {
@@ -767,7 +697,7 @@ typedef struct FILETESTDATAINFO
 
     void Close()
     {
-        ACE_OS::memset(m_szData, 0, MAX_BUFF_10240);
+        memset(m_szData, 0, MAX_BUFF_10240);
         m_u4DataLength     = 0;
     }
 
@@ -1039,9 +969,7 @@ struct _Head_Info
     uint16             m_u2PacketCommandID = 0;       //CommandID
     ACE_Message_Block* m_pmbHead           = NULL;    //包头消息体
 
-    _Head_Info()
-    {
-    }
+    _Head_Info() = default;
 };
 
 //数据包体结构
@@ -1052,9 +980,7 @@ struct _Body_Info
     uint16             m_u2PacketCommandID = 0;       //CommandID(如果有，则直接赋值，如果没有，则保持初始值不变)
     ACE_Message_Block* m_pmbBody           = NULL;    //包头消息体
 
-    _Body_Info()
-    {
-    }
+    _Body_Info() = default;
 };
 
 //数据包完整结构
@@ -1068,9 +994,7 @@ struct _Packet_Info
     ACE_Message_Block* m_pmbHead           = NULL;    //包头消息体
     ACE_Message_Block* m_pmbBody           = NULL;    //包头消息体
 
-    _Packet_Info()
-    {
-    }
+    _Packet_Info() = default;
 };
 
 //定时监控数据包和流量的数据信息，用于链接有效性的逻辑判定
@@ -1086,9 +1010,7 @@ struct _TimeConnectInfo
     uint32 m_u4ValidSendSize        = 0;         //单位时间可允许的数据发送量
     uint8  m_u1Minutes              = 0;         //当前的分钟数
 
-    _TimeConnectInfo()
-    {
-    }
+    _TimeConnectInfo() = default;
 
     void Init(uint32 u4RecvPacketCount, uint32 u4RecvSize, uint32 u4SendPacketCount, uint32 u4ValidSendSize)
     {
@@ -1176,29 +1098,28 @@ struct _TimeConnectInfo
 };
 
 //定时器参数的设置结构
-struct _TimerCheckID
+class _TimerCheckID
 {
+public:
     uint16 m_u2TimerCheckID = 0;
 
-    _TimerCheckID()
-    {
-    }
+    _TimerCheckID() = default;
 };
 
 //Message里面数据块结构体
-struct _PacketInfo
+class _PacketInfo
 {
+public:
     char*   m_pData    = NULL;       //解析后的数据头指针
     int32   m_nDataLen = 0;          //解析后的数据长度
 
-    _PacketInfo()
-    {
-    }
+    _PacketInfo() = default;
 };
 
 //客户端链接信息数据结构
-struct _ClientConnectInfo
+class _ClientConnectInfo
 {
+public:
     uint64        m_u8RecvQueueTimeCost = 0;     //接受逻辑处理包总时间消耗
     uint64        m_u8SendQueueTimeCost = 0;     //发送数据总时间消耗
     uint32        m_u4ConnectID         = 0;     //链接ID
@@ -1212,49 +1133,14 @@ struct _ClientConnectInfo
     bool          m_blValid             = false; //当前链接是否有效
     ACE_INET_Addr m_addrRemote;                  //远程链接地址
 
-    _ClientConnectInfo()
-    {
-    }
-
-    //拷贝构造函数
-    _ClientConnectInfo(const _ClientConnectInfo& ar)
-    {
-        this->m_blValid = ar.m_blValid;
-        this->m_u4ConnectID = ar.m_u4ConnectID;
-        this->m_addrRemote = ar.m_addrRemote;
-        this->m_u4RecvCount = ar.m_u4RecvCount;
-        this->m_u4SendCount = ar.m_u4SendCount;
-        this->m_u4AllRecvSize = ar.m_u4AllRecvSize;
-        this->m_u4AllSendSize = ar.m_u4AllSendSize;
-        this->m_u4BeginTime = ar.m_u4BeginTime;
-        this->m_u4AliveTime = ar.m_u4AliveTime;
-        this->m_u4RecvQueueCount = ar.m_u4RecvQueueCount;
-        this->m_u8RecvQueueTimeCost = ar.m_u8RecvQueueTimeCost;
-        this->m_u8SendQueueTimeCost = ar.m_u8SendQueueTimeCost;
-    }
-
-    _ClientConnectInfo& operator = (const _ClientConnectInfo& ar)
-    {
-        this->m_blValid             = ar.m_blValid;
-        this->m_u4ConnectID         = ar.m_u4ConnectID;
-        this->m_addrRemote          = ar.m_addrRemote;
-        this->m_u4RecvCount         = ar.m_u4RecvCount;
-        this->m_u4SendCount         = ar.m_u4SendCount;
-        this->m_u4AllRecvSize       = ar.m_u4AllRecvSize;
-        this->m_u4AllSendSize       = ar.m_u4AllSendSize;
-        this->m_u4BeginTime         = ar.m_u4BeginTime;
-        this->m_u4AliveTime         = ar.m_u4AliveTime;
-        this->m_u4RecvQueueCount    = ar.m_u4RecvQueueCount;
-        this->m_u8RecvQueueTimeCost = ar.m_u8RecvQueueTimeCost;
-        this->m_u8SendQueueTimeCost = ar.m_u8SendQueueTimeCost;
-        return *this;
-    }
+    _ClientConnectInfo() = default;
 };
 typedef vector<_ClientConnectInfo> vecClientConnectInfo;
 
 //要连接的服务器信息
-struct _ServerConnectInfo
+class _ServerConnectInfo
 {
+public:
     uint32      m_u4ServerID   = 0;     //服务器的ID
     uint32      m_u4ServerPort = 0;     //服务器的端口
     uint32      m_u4MaxConn    = 0;     //服务器的最大线程连接数
@@ -1262,28 +1148,30 @@ struct _ServerConnectInfo
     ACE_TString m_strServerName;        //服务器的名称
     ACE_TString m_strServerIP;          //服务器的IP
 
-    _ServerConnectInfo()
-    {
-    }
+    _ServerConnectInfo() = default;
 };
 
 //为逻辑块提供一个Try catch的保护宏，用于调试，具体使用方法请参看TestTcp用例
 //目前最多支持一条2K的日志
 //************************************************************************
-#define ASSERT_LOG_PATH  "./Log/assert.log"   //如果路径想自己要，请修改这里。
+const char ASSERT_LOG_PATH[] = "./Log/assert.log";   //如果路径想自己要，请修改这里。
 
 inline void __show__( const char* szTemp)
 {
 #if PSS_PLATFORM == PLATFORM_WIN
     printf_s("[__show__]%s.\n", szTemp);
+    FILE* f = nullptr;
+    fopen_s(&f, ASSERT_LOG_PATH, "a");
 #else
     printf("[__show__]%s.\n", szTemp);
+    FILE* f = fopen(ASSERT_LOG_PATH, "a");
 #endif
-
-    FILE* f = ACE_OS::fopen(ASSERT_LOG_PATH, "a") ;
-    ACE_OS::fwrite( szTemp, strlen(szTemp), sizeof(char), f) ;
-    ACE_OS::fwrite( "\r\n", 1, 2*sizeof(char), f);
-    fclose(f);
+    if (nullptr != f)
+    {
+        fwrite(szTemp, strlen(szTemp), sizeof(char), f);
+        fwrite("\r\n", 1, 2 * sizeof(char), f);
+        fclose(f);
+    }
 };
 
 inline void __assertspecial__(const char* file, int32 line, const char* func, const char* expr, const char* msg)
@@ -1294,13 +1182,13 @@ inline void __assertspecial__(const char* file, int32 line, const char* func, co
     __show__(szTemp) ;
 };
 
-#if defined(WIN32)
+#if PSS_PLATFORM == PLATFORM_WIN
 #define AssertSpecial(expr,msg) ((void)((expr)?0:(__assertspecial__(__FILE__, __LINE__, __FUNCTION__, #expr, msg),0)))
 #else
 #define AssertSpecial(expr,msg) {if(!(expr)){__assertspecial__(__FILE__, __LINE__, __PRETTY_FUNCTION__, #expr, msg);}}
 #endif
 
-#if defined(WIN32)
+#if PSS_PLATFORM == PLATFORM_WIN
 #define __ENTER_FUNCTION() {try{
 #define __THROW_FUNCTION(msg) throw(msg)
 #define __LEAVE_FUNCTION() }catch(char* msg){AssertSpecial(false,msg); }}
@@ -1317,7 +1205,7 @@ inline void __assertspecial__(const char* file, int32 line, const char* func, co
 //增加一个统计函数处理时间的宏，这个宏可以直接统计当前函数执行时间
 //使用例子 __TIMECOST(100); 100为毫秒，超过100毫秒就会计入日志
 //************************************************************************
-#define ASSERT_TIME_PATH  "./Log/FuncTimeout.log"   //如果路径想自己要，请修改这里。
+const char ASSERT_TIME_PATH[] = "./Log/FuncTimeout.log";   //如果路径想自己要，请修改这里。
 class CTimeCost
 {
 public:
@@ -1348,19 +1236,30 @@ public:
         if(lTimeInterval >= (long)m_nMillionSecond)
         {
             //记录日志
-            FILE* pFile = ACE_OS::fopen(ASSERT_TIME_PATH, "a+");
+#if PSS_PLATFORM == PLATFORM_WIN
+            FILE* pFile = nullptr;
+            fopen_s(&pFile, ASSERT_TIME_PATH, "a");
+#else
+            FILE* pFile = fopen(ASSERT_TIME_PATH, "a+");
+#endif
 
-            if(pFile != NULL)
+            if(pFile != nullptr)
             {
                 char szLog[MAX_BUFF_1024] = { '\0' };
 
                 char szTimeNow[MAX_BUFF_50];
                 time_t tNow = time(NULL);
-                struct tm* tmNow = ACE_OS::localtime(&tNow);
+#if PSS_PLATFORM == PLATFORM_WIN
+                struct tm tmNow_s;
+                localtime_s(&tmNow_s, &tNow);
+                struct tm* tmNow = &tmNow_s;
+#else
+                struct tm* tmNow = localtime(&tNow);
+#endif
                 sprintf_safe(szTimeNow, MAX_BUFF_50, "%04d-%02d-%02d %02d:%02d:%02d", tmNow->tm_year + 1900, tmNow->tm_mon + 1, tmNow->tm_mday, tmNow->tm_hour, tmNow->tm_min, tmNow->tm_sec);
                 sprintf_safe(szLog, MAX_BUFF_1024, "[%s]dbTimeInterval more than (%d) < (%d), File(%s):FunName(%s):Line(%d).\n", szTimeNow, m_nMillionSecond, lTimeInterval, m_szFileName, m_szFunctionName, m_nFileLine);
-                ACE_OS::fwrite(szLog, strlen(szLog), sizeof(char), pFile);
-                ACE_OS::fclose(pFile);
+                fwrite(szLog, strlen(szLog), sizeof(char), pFile);
+                fclose(pFile);
             }
         }
     }
@@ -1490,9 +1389,9 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 
     pTempSrc[u4Len - 1] = '\0';
 
-    uint16 u2NewLen = (uint16)ACE_OS::strlen(pNew);
+    auto u2NewLen = (uint16)strlen(pNew);
 
-    char* pPos = ACE_OS::strstr(pTempSrc, pOld);
+    char* pPos = strstr(pTempSrc, pOld);
 
     while(pPos)
     {
@@ -1527,7 +1426,7 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
             pTempSrc =  pTempSrc + u4PosLen;
 
             //寻找下一个相同的字符串
-            pPos = ACE_OS::strstr(pTempSrc, pOld);
+            pPos = strstr(pTempSrc, pOld);
         }
 
     }
@@ -1540,7 +1439,7 @@ inline bool Replace_String(char* pText, uint32 u4Len, const char* pOld, const ch
 //写独占文件锁
 inline int32 AcquireWriteLock(int32 fd, int32 start, int32 len)
 {
-#ifndef WIN32
+#if PSS_PLATFORM != PLATFORM_WIN
     struct flock arg;
     arg.l_type = F_WRLCK; // 加写锁
     arg.l_whence = SEEK_SET;
@@ -1557,7 +1456,7 @@ inline int32 AcquireWriteLock(int32 fd, int32 start, int32 len)
 //释放独占文件锁
 inline int32 ReleaseLock(int32 fd, int32 start, int32 len)
 {
-#ifndef WIN32
+#if PSS_PLATFORM != PLATFORM_WIN
     struct flock arg;
     arg.l_type = F_UNLCK; //  解锁
     arg.l_whence = SEEK_SET;
@@ -1574,7 +1473,7 @@ inline int32 ReleaseLock(int32 fd, int32 start, int32 len)
 //查看写锁
 inline int32 SeeLock(int32 fd, int32 start, int32 len)
 {
-#ifndef WIN32
+#if PSS_PLATFORM != PLATFORM_WIN
     struct flock arg;
     arg.l_type = F_WRLCK;
     arg.l_whence = SEEK_SET;
@@ -1607,15 +1506,17 @@ inline int32 SeeLock(int32 fd, int32 start, int32 len)
 }
 
 //客户端IP信息
-struct _ClientIPInfo
+class _ClientIPInfo
 {
+public:
     string  m_strClientIP;      //客户端的IP地址
     uint16 m_u2Port  = 0;        //客户端的端口
 };
 
 //链接别名映射信息(用于PSS_ClientManager管理)
-struct _ClientNameInfo
+class _ClientNameInfo
 {
+public:
     int16  m_u2Port                  = 0;           //客户端的端口
     int32  m_nConnectID              = 0;           //连接ID
     int32  m_nLog                    = 0;           //是否记录日志
@@ -1624,27 +1525,8 @@ struct _ClientNameInfo
 
     _ClientNameInfo() = default;
 
-    //拷贝构造函数
-    _ClientNameInfo(const _ClientNameInfo& ar)
-    {
-        this->m_strName = ar.m_strName;
-        this->m_strClientIP = ar.m_strClientIP;
-        this->m_u2Port = ar.m_u2Port;
-        this->m_nConnectID = ar.m_nConnectID;
-        this->m_nLog = ar.m_nLog;
-    }
-
-    _ClientNameInfo& operator = (const _ClientNameInfo& ar)
-    {
-        this->m_strName = ar.m_strName;
-        this->m_strClientIP = ar.m_strClientIP;
-        this->m_u2Port      = ar.m_u2Port;
-        this->m_nConnectID = ar.m_nConnectID;
-        this->m_nLog       = ar.m_nLog;
-        return *this;
-    }
 };
-typedef vector<_ClientNameInfo> vecClientNameInfo;
+using vecClientNameInfo = vector<_ClientNameInfo>;
 
 //格式化一个ACE Hash类
 template<class EXT_ID, class INT_ID>
@@ -1686,11 +1568,14 @@ inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* 
 				char szHistoryLogFile[MAX_BUFF_200] = { '\0' };
 				sprintf_safe(szHistoryLogFile, MAX_BUFF_200, "%s/%s_%04d%02d%02d_%02d%02d%02d.log", pLogPath, pLogName,
 					dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second());
-				ACE_OS::rename(szDebugFileName, szHistoryLogFile);
+				rename(szDebugFileName, szHistoryLogFile);
 
 				pOldLogoStream->close();
-
-				ACE_OS::unlink(szDebugFileName);
+#if PSS_PLATFORM == PLATFORM_WIN
+                _unlink(szDebugFileName);
+#else
+				unlink(szDebugFileName);
+#endif
 
 				pOldLogoStream->open(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
             }
@@ -1731,7 +1616,7 @@ inline vector<string> split_string(const string& s, const char& c)
     return v;
 }
 
-#ifndef WIN32
+#if PSS_PLATFORM != PLATFORM_WIN
 
 //获得当前文件打开数
 inline int Checkfilelimit(int nMaxOpenFile)
