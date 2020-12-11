@@ -112,13 +112,10 @@ int CMessageService::svc(void)
     {
         shared_ptr<CWorkThreadMessageList> msgList;
         m_objThreadQueue.Pop(msgList);
-        
-        for(auto msg : msgList->m_vecList)
+
+        if (false == Dispose_Queue(msgList))
         {
-            if (false == Dispose_Queue(msg))
-            {
-                break;
-            }
+            break;
         }
         msgList->m_vecList.clear();
     }
@@ -171,7 +168,7 @@ bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
     return true;
 }
 
-bool CMessageService::ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID)
+shared_ptr<CWorkThread_Handler_info> CMessageService::ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID)
 {
     //将数据转换成Message对象
     CMessage objRecvMessage;
@@ -225,7 +222,7 @@ bool CMessageService::ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage
             u4ThreadID,
             pMessage->m_u4ConnectID));
 		DeleteMessage(pMessage);
-		return false;
+		return nullptr;
 	}
 
     //更新接收包的时间
@@ -289,12 +286,6 @@ bool CMessageService::ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage
 
     DoMessage(&objRecvMessage, u2CommandID, u2CommandCount, blDeleteFlag);
 
-    if(objRecvMessage.GetMessageBase()->m_u2Cmd >= CLIENT_LINK_USER)
-    {
-        //同步发送数据逻辑
-        Synchronize_SendPostMessage(pWorkThread_Handler_info, pMessage->m_tvMessage);
-    }
-
     //如果是断开消息，在这里发还给逻辑线程去处理
     if (CLIENT_LINK_CDISCONNET == pMessage->m_u2Cmd ||
         CLIENT_LINK_SDISCONNET == pMessage->m_u2Cmd ||
@@ -319,7 +310,7 @@ bool CMessageService::ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage
 
     m_ThreadInfo.m_u4State = THREADSTATE::THREAD_RUNEND;
 
-    return true;
+    return pWorkThread_Handler_info;
 }
 
 bool CMessageService::ProcessSendMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID)
@@ -676,38 +667,32 @@ bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler
 {
 	//同步发送数据
     uint32 u4SendLength = m_objBuffSendPacket.GetPacketLen();
-    if (u4SendLength > 0)
+
+    auto pBlockSend = App_MessageBlockManager::instance()->Create(u4SendLength);
+
+    memcpy_safe(m_objBuffSendPacket.GetData(),
+        u4SendLength,
+        pBlockSend->rd_ptr(),
+        u4SendLength);
+
+    pBlockSend->wr_ptr(u4SendLength);
+
+    pHandlerInfo->m_pHandler->PutSendPacket(pHandlerInfo->m_u4ConnectID, pBlockSend, u4SendLength, tvMessage);
+    pBlockSend->release();
+    m_objBuffSendPacket.Clear();
+
+    //添加Handler统计信息
+    pHandlerInfo->m_OutPacketCount++;
+    pHandlerInfo->m_SendSize += u4SendLength;
+    pHandlerInfo->m_tvOutput = tvMessage;
+
+    if (m_u1PacketCounter != 0)
     {
-        auto pBlockSend = App_MessageBlockManager::instance()->Create(u4SendLength);
-
-        memcpy_safe(m_objBuffSendPacket.GetData(),
-            u4SendLength,
-            pBlockSend->rd_ptr(),
-            u4SendLength);
-
-        pBlockSend->wr_ptr(u4SendLength);
-
-        pHandlerInfo->m_pHandler->PutSendPacket(pHandlerInfo->m_u4ConnectID, pBlockSend, u4SendLength, tvMessage);
-        pBlockSend->release();
-        m_objBuffSendPacket.Clear();
-
-        //添加Handler统计信息
-        pHandlerInfo->m_OutPacketCount++;
-        pHandlerInfo->m_SendSize += u4SendLength;
-        pHandlerInfo->m_tvOutput = tvMessage;
-
-        if (m_u1PacketCounter != 0)
-        {
-            m_objWorkThreadProcess.AddPacketOut(u4SendLength,
-                tvMessage);
-        }
-
-        return true;
+        m_objWorkThreadProcess.AddPacketOut(u4SendLength,
+            tvMessage);
     }
-    else
-    {
-        return false;
-    }
+
+    return true;
 }
 
 bool CMessageService::SendPostMessage(const CSendMessageInfo& objSendMessageInfo)
@@ -844,47 +829,55 @@ void CMessageService::UpdateCommandList(uint32 u4UpdateIndex)
     }
 }
 
-bool CMessageService::Dispose_Queue(shared_ptr<CWorkThreadMessage> msg)
+bool CMessageService::Dispose_Queue(shared_ptr<CWorkThreadMessageList> msgList)
 {
-    if (EM_CONNECT_IO_TYPE::COMMAND_UPDATE == msg->m_emPacketType)
+    if (EM_CONNECT_IO_TYPE::COMMAND_UPDATE == msgList->m_vecList[0]->m_emPacketType)
     {
         //如果是当前命令刷新
-        UpdateCommandList(msg->m_u4ConnectID);
+        UpdateCommandList(msgList->m_vecList[0]->m_u4ConnectID);
 
         return true;
     }
 
-    if (EM_CONNECT_IO_TYPE::WORKTHREAD_CLOSE == msg->m_emPacketType)
+    if (EM_CONNECT_IO_TYPE::WORKTHREAD_CLOSE == msgList->m_vecList[0]->m_emPacketType)
     {
         //线程退出
         return true;
     }
 
-    if (EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT == msg->m_emDirect)
+    if (EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT == msgList->m_vecList[0]->m_emDirect)
     {
-        //是接收数据
-        if (false == ProcessRecvMessage(msg, m_u4ThreadID))
+        //接收数据可以是多个，一次处理，然后把所有要同步发送的数据一起发送出去,提高效率
+        shared_ptr<CWorkThread_Handler_info> pWorkThread_Handler_info = nullptr;
+
+        for (auto msg : msgList->m_vecList)
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)ProcessMessage is false!\n", m_u4ThreadID));
+            pWorkThread_Handler_info = ProcessRecvMessage(msg, m_u4ThreadID);
+        }
+        
+        //一次同步发送
+        if (m_objBuffSendPacket.GetPacketLen() > 0 && nullptr != pWorkThread_Handler_info)
+        {
+            Synchronize_SendPostMessage(pWorkThread_Handler_info, msgList->m_vecList[0]->m_tvMessage);
         }
     }
     else
     {
         //是发送数据和助攻关闭链接
-        if (CLIENT_LINK_SDISCONNET == msg->m_u2Cmd)
+        if (CLIENT_LINK_SDISCONNET == msgList->m_vecList[0]->m_u2Cmd)
         {
             //关闭链接
-            ProcessSendClose(msg, m_u4ThreadID);
+            ProcessSendClose(msgList->m_vecList[0], m_u4ThreadID);
         }
-        else if (CLINET_LINK_IS_LOG == msg->m_u2Cmd)
+        else if (CLINET_LINK_IS_LOG == msgList->m_vecList[0]->m_u2Cmd)
         {
             //处理日志
-            ProcessSendIsLog(msg, m_u4ThreadID);
+            ProcessSendIsLog(msgList->m_vecList[0], m_u4ThreadID);
         }
         else
         {
             //是发送数据
-            ProcessSendMessage(msg, m_u4ThreadID);
+            ProcessSendMessage(msgList->m_vecList[0], m_u4ThreadID);
         }
     }
 

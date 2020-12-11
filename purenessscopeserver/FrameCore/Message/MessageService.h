@@ -149,7 +149,7 @@ public:
     uint32 GetThreadID();
 
 private:
-    bool ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID); //处理接收事件
+    shared_ptr<CWorkThread_Handler_info> ProcessRecvMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID); //处理接收事件
     bool ProcessSendMessage(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID); //处理发送事件
     bool ProcessSendClose(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID);   //处理发送事件
     bool ProcessSendIsLog(shared_ptr<CWorkThreadMessage> pMessage, uint32 u4ThreadID);   //处理发送事件
@@ -157,8 +157,8 @@ private:
     shared_ptr<CClientCommandList> GetClientCommandList(uint16 u2CommandID);
     bool DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16& u2Count, bool& bDeleteFlag);
 
-    void UpdateCommandList(uint32 u4UpdateIndex);                //更新指令列表
-    bool Dispose_Queue(shared_ptr<CWorkThreadMessage> msg);      //队列消费
+    void UpdateCommandList(uint32 u4UpdateIndex);                        //更新指令列表
+    bool Dispose_Queue(shared_ptr<CWorkThreadMessageList> msgList);      //队列消费
 
     uint32                         m_u4ThreadID         = 0;                     //当前线程ID
     uint32                         m_u4MaxQueue         = MAX_MSG_THREADQUEUE;   //线程中最大消息对象个数
