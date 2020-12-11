@@ -3,7 +3,6 @@
 
 #include "ace/Thread_Mutex.h"
 
-#include "ACEMemory.hpp"
 #include "IBuffPacket.h"
 #include <stdexcept>
 #include <string>
@@ -105,16 +104,5 @@ private:
     int32                      m_nHashID         = 0;                   //记录当前对象在Hash数组中的位置
     bool                       m_blNetSort       = false;               //字节序开启开关，false为不转换为主机字节序，true为转换为主机字节序
     string                     m_strError;                              //错误信息
-
-public:
-    void* operator new(size_t stSize)
-    {
-        return App_ACEMemory::instance()->malloc(stSize);
-    }
-
-    void operator delete(void* p)
-    {
-        App_ACEMemory::instance()->free(p);
-    }
 };
 #endif

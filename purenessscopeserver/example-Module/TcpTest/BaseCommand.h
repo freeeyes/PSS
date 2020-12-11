@@ -13,7 +13,8 @@
 #define COMMAND_RETURN_ALIVE    0xf000
 #define NET_VERSION				0x6800			//版本
 #define COMMAND_HEARTBEAT		0x2100			//心跳
-#define COMMAND_TESTREPLY		0x2101			//测试回复
+#define COMMAND_TESTREPLY		0x2101			//测试回复（同步）
+#define COMMAND_TESTREPLY_SYNC  0x2102			//测试回复（异步）
 
 #define MESSAGE_FUNCTION_BEGIN(x) switch(x) {
 #define MESSAGE_FUNCTION(x,y,z,h) case x: { y(z,h); break; }
@@ -39,6 +40,7 @@ private:
     int Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
     int Do_ClientSendOk(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
     int Do_ReplyTest(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
+    int Do_ReplyTest_Sync(IMessage* pMessage, IBuffPacket* pSendBuffPacket);
     int SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nConnectId, bool nEncrypt, IBuffPacket* pSendBuffPacket);
 
 private:

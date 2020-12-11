@@ -879,9 +879,6 @@
     <ClInclude Include="..\Common\ILogicQueue.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\ACEMemory.hpp">
-      <Filter>Common\cppfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\MakePacket_Common.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>

@@ -48,6 +48,7 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag, IBuffPacket* 
     MESSAGE_FUNCTION(CLIENT_LINK_SENDOK,      Do_ClientSendOk,      pMessage, pSendBuffPacket);
     MESSAGE_FUNCTION(COMMAND_BASE,            Do_Base,              pMessage, pSendBuffPacket);
     MESSAGE_FUNCTION(COMMAND_TESTREPLY,       Do_ReplyTest,         pMessage, pSendBuffPacket);
+    MESSAGE_FUNCTION(COMMAND_TESTREPLY_SYNC,  Do_ReplyTest_Sync,    pMessage, pSendBuffPacket);
     MESSAGE_FUNCTION_END;
 
     return 0;
@@ -59,14 +60,6 @@ int CBaseCommand::Do_Connect(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
     ACE_UNUSED_ARG(pSendBuffPacket);
     OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] (%d)TCP CLIENT_LINK_CONNECT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
-
-    //判断当前连接总数是否超越了2000个
-    int nConnectCount = m_pServerObject->GetConnectManager()->GetCount();
-
-    if(nConnectCount > 2000)
-    {
-        OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect]connect count is more(%d).\n", nConnectCount));
-    }
 
     return 0;
 }
@@ -172,6 +165,47 @@ int CBaseCommand::Do_ReplyTest(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 
 	SendClient(BodyPacket, COMMAND_TESTREPLY, pMessage->GetMessageBase()->m_u4ConnectID, false, pSendBuffPacket);
 	return 0;
+}
+
+int CBaseCommand::Do_ReplyTest_Sync(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
+{
+    __ENTER_FUNCTION();
+    ACE_UNUSED_ARG(pSendBuffPacket);
+
+    //异步发送
+    _PacketInfo BodyPacket;
+    pMessage->GetPacketBody(BodyPacket);
+
+    shared_ptr<IBuffPacket> pCurrSendPacket= m_pServerObject->GetPacketManager()->Create();
+
+    int nRet = 0;
+    //拼装发送包体
+    char szSession[32] = { '\0' };
+    uint16 u2Version = (short)NET_VERSION;
+    uint16 u2Command = pMessage->GetMessageBase()->m_u2Cmd;
+    uint32 u4PacketLen = BodyPacket.m_nDataLen;
+    char* pBuffer = BodyPacket.m_pData;
+
+    //拼接消息头
+    (*pCurrSendPacket) << u2Version;
+    (*pCurrSendPacket) << u2Command;
+    (*pCurrSendPacket) << u4PacketLen;
+    pCurrSendPacket->WriteStream(szSession, 32);
+
+    //拼接消息体
+    pCurrSendPacket->WriteStream(pBuffer, u4PacketLen);
+
+    //pCurrSendPacket->Close();
+
+    CSend_Param objSendParam;
+    //异步发送消息
+    m_pServerObject->GetConnectManager()->PostMessage(pMessage->GetMessageBase()->m_u4ConnectID,
+        pMessage->GetMessageBase()->m_u2Cmd,
+        pCurrSendPacket,
+        objSendParam);
+
+    return 0;
+    __LEAVE_FUNCTION_WITHRETURN(0);
 }
 
 // 回复给客户端

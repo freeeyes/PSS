@@ -31,7 +31,7 @@ bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
         m_nHashID         = 0;
         m_u4PacketLen     = (uint32)((int32)ceil((double)nSize/(double)DEFINE_PACKET_ADD))*DEFINE_PACKET_ADD;
 
-        m_szData          = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
+        m_szData          = (char*)malloc(m_u4PacketLen);
         m_u4BuffID        = 0;
 
         m_blNetSort = false;
@@ -49,7 +49,7 @@ bool CBuffPacket::Close()
 {
     if(nullptr != m_szData)
     {
-        App_ACEMemory::instance()->free((void* )m_szData);
+        free((void* )m_szData);
         m_szData          = nullptr;
         m_u4ReadPtr       = 0;
         m_u4WritePtr      = 0;
@@ -100,7 +100,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
         u4Size = (uint32)ceil(dCurrSize / dPacketAddSize)*DEFINE_PACKET_ADD;
         m_u4PacketLen += u4Size;
 
-        szNewData = (char*)App_ACEMemory::instance()->malloc(m_u4PacketLen);
+        szNewData = (char*)malloc(m_u4PacketLen);
 
         if(nullptr == szNewData)
         {
@@ -124,7 +124,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
             memmove_safe(m_szData, u4OldPacketLen, szNewData, m_u4PacketLen);
 
             //删除已经不用的内存
-            App_ACEMemory::instance()->free(m_szData);
+            free(m_szData);
             m_szData = szNewData;
         }
 

@@ -505,7 +505,6 @@
     <ClCompile Include="UDP\UDPConnectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\ACEMemory.hpp" />
     <ClInclude Include="..\Common\ClientCommand.h" />
     <ClInclude Include="..\Common\ClientMessage.h" />
     <ClInclude Include="..\Common\ClientUDPMassage.h" />
