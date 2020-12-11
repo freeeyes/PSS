@@ -37,14 +37,9 @@ int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThr
     objMakePacket.m_emPacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_FRAME;
     objMakePacket.m_u4ConnectID  = u4WorkThreadID;
     objMakePacket.m_pPacketParse = pPacketParse;
-    objMakePacket.m_u1Option = PACKET_PARSE;
+    objMakePacket.m_u1Option     = PACKET_PARSE;
+    objMakePacket.m_tvRecv       = tvNow;
 
-    if (true == App_MakePacket::instance()->PutMessageBlock(objMakePacket, tvNow))
-    {
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
+    Send_MakePacket_Queue(m_MakePacket, objMakePacket);
+    return 0;
 }

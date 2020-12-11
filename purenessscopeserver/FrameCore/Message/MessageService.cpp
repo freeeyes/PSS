@@ -110,13 +110,17 @@ int CMessageService::svc(void)
 
     while(m_blRun)
     {
-        shared_ptr<CWorkThreadMessage> msg;
-        m_objThreadQueue.Pop(msg);
-
-        if (false == Dispose_Queue(msg))
+        shared_ptr<CWorkThreadMessageList> msgList;
+        m_objThreadQueue.Pop(msgList);
+        
+        for(auto msg : msgList->m_vecList)
         {
-            break;
+            if (false == Dispose_Queue(msg))
+            {
+                break;
+            }
         }
+        msgList->m_vecList.clear();
     }
 
 	//关闭所有的链接
@@ -144,7 +148,7 @@ int CMessageService::svc(void)
     return 0;
 }
 
-bool CMessageService::PutMessage(shared_ptr<CWorkThreadMessage> pMessage)
+bool CMessageService::PutMessage(shared_ptr<CWorkThreadMessageList> pMessage)
 {
     m_objThreadQueue.Push(pMessage);
 
@@ -159,7 +163,10 @@ bool CMessageService::PutUpdateCommandMessage(uint32 u4UpdateIndex)
     pMessage->m_emPacketType = EM_CONNECT_IO_TYPE::COMMAND_UPDATE;
     pMessage->m_u4ConnectID = u4UpdateIndex;
 
-    m_objThreadQueue.Push(pMessage);
+    auto pMessageLst = std::make_shared<CWorkThreadMessageList>();
+    pMessageLst->m_vecList.emplace_back(pMessage);
+
+    m_objThreadQueue.Push(pMessageLst);
 
     return true;
 }
@@ -399,7 +406,10 @@ int CMessageService::Close()
         //发一个消息，告诉线程终止了
         auto p = std::make_shared<CWorkThreadMessage>();
         p->m_emPacketType = EM_CONNECT_IO_TYPE::WORKTHREAD_CLOSE;
-        PutMessage(p);
+
+        auto pMessageLst = std::make_shared<CWorkThreadMessageList>();
+        pMessageLst->m_vecList.emplace_back(p);
+        PutMessage(pMessageLst);
 
         //等待线程处理完毕
         m_ttQueue.join();
@@ -710,7 +720,10 @@ bool CMessageService::SendPostMessage(const CSendMessageInfo& objSendMessageInfo
     pWorkThreadMessage->m_emDirect        = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_OUTPUT;
     pWorkThreadMessage->m_SendMessageInfo = objSendMessageInfo;
 
-    return PutMessage(pWorkThreadMessage);
+    auto pMessageList = std::make_shared<CWorkThreadMessageList>();
+    pMessageList->m_vecList.emplace_back(pWorkThreadMessage);
+
+    return PutMessage(pMessageList);
 }
 
 bool CMessageService::SendCloseMessage(uint32 u4ConnectID)
@@ -722,7 +735,10 @@ bool CMessageService::SendCloseMessage(uint32 u4ConnectID)
 	pWorkThreadMessage->m_u2Cmd       = CLINET_LINK_HANDLER_CLOSE;
     pWorkThreadMessage->m_u4ConnectID = u4ConnectID;
 
-	return PutMessage(pWorkThreadMessage);
+    auto pMessageList = std::make_shared<CWorkThreadMessageList>();
+    pMessageList->m_vecList.emplace_back(pWorkThreadMessage);
+
+	return PutMessage(pMessageList);
 }
 
 _ClientIPInfo CMessageService::GetClientIPInfo(uint32 u4ConnectID)
@@ -991,7 +1007,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     return true;
 }
 
-bool CMessageServiceGroup::PutMessage(shared_ptr<CWorkThreadMessage> pMessage)
+bool CMessageServiceGroup::PutMessage(shared_ptr<CWorkThreadMessageList> pMessage)
 {
     //判断是否为TCP包，如果是则按照ConnectID区分。UDP则随机分配一个
 

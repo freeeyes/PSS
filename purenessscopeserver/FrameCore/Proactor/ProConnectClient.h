@@ -76,5 +76,6 @@ private:
     EM_CONNECT_IO_DISPOSE       m_emDispose;                 //处理模式，框架处理 or 业务处理
     uint32                      m_u4PacketParseInfoID;       //框架处理模块ID
     string                      m_strDeviceName;             //转发接口名称
+    CMakePacket                 m_MakePacket;
 };
 #endif

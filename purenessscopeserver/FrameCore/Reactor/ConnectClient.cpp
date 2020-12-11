@@ -39,8 +39,9 @@ void CConnectClient::Close()
 			objMakePacket.m_AddrRemote      = m_addrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
             objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+            objMakePacket.m_tvRecv          = ACE_OS::gettimeofday();
 
-            Send_MakePacket_Queue(objMakePacket);
+            Send_MakePacket_Queue(m_MakePacket, objMakePacket);
         }
 
         //转发接口关闭
@@ -205,8 +206,9 @@ int CConnectClient::open(void* p)
 		objMakePacket.m_AddrRemote = m_addrRemote;
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
 		objMakePacket.m_emPacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+        objMakePacket.m_tvRecv = m_atvRecv;
 
-        Send_MakePacket_Queue(objMakePacket);
+        Send_MakePacket_Queue(m_MakePacket, objMakePacket);
     }
 
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
@@ -363,8 +365,9 @@ int CConnectClient::Dispose_Recv_Data(ACE_Message_Block* pCurrMessage)
 				objMakePacket.m_AddrRemote      = m_addrRemote;
 				objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
 				objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+                objMakePacket.m_tvRecv          = m_atvRecv;
 
-                Send_MakePacket_Queue(objMakePacket);
+                Send_MakePacket_Queue(m_MakePacket, objMakePacket);
 
                 m_emRecvState = EM_Server_Recv_State::SERVER_RECV_END;
                 m_pCurrMessage->reset();

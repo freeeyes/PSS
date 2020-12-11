@@ -52,13 +52,12 @@ int Make_Common_Dispose_Client_WorkTread_Message(uint16 u2CommandID, uint32 u4Se
         pWorkThreadMessage->m_emResouceType = EM_PACKET_RESOURCE::PACKET_RESOURCE_FROM_SERVER;
         pWorkThreadMessage->m_emDirect = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT;
 
+        auto pMessageList = std::make_shared<CWorkThreadMessageList>();
+        pMessageList->m_vecList.emplace_back(pWorkThreadMessage);
+        pMessageList->m_u4WorkThreadID = pWorkThreadMessage->m_u4WorkThreadID;
+
         //将要处理的消息放入消息处理线程
-        if (false == App_MessageServiceGroup::instance()->PutMessage(pWorkThreadMessage))
-        {
-            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
-            App_MessageServiceGroup::instance()->DeleteMessage(pWorkThreadMessage);
-            return -1;
-        }
+        App_MessageServiceGroup::instance()->PutMessage(pMessageList);
     }
 
     return 0;

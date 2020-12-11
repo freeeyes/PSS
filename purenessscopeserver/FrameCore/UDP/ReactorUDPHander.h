@@ -54,6 +54,7 @@ private:
     uint32                  m_u4PacketParseInfoID = 0;              //对应处理packetParse的模块ID
 	ACE_Message_Block*      m_pBlockMessage            = nullptr;   //当前发送缓冲等待数据块
 	ACE_Message_Block*      m_pBlockRecv               = nullptr;   //接收数据缓冲块
+    CMakePacket             m_MakePacket;                           //工作线程消息生成器 
     shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo  = nullptr;   //PacketParse解析器
 
 };

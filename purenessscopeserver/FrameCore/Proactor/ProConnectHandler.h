@@ -148,6 +148,8 @@ private:
     Fast_Asynch_Read_Stream  m_Reader;
     Fast_Asynch_Write_Stream m_Writer;
 
+    CMakePacket         m_MakePacket;
+
     CPerformanceCounter m_SendCounter;
     CPerformanceCounter m_RecvCounter;
 };

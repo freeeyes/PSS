@@ -40,7 +40,10 @@ public:
 };
 
 //将数据发送入工作线程消息队列
-void Send_MakePacket_Queue(_MakePacket const& objMakePacket);
+void Send_MakePacket_Queue(CMakePacket& MakePacketDispose, const _MakePacket& objMakePacket, bool blCommit = true);
+
+//将错误数据发送到工作线程消息队列
+void Send_MakePacket_Queue_Error(CMakePacket& MakePacketDispose, uint32 u4ConnectID, ACE_Message_Block* pMessageBlock, const ACE_Time_Value& tvNow);
 
 //udp函数发送数据包合成函数
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, shared_ptr<IBuffPacket> pBuffPacket, const ACE_SOCK_Dgram& skRemote, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, ACE_Message_Block* pBlockMessage);
@@ -55,13 +58,10 @@ bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, shared
 bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shared_ptr<CPacketParse> pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo);
 
 //提交udp数据到工作线程
-bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck);
+bool Udp_Common_Send_WorkThread(CMakePacket& MakePacket, uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck);
 
 //清理数据缓冲
 void Recovery_Common_BuffPacket(bool blDelete, shared_ptr<IBuffPacket> pBuffPacket);
-
-//错误信息返回工作线程
-void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, shared_ptr<IBuffPacket> pBuffPacket);
 
 //TCP流消息处理
 uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shared_ptr<CPacketParse> pPacketParse, uint32 u4PacketParseInfoID);
@@ -119,7 +119,8 @@ public:
 };
 
 //将数据添加入发送缓冲区
-bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Param,
+bool Tcp_Common_Send_Input_To_Cache(CMakePacket& MakePacket, 
+    _Input_To_Cache_Param obj_Input_To_Cache_Param,
     ACE_Message_Block* pBlockMessage, uint32& u4PacketSize,
     shared_ptr<IBuffPacket> pBuffPacket);
 
@@ -138,7 +139,8 @@ public:
 };
 
 //组装发送数据
-bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
+bool Tcp_Common_Make_Send_Packet(CMakePacket& MakePacket,
+    _Send_Packet_Param obj_Send_Packet_Param,
     shared_ptr<IBuffPacket> pBuffPacket,
     ACE_Message_Block* pBlockMessage,
     uint32& u4PacketSize);

@@ -109,7 +109,7 @@ public:
 
     bool Start();
 
-    bool PutMessage(shared_ptr<CWorkThreadMessage> pMessage);
+    bool PutMessage(shared_ptr<CWorkThreadMessageList> pMessage);
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex);
 
     _ThreadInfo* GetThreadInfo();
@@ -188,7 +188,7 @@ private:
 
     CPerformanceCounter m_PerformanceCounter;
     std::thread                                         m_ttQueue;               //消息队列线程
-    CMessageQueue<shared_ptr<CWorkThreadMessage>>       m_objThreadQueue;        //业务消息队列
+    CMessageQueue<shared_ptr<CWorkThreadMessageList>>   m_objThreadQueue;        //业务消息队列
 };
 
 //add by freeeyes
@@ -202,7 +202,7 @@ public:
     void start_new_task(brynet::TimerMgr::Ptr timerMgr);
 
     bool Init(uint32 u4ThreadCount = MAX_MSG_THREADCOUNT, uint32 u4MaxQueue = MAX_MSG_THREADQUEUE, uint32 u4LowMask = MAX_MSG_MASK);
-    bool PutMessage(shared_ptr<CWorkThreadMessage> pMessage);                                //发送到相应的线程去处理
+    bool PutMessage(shared_ptr<CWorkThreadMessageList> pMessage);                            //发送到相应的线程去处理
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex) const;                                //发送消息同步所有的工作线程命令副本
     void Close();
 

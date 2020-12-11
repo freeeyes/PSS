@@ -307,7 +307,7 @@ bool CProactorUDPHandler::CheckMessage(uint32 u4ConnectID, ACE_Message_Block* pM
     }
 
 	//处理数据包
-	if (false == Udp_Common_Send_WorkThread(u4ConnectID, m_pPacketParse, addrRemote, m_addrLocal, m_atvInput))
+	if (false == Udp_Common_Send_WorkThread(m_MakePacket, u4ConnectID, m_pPacketParse, addrRemote, m_addrLocal, m_atvInput))
 	{
 		return false;
 	}
@@ -339,7 +339,7 @@ void CProactorUDPHandler::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, 
     objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_UDP;
     objMakePacket.m_AddrListen      = m_addrLocal;
 
-	Send_MakePacket_Queue(objMakePacket);
+	Send_MakePacket_Queue(m_MakePacket, objMakePacket);
 }
 
 void CProactorUDPHandler::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut)

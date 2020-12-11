@@ -10,7 +10,7 @@ bool CMakePacket::Init() const
     return true;
 }
 
-bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow) const 
+bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow) 
 {   
     //根据操作OP，调用相应的方法。
     auto pMessage = App_MessageServiceGroup::instance()->CreateMessage(objMakePacket.m_u4ConnectID, 
@@ -40,13 +40,14 @@ bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Ti
 
     SetMessage(objMakePacket, pMessage, tvNow);
 
-    //将要处理的消息放入消息处理线程
-    if(false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
+    //将消息写入消息集合
+    if (nullptr == m_pMessageList)
     {
-        OUR_DEBUG((LM_ERROR, "[CMakePacket::ProcessMessageBlock] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
-        App_MessageServiceGroup::instance()->DeleteMessage(pMessage);
-        return false;
+        m_pMessageList = std::make_shared<CWorkThreadMessageList>();
+        m_pMessageList->m_u4WorkThreadID = pMessage->m_u4WorkThreadID;
     }
+
+    m_pMessageList->m_vecList.emplace_back(pMessage);
 
     return true;
 }
@@ -145,7 +146,7 @@ void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBo
     pWorkThreadMessage->m_emDirect      = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT;
 }
 
-bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow) const
+bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow)
 {
     auto pMessage = App_MessageServiceGroup::instance()->CreateMessage(u4ConnectID, EM_CONNECT_IO_TYPE::CONNECT_IO_TCP);
 
@@ -159,14 +160,24 @@ bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBo
     SetMessageSendError(u4ConnectID, pBodyMessage, pMessage, tvNow);
 
     //将要处理的消息放入消息处理线程
-    if(false == App_MessageServiceGroup::instance()->PutMessage(pMessage))
+    //将消息写入消息集合
+    if (nullptr == m_pMessageList)
     {
-        OUR_DEBUG((LM_ERROR, "[CMakePacket::PutSendErrorMessage] App_MessageServiceGroup::instance()->PutMessage Error.\n"));
-        App_MessageBlockManager::instance()->Close(pBodyMessage);
-        App_MessageServiceGroup::instance()->DeleteMessage(pMessage);
-        return false;
+        m_pMessageList = std::make_shared<CWorkThreadMessageList>();
+        m_pMessageList->m_u4WorkThreadID = pMessage->m_u4WorkThreadID;
     }
 
+    m_pMessageList->m_vecList.emplace_back(pMessage);
     return true;
+}
+
+void CMakePacket::CommitMessageList()
+{
+    //将要处理的消息放入消息处理线程
+    if (nullptr != m_pMessageList)
+    {
+        App_MessageServiceGroup::instance()->PutMessage(m_pMessageList);
+        m_pMessageList = nullptr;
+    }
 }
 

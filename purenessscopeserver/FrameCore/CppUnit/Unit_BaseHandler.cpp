@@ -79,10 +79,12 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
 
     pMB->copy(pBuffPacket->GetData(), pBuffPacket->GetWriteLen());
 
-    blRet = Tcp_Common_Send_Input_To_Cache(obj_Input_To_Cache_Param,
-                                           pMB,
-                                           u4PacketSize,
-                                           pBuffPacket);
+    CMakePacket MakePacket;
+    blRet = Tcp_Common_Send_Input_To_Cache(MakePacket,
+        obj_Input_To_Cache_Param,
+        pMB,
+        u4PacketSize,
+        pBuffPacket);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Send_Input_To_Cache]Tcp_Common_Send_Input_To_Cache is false.", true == blRet);
 
@@ -90,10 +92,11 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
     obj_Input_To_Cache_Param.m_u4SendMaxBuffSize = 2;
 
     OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Input_To_Cache]Begin,\n"));
-    Tcp_Common_Send_Input_To_Cache(obj_Input_To_Cache_Param,
-                                   pMB,
-                                   u4PacketSize,
-                                   pBuffPacket);
+    Tcp_Common_Send_Input_To_Cache(MakePacket,
+        obj_Input_To_Cache_Param,
+        pMB,
+        u4PacketSize,
+        pBuffPacket);
     OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Input_To_Cache]End,\n"));
 }
 
@@ -245,10 +248,12 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
     uint32 u4PacketSize = 4;
 
     //测试数据长度超长
-    bool blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
-                   pBuffPacket,
-                   pBlockMessage,
-                   u4PacketSize);
+    CMakePacket MakePacket;
+    bool blState = Tcp_Common_Make_Send_Packet(MakePacket,
+        obj_Send_Packet_Param,
+        pBuffPacket,
+        pBlockMessage,
+        u4PacketSize);
 
     pMbData = App_MessageBlockManager::instance()->Create(pBlockMessage->length());
     pMbData->copy(pBlockMessage->rd_ptr(), pBlockMessage->length());
@@ -262,7 +267,8 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
 
     obj_Send_Packet_Param.m_u4SendMaxBuffSize = MAX_BUFF_200;
 
-    blState = Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
+    blState = Tcp_Common_Make_Send_Packet(MakePacket,
+        obj_Send_Packet_Param,
         pBuffPacket,
 		pBlockMessage,
         u4PacketSize);

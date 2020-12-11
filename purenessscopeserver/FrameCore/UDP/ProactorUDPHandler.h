@@ -65,7 +65,7 @@ private:
     _TimeConnectInfo        m_TimeConnectInfo;              //链接健康检测器
     CCommandAccount         m_CommandAccount;               //数据包统计
 
-
+    CMakePacket             m_MakePacket;
 };
 
 #endif

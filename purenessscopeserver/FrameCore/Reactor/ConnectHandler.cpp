@@ -377,7 +377,7 @@ bool CConnectHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo, ui
     }
 }
 
-bool CConnectHandler::SendTimeoutMessage() const
+bool CConnectHandler::SendTimeoutMessage()
 {
 	_MakePacket objMakePacket;
 
@@ -388,7 +388,7 @@ bool CConnectHandler::SendTimeoutMessage() const
 	objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
     objMakePacket.m_AddrListen      = m_addrLocal;
 
-    Send_MakePacket_Queue(objMakePacket);
+    Send_MakePacket_Queue(m_MakePacket, objMakePacket);
 
     return true;
 }
@@ -444,7 +444,7 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
             //错误消息回调
             pmbSend->rd_ptr((size_t)0);
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-            App_MakePacket::instance()->PutSendErrorMessage(GetConnectID(), pmbSend, tvNow);
+            Send_MakePacket_Queue_Error(m_MakePacket, GetConnectID(), pmbSend, tvNow);
 
             OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID=%d send cancel.\n", GetConnectID()));
 
@@ -476,7 +476,7 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
 				objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
                 objMakePacket.m_AddrListen      = m_addrLocal;
 
-                Send_MakePacket_Queue(objMakePacket);
+                Send_MakePacket_Queue(m_MakePacket, objMakePacket);
 
                 //还原消息类型
                 pmbSend->msg_type(ACE_Message_Block::MB_DATA);
@@ -576,6 +576,7 @@ bool CConnectHandler::Dispose_Recv_buffer()
         auto while_State = Recv_Packet_Cut(blRet);
         if (while_State == ENUM_WHILE_STATE::WHILE_STATE_BREAK)
         {
+            m_MakePacket.CommitMessageList();
             break;
         }
         else
@@ -630,7 +631,7 @@ void CConnectHandler::Send_Hander_Event(uint8 u1Option)
     objMakePacket.m_tvRecv          = m_atvInput;
     objMakePacket.m_AddrListen      = m_addrLocal;
 
-	Send_MakePacket_Queue(objMakePacket);
+	Send_MakePacket_Queue(m_MakePacket, objMakePacket);
 }
 
 void CConnectHandler::ConnectOpen()
@@ -788,7 +789,7 @@ bool CConnectHandler::CheckMessage()
     objMakePacket.m_AddrListen      = m_addrLocal;
     objMakePacket.m_tvRecv          = m_atvInput;
 
-    Send_MakePacket_Queue(objMakePacket);
+    Send_MakePacket_Queue(m_MakePacket, objMakePacket, false);
 
     m_pPacketParse->Clear();
 
@@ -861,7 +862,8 @@ bool CConnectHandler::Send_Input_To_Cache(const CSendMessageInfo& objSendMessage
     obj_Input_To_Cache_Param.m_u4PacketParseInfoID = m_u4PacketParseInfoID;
     obj_Input_To_Cache_Param.m_u4SendMaxBuffSize   = m_u4SendMaxBuffSize;
 
-    return Tcp_Common_Send_Input_To_Cache(obj_Input_To_Cache_Param,
+    return Tcp_Common_Send_Input_To_Cache(m_MakePacket,
+        obj_Input_To_Cache_Param,
         m_pBlockMessage,
         u4PacketSize,
         objSendMessageInfo.pBuffPacket);
@@ -878,7 +880,8 @@ bool CConnectHandler::Send_Input_To_TCP(const CSendMessageInfo& objSendMessageIn
     obj_Send_Packet_Param.m_u4SendMaxBuffSize   = m_u4SendMaxBuffSize;
 
     //拼装数据
-    if (false == Tcp_Common_Make_Send_Packet(obj_Send_Packet_Param,
+    if (false == Tcp_Common_Make_Send_Packet(m_MakePacket,
+        obj_Send_Packet_Param,
         objSendMessageInfo.pBuffPacket,
         m_pBlockMessage,
         u4PacketSize))

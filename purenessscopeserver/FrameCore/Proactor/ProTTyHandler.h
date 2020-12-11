@@ -70,6 +70,7 @@ private:
     uint32                                m_u4PacketParseInfoID = 0;   //框架处理模块ID
     string                                m_strDeviceName;             //转发接口名称
     shared_ptr<_Packet_Parse_Info>        m_pPacketParse   = nullptr;  //数据包Packetparse函数接口
+    CMakePacket                           m_MakePacket;
 };
 #endif
 

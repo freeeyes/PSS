@@ -63,7 +63,7 @@ public:
     bool CheckSendMask(uint32 u4PacketLen) const;                            //检测指定的连接发送数据是否超过阻塞阀值
     bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize) final;  //发送当前数据
 
-    bool SendTimeoutMessage() const;                                         //发送连接超时消息
+    bool SendTimeoutMessage();                                               //发送连接超时消息
 
     void SetLocalIPInfo(const char* pLocalIP, uint16 u2LocalPort);           //设置监听IP和端口信息
 
@@ -139,7 +139,9 @@ private:
     EM_IO_TYPE                 m_emIOType             = EM_IO_TYPE::NET_INPUT; //当前IO入口类型
     IFileTestManager*          m_pFileTest            = nullptr;               //文件测试接口入口
     string                     m_strDeviceName;                                //转发接口名称
-    shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo     = nullptr;               //PacketParse的解析器
+    CMakePacket                m_MakePacket;                                   //工作线程消息生成器 
+    shared_ptr<_Packet_Parse_Info> m_pPacketParseInfo     = nullptr;           //PacketParse的解析器
+    
 };
 
 //链接ConnectHandler内存池

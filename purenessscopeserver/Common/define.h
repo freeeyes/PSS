@@ -60,16 +60,16 @@ using float32 = float;
 using float64 = double;
 
 //自动判定操作系统
-const uint8 PLATFORM_WIN   = 0;
-const uint8 PLATFORM_UNIX  = 1;
-const uint8 PLATFORM_APPLE = 2;
+#define PLATFORM_WIN     0
+#define PLATFORM_UNIX    1
+#define PLATFORM_APPLE   2
 
 #if defined(__WIN32__) || defined(WIN32) || defined(_WIN32) || defined(__WIN64__) || defined(WIN64) || defined(_WIN64)
-const uint8 PSS_PLATFORM = PLATFORM_WIN;
+#  define PSS_PLATFORM PLATFORM_WIN
 #elif defined(__APPLE_CC__)
-const uint8 PSS_PLATFORM = PLATFORM_APPLE;
+#  define PSS_PLATFORM PLATFORM_APPLE
 #else
-const uint8 PSS_PLATFORM = PLATFORM_UNIX;
+#  define PSS_PLATFORM PLATFORM_UNIX
 #endif
 
 #define SET_PROFILE_OUTPUT 1;   //是否打开性能监控选项

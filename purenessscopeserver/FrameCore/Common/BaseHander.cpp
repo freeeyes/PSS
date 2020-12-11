@@ -148,7 +148,7 @@ bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shar
     return true;
 }
 
-bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck)
+bool Udp_Common_Send_WorkThread(CMakePacket& MakePacket, uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck)
 {
     //组织数据包
     _MakePacket objMakePacket;
@@ -160,11 +160,13 @@ bool Udp_Common_Send_WorkThread(uint32 u4ConnectID, shared_ptr<CPacketParse> pPa
     objMakePacket.m_u1Option     = PACKET_PARSE;
 
     //UDP因为不是面向链接的
-    if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, tvCheck))
+    if (false == MakePacket.PutMessageBlock(objMakePacket, tvCheck))
     {
         OUR_DEBUG((LM_ERROR, "[Udp_Common_Send_WorkThread]PutMessageBlock is error.\n"));
         return false;
     }
+
+    MakePacket.CommitMessageList();
 
     return true;
 }
@@ -173,29 +175,6 @@ void Recovery_Common_BuffPacket(bool blDelete, shared_ptr<IBuffPacket> pBuffPack
 {
     ACE_UNUSED_ARG(blDelete);
     pBuffPacket->Clear();
-}
-
-void Tcp_Common_Send_Message_Error(uint32 u4ConnectID, uint16 u2CommandID, bool blDelete, shared_ptr<IBuffPacket> pBuffPacket)
-{
-    ACE_Message_Block* pSendMessage = nullptr;
-
-    if (pBuffPacket != nullptr && pBuffPacket->GetPacketLen() > 0)
-    {
-        pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
-        memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
-        pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-
-        if (false == App_MakePacket::instance()->PutSendErrorMessage(u4ConnectID, pSendMessage, ACE_OS::gettimeofday()))
-        {
-            OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Message_Error]Tcp_Common_Send_Message_Error]PutSendErrorMessage error.\n"));
-        }
-    }
-    else
-    {
-        OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Message_Error]u4ConnectID=%d,u2CommandID=%d pBuffPacket error.\n", u4ConnectID, u2CommandID));
-    }
-
-    Recovery_Common_BuffPacket(blDelete, pBuffPacket);
 }
 
 uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shared_ptr<CPacketParse> pPacketParse, uint32 u4PacketParseInfoID)
@@ -271,13 +250,29 @@ void Output_Debug_Data(const ACE_Message_Block* pMbData, uint16 u2LogType, const
     }
 }
 
-void Send_MakePacket_Queue(_MakePacket const& objMakePacket)
+void Send_MakePacket_Queue(CMakePacket& MakePacketDispose, const _MakePacket& objMakePacket, bool blCommit)
 {
     //放入消息队列
-    if (false == App_MakePacket::instance()->PutMessageBlock(objMakePacket, objMakePacket.m_tvRecv))
+    if (false == MakePacketDispose.PutMessageBlock(objMakePacket, objMakePacket.m_tvRecv))
     {
         OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", objMakePacket.m_u4ConnectID));
     }
+
+    if (blCommit)
+    {
+        MakePacketDispose.CommitMessageList();
+    }
+}
+
+void Send_MakePacket_Queue_Error(CMakePacket& MakePacketDispose, uint32 u4ConnectID, ACE_Message_Block* pMessageBlock, const ACE_Time_Value& tvNow)
+{
+    //放入消息队列
+    if (false == MakePacketDispose.PutSendErrorMessage(u4ConnectID, pMessageBlock, tvNow))
+    {
+        OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", u4ConnectID));
+    }
+
+    MakePacketDispose.CommitMessageList();
 }
 
 bool Tcp_Common_File_Message(_File_Message_Param const& obj_File_Message_Param, shared_ptr<IBuffPacket> pBuffPacket, const char* pConnectName)
@@ -359,7 +354,8 @@ _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_Cli
     return ClientConnectInfo;
 }
 
-bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Param,
+bool Tcp_Common_Send_Input_To_Cache(CMakePacket& MakePacket, 
+    _Input_To_Cache_Param obj_Input_To_Cache_Param,
     ACE_Message_Block* pBlockMessage, uint32& u4PacketSize,
     shared_ptr<IBuffPacket> pBuffPacket)
 {
@@ -385,7 +381,8 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
         memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
         ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-        App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+        MakePacket.PutSendErrorMessage(0, pSendMessage, tvNow);
+        MakePacket.CommitMessageList();
 
         Recovery_Common_BuffPacket(obj_Input_To_Cache_Param.m_blDelete, pBuffPacket);
 
@@ -413,7 +410,8 @@ bool Tcp_Common_Send_Input_To_Cache(_Input_To_Cache_Param obj_Input_To_Cache_Par
     return true;
 }
 
-bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
+bool Tcp_Common_Make_Send_Packet(CMakePacket& MakePacket,
+    _Send_Packet_Param obj_Send_Packet_Param,
     shared_ptr<IBuffPacket> pBuffPacket,
     ACE_Message_Block* pBlockMessage,
     uint32& u4PacketSize)
@@ -456,7 +454,8 @@ bool Tcp_Common_Make_Send_Packet(_Send_Packet_Param obj_Send_Packet_Param,
             memcpy_safe(pBuffPacket->GetData(), u4PacketSize, pSendMessage->wr_ptr(), u4PacketSize);
             pSendMessage->wr_ptr(u4PacketSize);
             ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-            App_MakePacket::instance()->PutSendErrorMessage(0, pSendMessage, tvNow);
+            MakePacket.PutSendErrorMessage(0, pSendMessage, tvNow);
+            MakePacket.CommitMessageList();
 
             Recovery_Common_BuffPacket(obj_Send_Packet_Param.m_blDelete, pBuffPacket);
 

@@ -71,6 +71,16 @@ public:
     void Close();
 };
 
+//一个工作线程消息数据集合
+class CWorkThreadMessageList
+{
+public:
+    CWorkThreadMessageList() = default;
+
+    uint32 m_u4WorkThreadID = 0;
+    vector<shared_ptr<CWorkThreadMessage>> m_vecList;
+};
+
 //线程内维护的Handler对象架构
 class CWorkThread_Handler_info
 {

@@ -270,7 +270,7 @@ bool CReactorUDPHander::CheckMessage(uint32 u4ConnectID, const char* pData, uint
     }
 
 	//处理数据包
-	if (false == Udp_Common_Send_WorkThread(u4ConnectID, m_pPacketParse, addrRemote, m_addrLocal, m_atvInput))
+	if (false == Udp_Common_Send_WorkThread(m_MakePacket, u4ConnectID, m_pPacketParse, addrRemote, m_addrLocal, m_atvInput))
 	{
 		return false;
 	}
@@ -320,7 +320,7 @@ void CReactorUDPHander::Send_Hander_Event(uint32 u4ConnandID, uint8 u1Option, co
 	objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_UDP;
     objMakePacket.m_AddrListen      = m_addrLocal;
 
-	Send_MakePacket_Queue(objMakePacket);
+	Send_MakePacket_Queue(m_MakePacket, objMakePacket);
 }
 
 void CReactorUDPHander::GetFlowInfo(uint32& u4FlowIn, uint32& u4FlowOut) const

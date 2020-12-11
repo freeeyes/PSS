@@ -64,8 +64,9 @@ void CProConnectClient::Close()
 			objMakePacket.m_AddrRemote      = m_AddrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
             objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+            objMakePacket.m_tvRecv          = ACE_OS::gettimeofday();
 
-            Send_MakePacket_Queue(objMakePacket);
+            Send_MakePacket_Queue(m_MakePacket, objMakePacket);
         }
 
         App_ClientProConnectManager::instance()->CloseByClient(m_nServerID);
@@ -199,8 +200,9 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 		objMakePacket.m_AddrRemote      = m_AddrRemote;
 		objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
         objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+        objMakePacket.m_tvRecv          = m_atvRecv;
 
-        Send_MakePacket_Queue(objMakePacket);
+        Send_MakePacket_Queue(m_MakePacket, objMakePacket);
     }
 
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_AddrRemote.get_host_addr(),
@@ -288,8 +290,9 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 					objMakePacket.m_AddrRemote      = m_AddrRemote;
 					objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
                     objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
+                    objMakePacket.m_tvRecv          = m_atvRecv;
 
-                    Send_MakePacket_Queue(objMakePacket);
+                    Send_MakePacket_Queue(m_MakePacket, objMakePacket);
                 }
                 else if (PACKET_GET_ERROR == n1Ret)
                 {

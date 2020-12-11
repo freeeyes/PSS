@@ -80,5 +80,6 @@ private:
 	EM_CONNECT_IO_DISPOSE       m_emDispose   = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN;    //处理模式，框架处理 or 业务处理
     ACE_Time_Value              m_atvRecv;                            //数据接收时间
     string                      m_strDeviceName;                      //转发接口名称
+    CMakePacket                 m_MakePacket;
 };
 #endif
