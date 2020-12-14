@@ -43,7 +43,7 @@ public:
 void Send_MakePacket_Queue(CMakePacket& MakePacketDispose, const _MakePacket& objMakePacket, bool blCommit = true);
 
 //将错误数据发送到工作线程消息队列
-void Send_MakePacket_Queue_Error(CMakePacket& MakePacketDispose, uint32 u4ConnectID, ACE_Message_Block* pMessageBlock, const ACE_Time_Value& tvNow);
+void Send_MakePacket_Queue_Error(CMakePacket& MakePacketDispose, uint32 u4ConnectID, ACE_Message_Block* pMessageBlock, const PSS_Time_Point& tvNow);
 
 //udp函数发送数据包合成函数
 bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param, shared_ptr<IBuffPacket> pBuffPacket, const ACE_SOCK_Dgram& skRemote, shared_ptr<_Packet_Parse_Info> pPacketParseInfo, ACE_Message_Block* pBlockMessage);
@@ -58,7 +58,7 @@ bool Udp_Common_Recv_Body(uint32 u4ConnectID, ACE_Message_Block* pMBBody, shared
 bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shared_ptr<CPacketParse> pPacketParse, shared_ptr<_Packet_Parse_Info> pPacketParseInfo);
 
 //提交udp数据到工作线程
-bool Udp_Common_Send_WorkThread(CMakePacket& MakePacket, uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck);
+bool Udp_Common_Send_WorkThread(CMakePacket& MakePacket, uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const PSS_Time_Point& tvCheck);
 
 //清理数据缓冲
 void Recovery_Common_BuffPacket(bool blDelete, shared_ptr<IBuffPacket> pBuffPacket);
@@ -95,7 +95,7 @@ public:
     uint32 m_u4AllSendCount      = 0;
     uint32 m_u4AllRecvSize       = 0;
     uint32 m_u4AllSendSize       = 0;
-    ACE_Time_Value m_atvConnect; 
+    PSS_Time_Point m_atvConnect;
     uint32 m_u4RecvQueueCount    = 0;
 
     _ClientConnectInfo_Param() = default;

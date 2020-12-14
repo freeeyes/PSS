@@ -148,7 +148,7 @@ bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shar
     return true;
 }
 
-bool Udp_Common_Send_WorkThread(CMakePacket& MakePacket, uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const ACE_Time_Value& tvCheck)
+bool Udp_Common_Send_WorkThread(CMakePacket& MakePacket, uint32 u4ConnectID, shared_ptr<CPacketParse> pPacketParse, const ACE_INET_Addr& addrRemote, const ACE_INET_Addr& addrLocal, const PSS_Time_Point& tvCheck)
 {
     //组织数据包
     _MakePacket objMakePacket;
@@ -264,7 +264,7 @@ void Send_MakePacket_Queue(CMakePacket& MakePacketDispose, const _MakePacket& ob
     }
 }
 
-void Send_MakePacket_Queue_Error(CMakePacket& MakePacketDispose, uint32 u4ConnectID, ACE_Message_Block* pMessageBlock, const ACE_Time_Value& tvNow)
+void Send_MakePacket_Queue_Error(CMakePacket& MakePacketDispose, uint32 u4ConnectID, ACE_Message_Block* pMessageBlock, const PSS_Time_Point& tvNow)
 {
     //放入消息队列
     if (false == MakePacketDispose.PutSendErrorMessage(u4ConnectID, pMessageBlock, tvNow))
@@ -347,8 +347,8 @@ _ClientConnectInfo Tcp_Common_ClientInfo(_ClientConnectInfo_Param const& obj_Cli
     ClientConnectInfo.m_u4SendCount   = obj_ClientConnectInfo_Param.m_u4AllSendCount;
     ClientConnectInfo.m_u4AllRecvSize = obj_ClientConnectInfo_Param.m_u4AllRecvSize;
     ClientConnectInfo.m_u4AllSendSize = obj_ClientConnectInfo_Param.m_u4AllSendSize;
-    ClientConnectInfo.m_u4BeginTime = (uint32)obj_ClientConnectInfo_Param.m_atvConnect.sec();
-    ClientConnectInfo.m_u4AliveTime = (uint32)(ACE_OS::gettimeofday().sec() - obj_ClientConnectInfo_Param.m_atvConnect.sec());
+    ClientConnectInfo.m_u4BeginTime = (uint32)CTimeStamp::Get_Time_use_second(obj_ClientConnectInfo_Param.m_atvConnect);
+    ClientConnectInfo.m_u4AliveTime = (uint32)(CTimeStamp::Get_Time_Difference(CTimeStamp::Get_Time_Stamp(), obj_ClientConnectInfo_Param.m_atvConnect) / 1000);
     ClientConnectInfo.m_u4RecvQueueCount = obj_ClientConnectInfo_Param.m_u4RecvQueueCount;
 
     return ClientConnectInfo;
@@ -380,7 +380,7 @@ bool Tcp_Common_Send_Input_To_Cache(CMakePacket& MakePacket,
         ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
         memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
         pSendMessage->wr_ptr(pBuffPacket->GetPacketLen());
-        ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+        auto tvNow = CTimeStamp::Get_Time_Stamp();
         MakePacket.PutSendErrorMessage(0, pSendMessage, tvNow);
         MakePacket.CommitMessageList();
 
@@ -453,7 +453,7 @@ bool Tcp_Common_Make_Send_Packet(CMakePacket& MakePacket,
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(u4PacketSize);
             memcpy_safe(pBuffPacket->GetData(), u4PacketSize, pSendMessage->wr_ptr(), u4PacketSize);
             pSendMessage->wr_ptr(u4PacketSize);
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+            auto tvNow = CTimeStamp::Get_Time_Stamp();
             MakePacket.PutSendErrorMessage(0, pSendMessage, tvNow);
             MakePacket.CommitMessageList();
 

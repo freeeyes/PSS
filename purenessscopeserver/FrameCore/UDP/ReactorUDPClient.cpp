@@ -91,7 +91,7 @@ bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const ch
 
     if((uint32)nSize == u4Len)
     {
-        m_atvOutput = ACE_OS::gettimeofday();
+        m_atvOutput = CTimeStamp::Get_Time_Stamp();
         m_u4SendSize += u4Len;
         m_u4SendPacketCount++;
         return true;
@@ -109,7 +109,7 @@ _ClientConnectInfo CReactorUDPClient::GetClientConnectInfo() const
     ClientConnectInfo.m_blValid       = true;
     ClientConnectInfo.m_u4ConnectID   = 0;
     ClientConnectInfo.m_u4AliveTime   = 0;
-    ClientConnectInfo.m_u4BeginTime   = (uint32)m_atvInput.sec();
+    ClientConnectInfo.m_u4BeginTime   = (uint32)CTimeStamp::Get_Time_use_second(m_atvInput);
     ClientConnectInfo.m_u4AllRecvSize = m_u4RecvSize;
     ClientConnectInfo.m_u4AllSendSize = m_u4SendSize;
     ClientConnectInfo.m_u4RecvCount   = m_u4RecvPacketCount;
@@ -129,7 +129,7 @@ bool CReactorUDPClient::CheckMessage(const char* pData, uint32 u4Len)
     objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
     m_pClientUDPMessage->RecvData(pData, u4Len, objServerIPInfo);
 
-    m_atvInput = ACE_OS::gettimeofday();
+    m_atvInput = CTimeStamp::Get_Time_Stamp();
     m_u4RecvSize += u4Len;
     m_u4RecvPacketCount++;
 

@@ -88,7 +88,7 @@ public:
     bool Write_SendData_To_File(bool blDelete, shared_ptr<IBuffPacket> pBuffPacket);                              //将发送数据写入文件
     bool Send_Input_To_Cache(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize);               //讲发送对象放入缓存
     bool Send_Input_To_TCP(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize);                 //将数据发送给对端
-    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;//发送数据
+    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend) final;//发送数据
 
 private:
     ENUM_WHILE_STATE Recv_Packet_Cut(bool& blRet);                           //数据切包
@@ -130,9 +130,9 @@ private:
     string                     m_strConnectName;                               //连接名称，可以开放给逻辑插件去设置
     ACE_INET_Addr              m_addrRemote;                                   //远程链接客户端地址
     ACE_INET_Addr              m_addrLocal;                                    //远程链接客户端地址
-    ACE_Time_Value             m_atvConnect;                                   //当前链接建立时间
-    ACE_Time_Value             m_atvInput;                                     //最后一次接收数据时间
-    ACE_Time_Value             m_atvOutput;                                    //最后一次发送数据时间
+    PSS_Time_Point             m_atvConnect;                                   //当前链接建立时间
+    PSS_Time_Point             m_atvInput;                                     //最后一次接收数据时间
+    PSS_Time_Point             m_atvOutput;                                    //最后一次发送数据时间
     shared_ptr<CPacketParse>   m_pPacketParse;                               //数据包解析类
     ACE_Message_Block*         m_pBlockRecv           = nullptr;               //接收数据缓冲块
     ACE_Message_Block*         m_pBlockMessage        = nullptr;               //当前发送缓冲等待数据块

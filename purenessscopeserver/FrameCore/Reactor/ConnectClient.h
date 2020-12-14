@@ -35,7 +35,7 @@ public:
 
     void Close(uint32 u4ConnectID) final;
     bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize) final;
-    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;
+    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend) final;
     void SetIsLog(bool blIsLog) final;
 
     void SetClientMessage(IClientMessage* pClientMessage); //设置消息接收处理类
@@ -45,7 +45,7 @@ public:
     bool SendData(ACE_Message_Block* pmblk);
     void Close();
 
-    bool GetTimeout(ACE_Time_Value const& tvNow) const;           //获得当前数据处理是否超时
+    bool GetTimeout(PSS_Time_Point const& tvNow) const;           //获得当前数据处理是否超时
 
     void ClientClose();                                           //主动关闭
     _ClientConnectInfo GetClientConnectInfo() const;              //得到当前链接信息
@@ -73,12 +73,12 @@ private:
     ACE_Recursive_Thread_Mutex  m_ThreadLock;
     IClientMessage*             m_pClientMessage = nullptr;              //消息处理类的指针
     ACE_Message_Block*          m_pCurrMessage   = nullptr;              //当前的MB对象
-    ACE_Time_Value              m_atvBegin;                           //链接建立时间
+    PSS_Time_Point              m_atvBegin;                           //链接建立时间
 
     EM_s2s                      m_ems2s       = EM_s2s::S2S_NEED_CALLBACK;    //是否需要回调状态
 	EM_Server_Recv_State        m_emRecvState = EM_Server_Recv_State::SERVER_RECV_INIT;     //0为未接收数据，1为接收数据完成，2为处理数据完成
 	EM_CONNECT_IO_DISPOSE       m_emDispose   = EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN;    //处理模式，框架处理 or 业务处理
-    ACE_Time_Value              m_atvRecv;                            //数据接收时间
+    PSS_Time_Point              m_atvRecv;                            //数据接收时间
     string                      m_strDeviceName;                      //转发接口名称
     CMakePacket                 m_MakePacket;
 };

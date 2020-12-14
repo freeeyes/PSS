@@ -184,7 +184,7 @@ bool CProactorUDPHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo
     return true;
 }
 
-bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
+bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend)
 {
     //Á¢¼´·¢ËÍ
 	_ClientIPInfo objClientIPInfo = App_UDPConnectIDManager::instance()->GetConnectIP(u4ConnectID);
@@ -240,7 +240,7 @@ _ClientConnectInfo CProactorUDPHandler::GetClientConnectInfo()
     ClientConnectInfo.m_blValid       = true;
     ClientConnectInfo.m_u4ConnectID   = 0;
     ClientConnectInfo.m_u4AliveTime   = 0;
-    ClientConnectInfo.m_u4BeginTime   = (uint32)m_atvInput.sec();
+    ClientConnectInfo.m_u4BeginTime   = (uint32)CTimeStamp::Get_Time_use_second(m_atvInput);
     ClientConnectInfo.m_u4AllRecvSize = m_u4RecvSize;
     ClientConnectInfo.m_u4AllSendSize = m_u4SendSize;
     ClientConnectInfo.m_u4RecvCount   = m_u4RecvPacketCount;
@@ -250,7 +250,7 @@ _ClientConnectInfo CProactorUDPHandler::GetClientConnectInfo()
 
 bool CProactorUDPHandler::CheckMessage(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Len, ACE_INET_Addr addrRemote)
 {
-    m_atvInput = ACE_OS::gettimeofday();
+    m_atvInput = CTimeStamp::Get_Time_Stamp();
 
     if(m_pPacketParseInfo->m_u1PacketParseType == PACKET_WITHHEAD)
     {
@@ -320,7 +320,7 @@ bool CProactorUDPHandler::CheckMessage(uint32 u4ConnectID, ACE_Message_Block* pM
 
 void CProactorUDPHandler::SaveProSendInfo(uint32 u4Len)
 {
-    m_atvOutput = ACE_OS::gettimeofday();
+    m_atvOutput = CTimeStamp::Get_Time_Stamp();
     m_u4SendSize += u4Len;
     m_u4SendPacketCount++;
 }

@@ -3,6 +3,7 @@
 
 #include "IBuffPacket.h"
 #include "ProfileTime.h"
+#include "TimeStamp.hpp"
 
 //记录消息的一些参数
 struct _MessageBase
@@ -21,7 +22,7 @@ struct _MessageBase
     string             m_strListenIP;                       //监听IP
     char               m_szTraceID[MAX_BUFF_50] = {'\0'};   //TraceID
     CProfileTime       m_ProfileTime;                       //消息到达时间
-    ACE_Time_Value     m_tvRecvTime;                        //消息接收时间
+    PSS_Time_Point     m_tvRecvTime;                        //消息接收时间
 
     _MessageBase()
     {

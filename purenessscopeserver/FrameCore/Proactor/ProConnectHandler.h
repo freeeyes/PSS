@@ -84,7 +84,7 @@ public:
     void SetPacketParseInfoID(uint32 u4PacketParseInfoID);                    //设置对应的m_u4PacketParseInfoID
     uint32 GetPacketParseInfoID();                                            //获得相应的m_u4PacketParseInfoID
     bool SendTimeoutMessage();                                                //发送连接超时消息
-    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend);       //将发送数据发送出去
+    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend);       //将发送数据发送出去
 
 private:
     ENUM_WHILE_STATE Recv_Packet_Cut(bool& blRet);                           //数据切包
@@ -127,10 +127,9 @@ private:
 
     ACE_INET_Addr      m_addrRemote;                   //远程链接客户端地址
     ACE_INET_Addr      m_addrListen;                   //本地监听地址
-    ACE_Time_Value     m_atvConnect;                   //当前链接建立时间
-    ACE_Time_Value     m_atvInput;                     //最后一次接收数据时间
-    ACE_Time_Value     m_atvOutput;                    //最后一次发送数据时间
-    ACE_Time_Value     m_atvSendAlive;                 //链接存活时间
+    PSS_Time_Point     m_atvConnect;                   //当前链接建立时间
+    PSS_Time_Point     m_atvInput;                     //最后一次接收数据时间
+    PSS_Time_Point     m_atvOutput;                    //最后一次发送数据时间
     shared_ptr<CPacketParse> m_pPacketParse;           //数据包解析类
     char               m_szConnectName[MAX_BUFF_100];  //连接名称，可以开放给逻辑插件去设置
     char               m_szLocalIP[MAX_BUFF_50];       //本地监听IP

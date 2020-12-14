@@ -34,7 +34,7 @@ public:
 
     void Close(uint32 u4ConnectID) final;
     bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize) final;
-    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend) final;
+    bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend) final;
     void SetIsLog(bool blIsLog) final;
 
     void Close();                                          //链接关闭
@@ -45,7 +45,7 @@ public:
     int  GetServerID();                                    //获得当前ServerID
     bool SendData(ACE_Message_Block* pmblk);               //发送数据
 
-    bool GetTimeout(ACE_Time_Value const& tvNow);                 //获得当前数据处理是否超时
+    bool GetTimeout(PSS_Time_Point const& tvNow);                 //获得当前数据处理是否超时
 
     _ClientConnectInfo GetClientConnectInfo();             //得到当前链接信息
 
@@ -64,14 +64,14 @@ private:
     int                         m_nServerID;                 //当前ServerID
     ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;           //线程锁
 
-    ACE_Time_Value              m_atvBegin;                  //链接建立时间
+    PSS_Time_Point              m_atvBegin;                  //链接建立时间
     uint32                      m_u4SendSize;                //发送字节数
     uint32                      m_u4SendCount;               //发送数据包数
     uint32                      m_u4RecvSize;                //接受字节数
     uint32                      m_u4RecvCount;               //接受数据包数
     uint32                      m_u4CostTime;                //消息处理总时间
     EM_s2s                      m_ems2s;                     //是否需要回调
-    ACE_Time_Value              m_atvRecv;                   //数据接收时间
+    PSS_Time_Point              m_atvRecv;                   //数据接收时间
     EM_Server_Recv_State        m_emRecvState;               //0为未接收数据，1为接收数据完成，2为处理数据完成
     EM_CONNECT_IO_DISPOSE       m_emDispose;                 //处理模式，框架处理 or 业务处理
     uint32                      m_u4PacketParseInfoID;       //框架处理模块ID

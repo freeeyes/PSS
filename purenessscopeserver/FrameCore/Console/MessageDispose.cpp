@@ -413,8 +413,8 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, shared_ptr<IBuff
         if (CommandInfo.m_u1OutputType == 0)
         {
             (*pBuffPacket) << (uint8)pCurrThreadInfo.m_u4ThreadID;
-            (*pBuffPacket) << (uint32)pCurrThreadInfo.m_tvUpdateTime.sec();
-            (*pBuffPacket) << (uint32)pCurrThreadInfo.m_tvCreateTime.sec();
+            (*pBuffPacket) << (uint32)CTimeStamp::Get_Time_use_second(pCurrThreadInfo.m_tvUpdateTime);
+            (*pBuffPacket) << (uint32)CTimeStamp::Get_Time_use_second(pCurrThreadInfo.m_tvCreateTime);
             (*pBuffPacket) << (uint8)pCurrThreadInfo.m_u4State;
             (*pBuffPacket) << pCurrThreadInfo.m_u4RecvPacketCount;
             (*pBuffPacket) << pCurrThreadInfo.m_u2CommandID;
@@ -425,8 +425,8 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, shared_ptr<IBuff
         {
             std::stringstream ss_format;
             ss_format << "ThreadID(" << pCurrThreadInfo.m_u4ThreadID << ")\n"
-                << "ThreadUpdateTime(" << pCurrThreadInfo.m_tvUpdateTime.sec() << ")\n"
-                << "ThreadCreateTime(" << pCurrThreadInfo.m_tvCreateTime.sec() << ")\n"
+                << "ThreadUpdateTime(" << CTimeStamp::Get_Time_use_second(pCurrThreadInfo.m_tvUpdateTime) << ")\n"
+                << "ThreadCreateTime(" << CTimeStamp::Get_Time_use_second(pCurrThreadInfo.m_tvCreateTime) << ")\n"
                 << "ThreadState(" << (int)pCurrThreadInfo.m_u4State << ")\n"
                 << "ThreadRecvPacketCount(" << pCurrThreadInfo.m_u4RecvPacketCount << ")\n"
                 << "ThreadCommandID(" << pCurrThreadInfo.m_u2CommandID << ")\n"
@@ -1782,7 +1782,7 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket>
             if (CommandInfo.m_u1OutputType == 0)
             {
                 (*pBuffPacket) << vec_Port_Data_Account[i].m_u1ThreadID;
-                (*pBuffPacket) << vec_Port_Data_Account[i].m_u4Minute;
+                (*pBuffPacket) << vec_Port_Data_Account[i].m_u1Minute;
                 (*pBuffPacket) << vec_Port_Data_Account[i].m_u4PacketIn;
                 (*pBuffPacket) << vec_Port_Data_Account[i].m_u4PacketOut;
             }
@@ -1790,7 +1790,7 @@ void DoMessage_PortList(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket>
             {
                 std::stringstream ss_format;
                 ss_format << "m_u1Type(" << vec_Port_Data_Account[i].m_u1ThreadID << ")\n"
-                    << "m_u4Port(" << vec_Port_Data_Account[i].m_u4Minute << ")\n"
+                    << "m_u4Port(" << vec_Port_Data_Account[i].m_u1Minute << ")\n"
                     << "m_u4FlowIn(" << vec_Port_Data_Account[i].m_u4PacketIn << ")\n"
                     << "m_u4FlowOut(" << vec_Port_Data_Account[i].m_u4PacketOut << ")\n";
                 string strLineText = ss_format.str();

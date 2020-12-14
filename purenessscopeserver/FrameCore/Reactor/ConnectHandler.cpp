@@ -174,7 +174,7 @@ int CConnectHandler::open(void*)
 //接受数据
 int CConnectHandler::handle_input(ACE_HANDLE fd)
 {
-    m_atvInput = ACE_OS::gettimeofday();
+    m_atvInput = CTimeStamp::Get_Time_Stamp();
 
     if(fd == ACE_INVALID_HANDLE)
     {
@@ -268,7 +268,7 @@ int CConnectHandler::Init_Open_Connect()
     SetConnectName(m_addrRemote.get_host_addr());
 
     //初始化当前链接的某些参数
-    m_atvConnect          = ACE_OS::gettimeofday();
+    m_atvConnect          = CTimeStamp::Get_Time_Stamp();
     m_atvInput            = m_atvConnect;
     m_atvOutput           = m_atvConnect;
 
@@ -393,7 +393,7 @@ bool CConnectHandler::SendTimeoutMessage()
     return true;
 }
 
-bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
+bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend)
 {
 	ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(u4Size);
 	memcpy_safe(pMbData->rd_ptr(),
@@ -443,7 +443,7 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
 
             //错误消息回调
             pmbSend->rd_ptr((size_t)0);
-            ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+            auto tvNow = CTimeStamp::Get_Time_Stamp();
             Send_MakePacket_Queue_Error(m_MakePacket, GetConnectID(), pmbSend, tvNow);
 
             OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID=%d send cancel.\n", GetConnectID()));

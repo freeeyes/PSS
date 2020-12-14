@@ -936,6 +936,9 @@
     <ClInclude Include="..\Common\ConvertBuffer.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\TimeStamp.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

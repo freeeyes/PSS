@@ -38,7 +38,7 @@ void CUnit_ConnectClient::Test_handle_input(void)
 void CUnit_ConnectClient::Test_GetTimeout(void)
 {
     bool blRet = false;
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+    auto tvNow = CTimeStamp::Get_Time_Stamp();
     m_pConnectClient->GetTimeout(tvNow);
 
     CPPUNIT_ASSERT_MESSAGE("[Test_GetTimeout]GetTimeout is fail.", false == blRet);

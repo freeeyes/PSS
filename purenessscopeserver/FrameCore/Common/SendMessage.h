@@ -6,6 +6,7 @@
 #include "IBuffPacket.h"
 #include "HashTable.h"
 #include "ObjectArrayList.h"
+#include "TimeStamp.hpp"
 #include <string>
 #include <sstream>
 
@@ -18,7 +19,7 @@ public:
     uint16 u2CommandID                  = 0;
     EM_Client_Send_Status emSendState   = EM_Client_Send_Status::CLIENT_SEND_IMMEDIATLY;
     EM_SEND_PACKET_PARSE emSendType     = EM_SEND_PACKET_PARSE::EM_SENDMESSAGE_JAMPNOMAL;
-    ACE_Time_Value tvSendBegin          = ACE_OS::gettimeofday();
+    PSS_Time_Point tvSendBegin          = CTimeStamp::Get_Time_Stamp();
     bool blDelete                       = true;
     int nMessageID                      = 0;
 };
@@ -36,7 +37,7 @@ public:
     uint8               m_u1Type      = 0;        //数据包的类型，0:数据包，1:主动关闭行为
     bool                m_blDelete    = true;     //发送完成后是否删除，true是删除，false是不删除
     IBuffPacket*        m_pBuffPacket = nullptr;  //数据包内容
-    ACE_Time_Value      m_tvSend;                 //数据包发送的时间戳
+    PSS_Time_Point      m_tvSend;                 //数据包发送的时间戳
 
     _SendMessage() = default;
 
@@ -51,7 +52,6 @@ public:
         m_nMessageID  = 0;
         m_u1Type      = 0;
         m_nHashID     = 0;
-        m_tvSend      = 0;
     }
 
     void SetHashID(int32 nHashID)

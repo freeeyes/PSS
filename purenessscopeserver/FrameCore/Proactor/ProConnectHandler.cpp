@@ -133,10 +133,9 @@ int CProConnectHandler::handle_write_file_stream(const char* pData, uint32 u4Siz
 
 void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
 {
-    m_atvConnect      = ACE_OS::gettimeofday();
+    m_atvConnect      = CTimeStamp::Get_Time_Stamp();
     m_atvInput        = m_atvConnect;
     m_atvOutput       = m_atvConnect;
-    m_atvSendAlive    = m_atvConnect;
 
     m_u4AllRecvSize       = 0;
     m_u4AllSendSize       = 0;
@@ -246,7 +245,7 @@ void CProConnectHandler::handle_read_stream(const ACE_Asynch_Read_Stream::Result
         return;
     }
 
-    m_atvInput = ACE_OS::gettimeofday();
+    m_atvInput = CTimeStamp::Get_Time_Stamp();
 
     Output_Debug_Data(&mb, LOG_SYSTEM_DEBUG_CLIENTRECV, m_addrRemote);
 
@@ -283,7 +282,7 @@ void CProConnectHandler::handle_write_stream(const ACE_Asynch_Write_Stream::Resu
         AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
 
         OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
-        m_atvOutput = ACE_OS::gettimeofday();
+        m_atvOutput = CTimeStamp::Get_Time_Stamp();
 
         //错误消息回调
         Send_MakePacket_Queue_Error(m_MakePacket, GetConnectID(), &result.message_block(), m_atvOutput);
@@ -346,7 +345,7 @@ bool CProConnectHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo,
     return true;
 }
 
-bool CProConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
+bool CProConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend)
 {
     ACE_Message_Block* pmbSend = App_MessageBlockManager::instance()->Create(u4Size);
     memcpy_safe(pMbData->rd_ptr(),
@@ -371,7 +370,6 @@ bool CProConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pM
             errno));
 
         //如果发送失败，在这里返回失败，回调给业务逻辑去处理
-        ACE_Time_Value tvNow = tvSend;
         Send_MakePacket_Queue_Error(m_MakePacket, u4ConnectID, pmbSend, m_atvOutput);
         return false;
     }

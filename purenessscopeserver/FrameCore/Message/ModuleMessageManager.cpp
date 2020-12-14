@@ -8,7 +8,7 @@ int CModuleMessageManager::SendModuleMessage(const char* pModuleName, uint16 u2C
 int CModuleMessageManager::SendFrameMessage(uint16 u2CommandID, uint32 u4WorkThreadID, shared_ptr<IBuffPacket> pHeadPacket, shared_ptr<IBuffPacket> pBodyBuffPacket)
 {
     //向框架重发送消息，通过注册的插件进行消费
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+    auto tvNow = CTimeStamp::Get_Time_Stamp();
     _MakePacket objMakePacket;
     auto pPacketParse = std::make_shared<CPacketParse>();
 

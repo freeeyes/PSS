@@ -548,6 +548,7 @@
     <ClInclude Include="..\Common\ThreadQueue.h" />
     <ClInclude Include="..\Common\TimerEvent.hpp" />
     <ClInclude Include="..\Common\TimerNodeList.hpp" />
+    <ClInclude Include="..\Common\TimeStamp.hpp" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="..\Common\TSCommon.hpp" />

@@ -29,7 +29,7 @@ public:
     int  OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proactor* pProactor);
     virtual void Close(uint32 u4ConnectID);
     virtual bool SendMessage(const CSendMessageInfo& objSendMessageInfo, uint32& u4PacketSize);
-    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend);
+    virtual bool PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend);
     virtual void SetIsLog(bool blIsLog);                                      //记录日志
     virtual bool Device_Send_Data(const char* pData, ssize_t nLen);
     _ClientConnectInfo GetClientConnectInfo();
@@ -49,8 +49,8 @@ private:
     ACE_Asynch_Read_Dgram   m_Read;
     ACE_Asynch_Write_Dgram  m_Write;
 
-    ACE_Time_Value          m_atvInput;                     //接收包的时间
-    ACE_Time_Value          m_atvOutput;                    //发送包的时间
+    PSS_Time_Point          m_atvInput;                     //接收包的时间
+    PSS_Time_Point          m_atvOutput;                    //发送包的时间
     uint32                  m_u4RecvPacketCount;            //接收数据包的数量
     uint32                  m_u4SendPacketCount;            //发送数据包的数量
     uint32                  m_u4RecvSize;                   //接收数据的总大小

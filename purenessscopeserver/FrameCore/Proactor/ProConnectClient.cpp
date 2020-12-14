@@ -64,7 +64,7 @@ void CProConnectClient::Close()
 			objMakePacket.m_AddrRemote      = m_AddrRemote;
 			objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
             objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_SERVER_TCP;
-            objMakePacket.m_tvRecv          = ACE_OS::gettimeofday();
+            objMakePacket.m_tvRecv          = CTimeStamp::Get_Time_Stamp();
 
             Send_MakePacket_Queue(m_MakePacket, objMakePacket);
         }
@@ -99,7 +99,7 @@ bool CProConnectClient::SendMessage(const CSendMessageInfo& objSendMessageInfo, 
     return true;
 }
 
-bool CProConnectClient::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const ACE_Time_Value& tvSend)
+bool CProConnectClient::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbData, uint32 u4Size, const PSS_Time_Point& tvSend)
 {
     ACE_UNUSED_ARG(u4ConnectID);
     ACE_UNUSED_ARG(pMbData);
@@ -178,7 +178,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     m_u4RecvSize        = 0;
     m_u4RecvCount       = 0;
     m_u4CostTime        = 0;
-    m_atvBegin          = ACE_OS::gettimeofday();
+    m_atvBegin          = CTimeStamp::Get_Time_Stamp();
 
     OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_nServerID=%d, this=0x%08x.\n", m_nServerID, this));
 
@@ -322,7 +322,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 uint16 u2CommandID = 0;
                 ACE_Message_Block* pRecvFinish = nullptr;
 
-                m_atvRecv = ACE_OS::gettimeofday();
+                m_atvRecv = CTimeStamp::Get_Time_Stamp();
                 m_emRecvState = EM_Server_Recv_State::SERVER_RECV_BEGIN;
 
                 while (true)
@@ -421,14 +421,15 @@ bool CProConnectClient::Device_Send_Data(const char* pData, ssize_t nLen)
     return SendData(pmb);
 }
 
-bool CProConnectClient::GetTimeout(ACE_Time_Value const& tvNow)
+bool CProConnectClient::GetTimeout(PSS_Time_Point const& tvNow)
 {
-    ACE_Time_Value tvIntval(tvNow - m_atvRecv);
+    auto time_interval_millisecond = CTimeStamp::Get_Time_Difference(tvNow, m_atvRecv);
+    auto time_interval_second = time_interval_millisecond / 1000;
 
-    if(m_emRecvState == EM_Server_Recv_State::SERVER_RECV_BEGIN && tvIntval.sec() > SERVER_RECV_TIMEOUT)
+    if(m_emRecvState == EM_Server_Recv_State::SERVER_RECV_BEGIN && time_interval_second > SERVER_RECV_TIMEOUT)
     {
         //接收数据处理已经超时，在这里打印出来
-        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, tvIntval.sec()));
+        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, time_interval_second));
         return false;
     }
     else
@@ -561,13 +562,13 @@ _ClientConnectInfo CProConnectClient::GetClientConnectInfo()
 {
     _ClientConnectInfo ClientConnectInfo;
     ClientConnectInfo.m_blValid       = true;
-    ClientConnectInfo.m_u4AliveTime   = (uint32)(ACE_OS::gettimeofday().sec() - m_atvBegin.sec());
+    ClientConnectInfo.m_u4AliveTime   = (uint32)(CTimeStamp::Get_Time_Difference(CTimeStamp::Get_Time_Stamp(), m_atvBegin));
     ClientConnectInfo.m_u4AllRecvSize = m_u4RecvSize;
     ClientConnectInfo.m_u4RecvCount   = m_u4RecvCount;
     ClientConnectInfo.m_u4AllSendSize = m_u4SendSize;
     ClientConnectInfo.m_u4SendCount   = m_u4SendCount;
     ClientConnectInfo.m_u4ConnectID   = m_nServerID;
-    ClientConnectInfo.m_u4BeginTime   = (uint32)m_atvBegin.sec();
+    ClientConnectInfo.m_u4BeginTime   = (uint32)CTimeStamp::Get_Time_use_second(m_atvBegin);
     return ClientConnectInfo;
 }
 

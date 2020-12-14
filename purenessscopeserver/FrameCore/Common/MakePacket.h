@@ -29,13 +29,13 @@ public:
 
     bool Init() const;
 
-    bool PutMessageBlock(_MakePacket const& objMakePacket, const ACE_Time_Value& tvNow);                         //处理消息数据包
-    bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const ACE_Time_Value& tvNow);  //发送失败消息回调
+    bool PutMessageBlock(_MakePacket const& objMakePacket, const PSS_Time_Point& tvNow);                         //处理消息数据包
+    bool PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, const PSS_Time_Point& tvNow);  //发送失败消息回调
     void CommitMessageList();          //提交到工作线程队列
 
 private:
-    void SetMessage(_MakePacket const& objMakePacket, shared_ptr<CWorkThreadMessage> pWorkThreadMessage, const ACE_Time_Value& tvNow) const;                              //一般数据包消息
-    void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, shared_ptr<CWorkThreadMessage> pWorkThreadMessage, const ACE_Time_Value& tvNow) const;  //服务发送失败回调数据包消息
+    void SetMessage(_MakePacket const& objMakePacket, shared_ptr<CWorkThreadMessage> pWorkThreadMessage, const PSS_Time_Point& tvNow) const;                              //一般数据包消息
+    void SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBodyMessage, shared_ptr<CWorkThreadMessage> pWorkThreadMessage, const PSS_Time_Point& tvNow) const;  //服务发送失败回调数据包消息
 
     ACE_Recursive_Thread_Mutex         m_ThreadWriteLock;
     CPerformanceCounter                m_PerformanceCounter;

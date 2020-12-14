@@ -12,6 +12,7 @@
 #include "define.h"
 #include "MessageBlockManager.h"
 #include "ClientUDPMassage.h"
+#include "TimeStamp.hpp"
 
 class CReactorUDPClient : public ACE_Event_Handler
 {
@@ -35,8 +36,8 @@ private:
     ACE_INET_Addr           m_addrRemote;                   //数据发送方的IP信息
     IClientUDPMessage*      m_pClientUDPMessage = nullptr;     //消息处理类
 
-    ACE_Time_Value          m_atvInput;                     //接收包的时间
-    ACE_Time_Value          m_atvOutput;                    //发送包的时间
+    PSS_Time_Point          m_atvInput;                     //接收包的时间
+    PSS_Time_Point          m_atvOutput;                    //发送包的时间
     uint32                  m_u4RecvPacketCount = 0;        //接收数据包的数量
     uint32                  m_u4SendPacketCount = 0;        //发送数据包的数量
     uint32                  m_u4RecvSize        = 0;        //接收数据的总大小

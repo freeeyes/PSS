@@ -54,7 +54,7 @@ public:
 	ACE_Message_Block* m_pmbRecvBody     = nullptr;                                          //接收包体部分
 
     IHandler*          m_pHandler        = nullptr;                                          //Handler指针
-    ACE_Time_Value     m_tvMessage;                                                          //消息处理时间
+    PSS_Time_Point     m_tvMessage;                                                          //消息处理时间
 	ACE_INET_Addr      m_AddrRemote;                                                         //数据包的来源IP信息
 	ACE_INET_Addr      m_AddrListen;                                                         //数据包来源监听IP信息
      
@@ -86,8 +86,8 @@ class CWorkThread_Handler_info
 {
 public:
     IHandler*          m_pHandler = nullptr;                                             //Handler指针
-	ACE_Time_Value     m_tvInput;                                                        //消息处理时间
-	ACE_Time_Value     m_tvOutput;                                                       //消息处理时间
+    PSS_Time_Point     m_tvInput;                                                        //消息处理时间
+    PSS_Time_Point     m_tvOutput;                                                       //消息处理时间
     std::string        m_strLocalIP;                                                     //监听IP
     uint16             m_u2LocalPort;                                                    //监听端口
 	std::string        m_strRemoteIP;                                                    //客户端IP

@@ -250,7 +250,7 @@ shared_ptr<CWorkThread_Handler_info> CMessageService::ProcessRecvMessage(shared_
         if (m_u1PacketCounter != 0)
         {
             m_objWorkThreadProcess.AddPacketIn(u4PacletHeadLength + u4PacletBodyLength,
-                pMessage->m_tvMessage);
+                CTimeStamp::Get_Time_of_Minute(pMessage->m_tvMessage));
         }
 
         //添加线程统计信息
@@ -327,7 +327,7 @@ bool CMessageService::ProcessSendMessage(shared_ptr<CWorkThreadMessage> pMessage
         if (m_u1PacketCounter != 0)
         {
             m_objWorkThreadProcess.AddPacketOut(u4PacketSize,
-                pMessage->m_tvMessage);
+                CTimeStamp::Get_Time_of_Minute(pMessage->m_tvMessage));
         }
     }
     else
@@ -411,23 +411,24 @@ int CMessageService::Close()
     return 0;
 }
 
-bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
+bool CMessageService::SaveThreadInfoData(const PSS_Time_Point& tvNow)
 {
     //这里进行线程自检
-    ACE_Date_Time dt(m_ThreadInfo.m_tvUpdateTime);
+    auto time_internal_millisecond = CTimeStamp::Get_Time_Difference(tvNow, m_ThreadInfo.m_tvUpdateTime);
+    auto time_interval_second = (uint16)(time_internal_millisecond / 1000);
 
     //开始查看线程是否超时
-    if(m_ThreadInfo.m_u4State == THREADSTATE::THREAD_RUNBEGIN && tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec() > m_u2ThreadTimeOut)
+    if(m_ThreadInfo.m_u4State == THREADSTATE::THREAD_RUNBEGIN && time_interval_second > m_u2ThreadTimeOut)
     {
-        string strLog = fmt::format("[WorkThread_timeout] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d} {5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} TimeOut > {11}{12} QueueCount = {13}.",
+        string strLog = fmt::format("[WorkThread_timeout] pThreadInfo = {0} State = {1} Time = [{2}] PacketCount = {3} LastCommand = {4:#x} PacketTime = {5} TimeOut > {6}{7} QueueCount = {8}.",
             m_ThreadInfo.m_u4ThreadID,
             m_ThreadInfo.m_u4State,
-            dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
+            CTimeStamp::Get_DateTime(m_ThreadInfo.m_tvUpdateTime),
             m_ThreadInfo.m_u4RecvPacketCount,
             m_ThreadInfo.m_u2CommandID,
             m_ThreadInfo.m_u2PacketTime,
             m_u2ThreadTimeOut,
-            tvNow.sec() - m_ThreadInfo.m_tvUpdateTime.sec(),
+            time_interval_second,
             (int)m_objThreadQueue.Size());
 
         AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_WORKTHREAD, strLog);
@@ -440,10 +441,10 @@ bool CMessageService::SaveThreadInfoData(const ACE_Time_Value& tvNow)
     }
     else
     {
-        string strLog = fmt::format("[WorkThread_nomal] pThreadInfo = {0} State = {1} Time = [{2:04d}-{3:02d}-{4:02d} {5:02d}:{6:02d}:{7:02d}] PacketCount = {8} LastCommand = {9:#x} PacketTime = {10} QueueCount = {11}.",
+        string strLog = fmt::format("[WorkThread_nomal] pThreadInfo = {0} State = {1} Time = [{2}] PacketCount = {3} LastCommand = {4:#x} PacketTime = {5} QueueCount = {6}.",
             m_ThreadInfo.m_u4ThreadID,
             m_ThreadInfo.m_u4State,
-            dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(),
+            CTimeStamp::Get_DateTime(m_ThreadInfo.m_tvUpdateTime),
             m_ThreadInfo.m_u4RecvPacketCount,
             m_ThreadInfo.m_u2CommandID,
             m_ThreadInfo.m_u2PacketTime,
@@ -658,12 +659,12 @@ void CMessageService::DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage) con
     pMessage->Close();
 }
 
-void CMessageService::GetFlowPortList(const ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
+void CMessageService::GetFlowPortList(const PSS_Time_Point& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account)
 {
-    vec_Port_Data_Account.push_back(m_objWorkThreadProcess.GetCurrInfo(tvNow));
+    vec_Port_Data_Account.push_back(m_objWorkThreadProcess.GetCurrInfo(CTimeStamp::Get_Time_of_Minute(tvNow)));
 }
 
-bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const ACE_Time_Value& tvMessage)
+bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const PSS_Time_Point& tvMessage)
 {
 	//同步发送数据
     uint32 u4SendLength = m_objBuffSendPacket.GetPacketLen();
@@ -689,7 +690,7 @@ bool CMessageService::Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler
     if (m_u1PacketCounter != 0)
     {
         m_objWorkThreadProcess.AddPacketOut(u4SendLength,
-            tvMessage);
+            CTimeStamp::Get_Time_of_Minute(tvMessage));
     }
 
     return true;
@@ -770,7 +771,7 @@ void CMessageService::Check_Handler_Recv_Timeout()
         vecList.emplace_back(iter.second);
         });
 
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+    auto tvNow = CTimeStamp::Get_Time_Stamp();
 
     for (shared_ptr<CWorkThread_Handler_info> pHandlerInfo : vecList)
     {
@@ -781,11 +782,11 @@ void CMessageService::Check_Handler_Recv_Timeout()
             continue;
         }
 
-        ACE_Time_Value tvTimeWait = tvNow - pHandlerInfo->m_tvInput;
-        if (m_u4MaxRecvWait < tvTimeWait.msec())
+        auto time_interval_millisecond = CTimeStamp::Get_Time_Difference(tvNow, pHandlerInfo->m_tvInput);
+        if (m_u4MaxRecvWait < time_interval_millisecond)
         {
-            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d tvNow=%d.\n", pHandlerInfo->m_u4ConnectID, tvNow.sec()));
-            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d tvNow=%d.\n", pHandlerInfo->m_u4ConnectID, pHandlerInfo->m_tvInput.sec()));
+            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d last tvNow=%s.\n", pHandlerInfo->m_u4ConnectID, CTimeStamp::Get_DateTime(tvNow).c_str()));
+            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d last m_tvInput=%s.\n", pHandlerInfo->m_u4ConnectID, CTimeStamp::Get_DateTime(pHandlerInfo->m_tvInput).c_str()));
             OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d is recv timeout.\n", pHandlerInfo->m_u4ConnectID));
 
             //超时了，发送链接断开消息
@@ -901,7 +902,7 @@ CMessageServiceGroup::CMessageServiceGroup()
 
 int CMessageServiceGroup::timer_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    ACE_Time_Value tv = ACE_OS::gettimeofday();
+    auto tv = CTimeStamp::Get_Time_Stamp();
 
     //检查超时的链接
     CheckRecvTimeout();
@@ -1110,7 +1111,7 @@ bool CMessageServiceGroup::CheckRecvTimeout() const
     return true;
 }
 
-bool CMessageServiceGroup::CheckWorkThread(const ACE_Time_Value& tvNow) const
+bool CMessageServiceGroup::CheckWorkThread(const PSS_Time_Point& tvNow) const
 {
     for (auto pMessageService : m_vecMessageService)
     {
@@ -1268,7 +1269,7 @@ void CMessageServiceGroup::GetDyeingCommand(vec_Dyeing_Command_list& objList) co
 void CMessageServiceGroup::GetFlowPortList(vector<CWorkThread_Packet_Info>& vec_Port_Data_Account) const
 {
     vec_Port_Data_Account.clear();
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
+    auto tvNow = CTimeStamp::Get_Time_Stamp();
 
     for (auto pMessageService : m_vecMessageService)
     {

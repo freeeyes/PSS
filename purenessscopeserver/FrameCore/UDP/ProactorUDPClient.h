@@ -7,6 +7,7 @@
 #include "ace/Asynch_IO.h"
 #include "ace/INET_Addr.h"
 #include "ace/SOCK_Dgram.h"
+#include "TimeStamp.hpp"
 
 #include "define.h"
 #include "MessageBlockManager.h"
@@ -34,8 +35,8 @@ private:
     ACE_Asynch_Write_Dgram  m_Write;
     IClientUDPMessage*      m_pClientUDPMessage;            //需要回调的消息类
 
-    ACE_Time_Value          m_atvInput;                     //接收包的时间
-    ACE_Time_Value          m_atvOutput;                    //发送包的时间
+    PSS_Time_Point          m_atvInput;                     //接收包的时间
+    PSS_Time_Point          m_atvOutput;                    //发送包的时间
     uint32                  m_u4RecvPacketCount;            //接收数据包的数量
     uint32                  m_u4SendPacketCount;            //发送数据包的数量
     uint32                  m_u4RecvSize;                   //接收数据的总大小

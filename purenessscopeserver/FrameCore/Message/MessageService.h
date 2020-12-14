@@ -42,7 +42,7 @@ public:
     uint32 m_u4RecvSize  = 0;
     uint32 m_u4SendSize  = 0;
     
-    uint32 m_u4Minute    = 0;    //当前时间，按照分钟统计
+    uint8 m_u1Minute    = 0;    //当前时间，按照分钟统计
 
     void Clear()
     {
@@ -59,38 +59,34 @@ class CWorkThread_Process
 public:
     CWorkThread_Packet_Info m_objPacketCounter;
 
-    void Clear(uint32 u4NowMinite)
+    void Clear(uint8 u1NowMinite)
     {
-        if (u4NowMinite != m_objPacketCounter.m_u4Minute)
+        if (u1NowMinite != m_objPacketCounter.m_u1Minute)
         {
             m_objPacketCounter.Clear();
-            m_objPacketCounter.m_u4Minute = u4NowMinite;
+            m_objPacketCounter.m_u1Minute = u1NowMinite;
         }
     }
 
-    void AddPacketIn(uint32 m_u4PacketIn, const ACE_Time_Value& tvNow)
+    void AddPacketIn(uint32 m_u4PacketIn, uint8 u1Minute)
     {
-        auto u4NowMinite = (uint32)(tvNow.sec() / 60);
-        Clear(u4NowMinite);
+        Clear(u1Minute);
         
         m_objPacketCounter.m_u4PacketIn++;
         m_objPacketCounter.m_u4RecvSize = m_u4PacketIn;
     }
 
-    void AddPacketOut(uint32 m_u4PacketOut, const ACE_Time_Value& tvNow)
+    void AddPacketOut(uint32 m_u4PacketOut, uint8 u1Minute)
     {
-        auto u4NowMinite = (uint32)(tvNow.sec() / 60);
-        Clear(u4NowMinite);
+        Clear(u1Minute);
 
         m_objPacketCounter.m_u4PacketOut++;
         m_objPacketCounter.m_u4SendSize = m_u4PacketOut;
     }
 
-    CWorkThread_Packet_Info GetCurrInfo(const ACE_Time_Value& tvNow)
+    CWorkThread_Packet_Info GetCurrInfo(uint8 u1Minute)
     {
-        auto u4NowMinite = (uint32)(tvNow.sec() / 60);
-        Clear(u4NowMinite);
-
+        Clear(u1Minute);
         return m_objPacketCounter;
     }
 };
@@ -113,7 +109,7 @@ public:
     bool PutUpdateCommandMessage(uint32 u4UpdateIndex);
 
     _ThreadInfo* GetThreadInfo();
-    bool SaveThreadInfoData(const ACE_Time_Value& tvNow);   //记录当前工作线程状态信息日志
+    bool SaveThreadInfoData(const PSS_Time_Point& tvNow);   //记录当前工作线程状态信息日志
 
     void GetAIInfo(_WorkThreadAIInfo& objAIInfo) const;           //得到所有工作线程的AI配置
     void GetAITO(vecCommandTimeout& objTimeout) const;            //得到所有的AI超时数据包信息
@@ -134,9 +130,9 @@ public:
     shared_ptr<CWorkThreadMessage> CreateMessage() const;
     void DeleteMessage(shared_ptr<CWorkThreadMessage> pMessage) const;
 
-    void GetFlowPortList(const ACE_Time_Value& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
+    void GetFlowPortList(const PSS_Time_Point& tvNow, vector<CWorkThread_Packet_Info>& vec_Port_Data_Account); //得到当前列表描述信息
 
-    bool Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const ACE_Time_Value& tvMessage);
+    bool Synchronize_SendPostMessage(shared_ptr<CWorkThread_Handler_info> pHandlerInfo, const PSS_Time_Point& tvMessage);
     bool SendPostMessage(const CSendMessageInfo& objSendMessageInfo);          //发送数据
     bool SendCloseMessage(uint32 u4ConnectID);                                //关闭指定链接 
 
@@ -243,7 +239,7 @@ private:
     bool KillTimer();
 
     bool CheckRecvTimeout() const;                                                            //检查所有的超时链接
-    bool CheckWorkThread(const ACE_Time_Value& tvNow) const;                                  //检查所有的工作线程状态
+    bool CheckWorkThread(const PSS_Time_Point& tvNow) const;                                  //检查所有的工作线程状态
     bool CheckPlugInState() const;                                                            //检查所有插件状态
    
 	using vecMessageService = vector<shared_ptr<CMessageService>>;
