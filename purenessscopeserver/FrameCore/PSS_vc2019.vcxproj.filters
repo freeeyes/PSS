@@ -307,12 +307,6 @@
     <ClCompile Include="Proactor\ProConnectHandler.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="CppUnit\Unit_TSTimer.cpp">
-      <Filter>CppUnit\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="CppUnit\Unit_TMService.cpp">
-      <Filter>CppUnit\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="..\Common\Echartlog.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -822,12 +816,6 @@
     <ClInclude Include="..\Common\TSCommon.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="CppUnit\Unit_TSTimer.h">
-      <Filter>CppUnit\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="CppUnit\Unit_TMService.h">
-      <Filter>CppUnit\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\Echartlog.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -916,6 +904,9 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\TimeStamp.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\tms.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

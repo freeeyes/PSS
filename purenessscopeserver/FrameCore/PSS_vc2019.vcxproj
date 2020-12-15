@@ -233,8 +233,6 @@
     <ClCompile Include="CppUnit\Unit_ModuleMessageManager.cpp" />
     <ClCompile Include="CppUnit\Unit_ProfileTime.cpp" />
     <ClCompile Include="CppUnit\Unit_TimeQueue.cpp" />
-    <ClCompile Include="CppUnit\Unit_TMService.cpp" />
-    <ClCompile Include="CppUnit\Unit_TSTimer.cpp" />
     <ClCompile Include="CppUnit\Unit_WorkThreadAI.cpp" />
     <ClCompile Include="Mail\smtps.cpp" />
     <ClCompile Include="Message\HandlerManager.cpp" />
@@ -544,6 +542,7 @@
     <ClInclude Include="..\Common\ThreadLock.h" />
     <ClInclude Include="..\Common\TimeStamp.hpp" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
+    <ClInclude Include="..\Common\tms.hpp" />
     <ClInclude Include="..\Common\Trace.h" />
     <ClInclude Include="..\Common\TSCommon.hpp" />
     <ClInclude Include="Common\BaseClientConnectManager.h" />
@@ -600,8 +599,6 @@
     <ClInclude Include="CppUnit\Unit_ModuleMessageManager.h" />
     <ClInclude Include="CppUnit\Unit_ProfileTime.h" />
     <ClInclude Include="CppUnit\Unit_TimeQueue.h" />
-    <ClInclude Include="CppUnit\Unit_TMService.h" />
-    <ClInclude Include="CppUnit\Unit_TSTimer.h" />
     <ClInclude Include="CppUnit\Unit_WorkThreadAI.h" />
     <ClInclude Include="Encrypt\Aes.h" />
     <ClInclude Include="FileTest\FileTest.h" />

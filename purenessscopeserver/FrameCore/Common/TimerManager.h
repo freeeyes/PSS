@@ -142,7 +142,7 @@ namespace brynet {
             if (mTimers.empty())
             {
                 //当前没有定时器，等待唤醒
-                cv.wait_for(lck, std::chrono::microseconds(timer_default_wait));
+                cv.wait_for(lck, std::chrono::seconds(timer_default_wait));
             }
 
             if (!timer_run_)
