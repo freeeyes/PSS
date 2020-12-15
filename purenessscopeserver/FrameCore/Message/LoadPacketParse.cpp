@@ -25,90 +25,90 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
     string strFilePath;
 
     strFilePath = fmt::format("{0}{1}", pPacketParsePath, szPacketParseName);
-    pPacketParseInfo->m_hModule = ACE_OS::dlopen(strFilePath.c_str(), RTLD_NOW);
+    pPacketParseInfo->m_hModule = CLoadLibrary::PSS_dlopen(strFilePath.c_str(), RTLD_NOW);
 
     if(nullptr == pPacketParseInfo->m_hModule)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, pModuleInfo->hModule is nullptr(%s)!\n", szPacketParseName, ACE_OS::dlerror()));
+        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, pModuleInfo->hModule is nullptr(%s)!\n", szPacketParseName, CLoadLibrary::PSS_dlerror()));
         return false;
     }
 
-    pPacketParseInfo->Parse_Packet_Head_Info = (bool(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Head_Info*, EM_CONNECT_IO_TYPE))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Head_Info");
+    pPacketParseInfo->Parse_Packet_Head_Info = (bool(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Head_Info*, EM_CONNECT_IO_TYPE))CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Head_Info");
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Head_Info)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Head_Info is error!\n", szPacketParseName));
-        nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
         return false;
     }
 
-    pPacketParseInfo->Parse_Packet_Body_Info = (bool(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Body_Info*, EM_CONNECT_IO_TYPE))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Body_Info");
+    pPacketParseInfo->Parse_Packet_Body_Info = (bool(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Body_Info*, EM_CONNECT_IO_TYPE))CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Body_Info");
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Body_Info)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Body_Info is error!\n", szPacketParseName));
-        nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
         return false;
     }
 
-    pPacketParseInfo->Parse_Packet_Stream = (uint8(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Packet_Info*, EM_CONNECT_IO_TYPE))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Stream");
+    pPacketParseInfo->Parse_Packet_Stream = (uint8(*)(uint32, ACE_Message_Block*, IMessageBlockManager*, _Packet_Info*, EM_CONNECT_IO_TYPE))CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "Parse_Packet_Stream");
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Stream)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Stream is error!\n", szPacketParseName));
-        nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
         return false;
     }
 
-    pPacketParseInfo->Make_Send_Packet = (bool(*)(uint32, const char*, uint32, ACE_Message_Block*, uint16))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Make_Send_Packet");
+    pPacketParseInfo->Make_Send_Packet = (bool(*)(uint32, const char*, uint32, ACE_Message_Block*, uint16))CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "Make_Send_Packet");
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Make_Send_Packet)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Make_Send_Packet is error!\n", szPacketParseName));
-        nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
         return false;
     }
 
-    pPacketParseInfo->Make_Send_Packet_Length = (uint32(*)(uint32, uint32, uint16))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Make_Send_Packet_Length");
+    pPacketParseInfo->Make_Send_Packet_Length = (uint32(*)(uint32, uint32, uint16))CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "Make_Send_Packet_Length");
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Make_Send_Packet_Length)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Make_Send_Packet_Length is error!\n", szPacketParseName));
-        nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
         return false;
     }
 
-    pPacketParseInfo->Connect = (bool(*)(uint32, _ClientIPInfo, _ClientIPInfo const&))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Connect");
+    pPacketParseInfo->Connect = (bool(*)(uint32, _ClientIPInfo, _ClientIPInfo const&))CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "Connect");
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Connect)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Connect is error!\n", szPacketParseName));
-        nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
         return false;
     }
 
-    pPacketParseInfo->DisConnect = (void(*)(uint32))ACE_OS::dlsym(pPacketParseInfo->m_hModule, "DisConnect");
+    pPacketParseInfo->DisConnect = (void(*)(uint32))CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "DisConnect");
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->DisConnect)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function DisConnect is error!\n", szPacketParseName));
-        nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
         return false;
     }
 
-    pPacketParseInfo->Close = (void(*)())ACE_OS::dlsym(pPacketParseInfo->m_hModule, "Close");
+    pPacketParseInfo->Close = (void(*)())CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "Close");
 
     if (nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Close)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Close is error!\n", szPacketParseName));
-        nRet = ACE_OS::dlclose(pPacketParseInfo->m_hModule);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
         OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
         return false;
     }
@@ -141,7 +141,7 @@ void CLoadPacketParse::Close()
     for_each(m_objPacketParseList.begin(), m_objPacketParseList.end(), [](const std::pair<uint32, shared_ptr<_Packet_Parse_Info>>& iter) {
         //关闭模块接口
         iter.second->Close();
-        ACE_OS::dlclose(iter.second->m_hModule);
+        CLoadLibrary::PSS_dlClose(iter.second->m_hModule);
         });
 
     m_objPacketParseList.clear();

@@ -1,4 +1,3 @@
-// BuffPacket.h
 // 这里实现模块加载
 // 一步步，便可聚少为多，便能实现目标。
 // add by freeeyes
@@ -21,7 +20,7 @@ void CLoadModule::Close()
         iter.second->UnLoadModuleData();
 
         //清除模块相关索引和数据
-        ACE_OS::dlclose(iter.second->hModule);
+        CLoadLibrary::PSS_dlClose(iter.second->hModule);
         });
 
     m_objHashModuleList.clear();
@@ -33,7 +32,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 
     auto pModuleInfo = std::make_shared<_ModuleInfo>();
 
-    if(nullptr == pModuleInfo)
+    if (nullptr == pModuleInfo)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] new _ModuleInfo is error!\n"));
         return false;
@@ -43,7 +42,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
     pModuleInfo->strModuleParam = (string)pModuleParam;
 
     //开始注册模块函数
-    if(false == LoadModuleInfo(strModuleName, pModuleInfo, pModulePath))
+    if (false == LoadModuleInfo(strModuleName, pModuleInfo, pModulePath))
     {
         return false;
     }
@@ -51,17 +50,17 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
     //查找此模块是否已经被注册，有则把信息老信息清理
     auto f = m_objHashModuleList.find(pModuleInfo->GetName());
 
-    if(m_objHashModuleList.end() != f)
+    if (m_objHashModuleList.end() != f)
     {
         //卸载旧的插件
-        ACE_OS::dlclose(f->second->hModule);
+        CLoadLibrary::PSS_dlClose(f->second->hModule);
         m_objHashModuleList.erase(f);
     }
 
     //开始调用模块初始化动作
     int nRet = pModuleInfo->LoadModuleData(App_ServerObject::instance());
 
-    if(nRet != 0)
+    if (nRet != 0)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
         return false;
@@ -80,7 +79,7 @@ bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
     OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szModuleName));
     auto f = m_objHashModuleList.find(strModuleName);
 
-    if(m_objHashModuleList.end() == f)
+    if (m_objHashModuleList.end() == f)
     {
         return false;
     }
@@ -91,14 +90,14 @@ bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
         pModuleInfo->UnLoadModuleData();
 
         //清除模块相关索引和数据
-        int nRet = ACE_OS::dlclose(pModuleInfo->hModule);
+        CLoadLibrary::PSS_dlClose(pModuleInfo->hModule);
 
-        if(true == blIsDelete)
+        if (true == blIsDelete)
         {
             m_objHashModuleList.erase(f);
         }
 
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule] Close Module=%s, nRet=%d!\n", strModuleName.c_str(), nRet));
+        OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule] Close Module=%s!\n", strModuleName.c_str()));
 
         return true;
     }
@@ -120,14 +119,14 @@ bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex,
 
         //放入等待清理的线程列表
         CWaitUnLoadModule objWaitUnloadModule;
-        objWaitUnloadModule.m_u4UpdateIndex        = u4UpdateIndex;
-        objWaitUnloadModule.m_hModule              = pModuleInfo->hModule;
-        objWaitUnloadModule.UnLoadModuleData       = pModuleInfo->UnLoadModuleData;
+        objWaitUnloadModule.m_u4UpdateIndex = u4UpdateIndex;
+        objWaitUnloadModule.m_hModule = pModuleInfo->hModule;
+        objWaitUnloadModule.UnLoadModuleData = pModuleInfo->UnLoadModuleData;
         objWaitUnloadModule.m_u4ThreadCurrEndCount = u4ThreadCount;
-        objWaitUnloadModule.m_u1UnloadState        = u1UnLoadState;
-        objWaitUnloadModule.m_strModuleName        = strModuleName;
-        objWaitUnloadModule.m_strModulePath        = strModulePath;
-        objWaitUnloadModule.m_strModuleParam       = strModuleParam;
+        objWaitUnloadModule.m_u1UnloadState = u1UnLoadState;
+        objWaitUnloadModule.m_strModuleName = strModuleName;
+        objWaitUnloadModule.m_strModulePath = strModulePath;
+        objWaitUnloadModule.m_strModuleParam = strModuleParam;
         m_veCWaitUnLoadModule.push_back(objWaitUnloadModule);
 
         //删除存在m_objHashModuleList的插件信息
@@ -163,10 +162,10 @@ int CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
 
             //回收插件端口资源
             OUR_DEBUG((LM_ERROR, "[CLoadModule::UnloadListUpdate]szResourceName=%s UnLoad.\n", (*itr).m_strModuleName.c_str()));
-            ACE_OS::dlclose((*itr).m_hModule);
+            CLoadLibrary::PSS_dlClose((*itr).m_hModule);
 
             //判断是否需要重载插件
-            if(2 == (*itr).m_u1UnloadState)
+            if (2 == (*itr).m_u1UnloadState)
             {
                 //重新加载
                 LoadModule((*itr).m_strModulePath.c_str(), (*itr).m_strModuleName.c_str(), (*itr).m_strModuleParam.c_str());
@@ -235,7 +234,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 {
     string strModuleFile;
 
-    if(nullptr == pModuleInfo)
+    if (nullptr == pModuleInfo)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, pModuleInfo is nullptr!\n", strModuleName.c_str()));
         return false;
@@ -247,72 +246,72 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     m_tmModule.acquire();
 
-    pModuleInfo->hModule = ACE_OS::dlopen(strModuleFile.c_str(), RTLD_NOW);
+    pModuleInfo->hModule = CLoadLibrary::PSS_dlopen(strModuleFile.c_str(), RTLD_NOW);
 
-    if(nullptr == pModuleInfo->hModule || !pModuleInfo->hModule)
+    if (nullptr == pModuleInfo->hModule || !pModuleInfo->hModule)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, pModuleInfo->hModule is nullptr(%s)!\n", strModuleName.c_str(), ACE_OS::dlerror()));
+        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, pModuleInfo->hModule is nullptr(%s)!\n", strModuleName.c_str(), CLoadLibrary::PSS_dlerror()));
         m_tmModule.release();
         return false;
     }
 
-    pModuleInfo->LoadModuleData = (int(*)(CServerObject*))ACE_OS::dlsym(pModuleInfo->hModule, "LoadModuleData");
+    pModuleInfo->LoadModuleData = (int(*)(CServerObject*))CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "LoadModuleData");
 
-    if(nullptr == pModuleInfo->LoadModuleData)
+    if (nullptr == pModuleInfo->LoadModuleData)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function LoadMoudle is error!\n", strModuleName.c_str()));
         m_tmModule.release();
         return false;
     }
 
-    pModuleInfo->UnLoadModuleData = (int(*)())ACE_OS::dlsym(pModuleInfo->hModule, "UnLoadModuleData");
+    pModuleInfo->UnLoadModuleData = (int(*)())CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "UnLoadModuleData");
 
-    if(nullptr == pModuleInfo->UnLoadModuleData)
+    if (nullptr == pModuleInfo->UnLoadModuleData)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function UnloadModule is error!\n", strModuleName.c_str()));
         m_tmModule.release();
         return false;
     }
 
-    pModuleInfo->GetDesc = (const char* (*)())ACE_OS::dlsym(pModuleInfo->hModule, "GetDesc");
+    pModuleInfo->GetDesc = (const char* (*)())CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "GetDesc");
 
-    if(nullptr == pModuleInfo->GetDesc)
+    if (nullptr == pModuleInfo->GetDesc)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetDesc is error!\n", strModuleName.c_str()));
         m_tmModule.release();
         return false;
     }
 
-    pModuleInfo->GetName = (const char* (*)())ACE_OS::dlsym(pModuleInfo->hModule, "GetName");
+    pModuleInfo->GetName = (const char* (*)())CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "GetName");
 
-    if(nullptr == pModuleInfo->GetName)
+    if (nullptr == pModuleInfo->GetName)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetName is error!\n", strModuleName.c_str()));
         m_tmModule.release();
         return false;
     }
 
-    pModuleInfo->GetModuleKey = (const char* (*)())ACE_OS::dlsym(pModuleInfo->hModule, "GetModuleKey");
+    pModuleInfo->GetModuleKey = (const char* (*)())CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "GetModuleKey");
 
-    if(nullptr == pModuleInfo->GetModuleKey)
+    if (nullptr == pModuleInfo->GetModuleKey)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetModuleKey is error!\n", strModuleName.c_str()));
         m_tmModule.release();
         return false;
     }
 
-    pModuleInfo->DoModuleMessage = (int(*)(uint16, shared_ptr<IBuffPacket>, shared_ptr<IBuffPacket>))ACE_OS::dlsym(pModuleInfo->hModule, "DoModuleMessage");
+    pModuleInfo->DoModuleMessage = (int(*)(uint16, shared_ptr<IBuffPacket>, shared_ptr<IBuffPacket>))CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "DoModuleMessage");
 
-    if(nullptr == pModuleInfo->DoModuleMessage)
+    if (nullptr == pModuleInfo->DoModuleMessage)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function DoModuleMessage is error(%d)!\n", strModuleName.c_str(), errno));
         m_tmModule.release();
         return false;
     }
 
-    pModuleInfo->GetModuleState = (bool(*)(uint32&))ACE_OS::dlsym(pModuleInfo->hModule, "GetModuleState");
+    pModuleInfo->GetModuleState = (bool(*)(uint32&))CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "GetModuleState");
 
-    if(nullptr == pModuleInfo->GetModuleState)
+    if (nullptr == pModuleInfo->GetModuleState)
     {
         OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetModuleState is error(%d)!\n", strModuleName.c_str(), errno));
         m_tmModule.release();
@@ -320,7 +319,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
     }
 
     //这个可以为空，当为空的时候初始化不调用
-    pModuleInfo->InitModule = (int(*)(CServerObject*))ACE_OS::dlsym(pModuleInfo->hModule, "InitModule");
+    pModuleInfo->InitModule = (int(*)(CServerObject*))CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "InitModule");
 
     pModuleInfo->strModuleName = strModuleName;
     m_tmModule.release();
@@ -331,7 +330,7 @@ int CLoadModule::SendModuleMessage(const char* pModuleName, uint16 u2CommandID, 
 {
     auto f = m_objHashModuleList.find(pModuleName);
 
-    if(m_objHashModuleList.end() != f)
+    if (m_objHashModuleList.end() != f)
     {
         f->second->DoModuleMessage(u2CommandID, pBuffPacket, pReturnBuffPacket);
     }
@@ -343,7 +342,7 @@ bool CLoadModule::GetModuleExist(const char* pModuleName)
 {
     auto f = m_objHashModuleList.find(pModuleName);
 
-    if(m_objHashModuleList.end() != f)
+    if (m_objHashModuleList.end() != f)
     {
         return true;
     }
@@ -357,7 +356,7 @@ const char* CLoadModule::GetModuleParam(const char* pModuleName)
 {
     auto f = m_objHashModuleList.find(pModuleName);
 
-    if(m_objHashModuleList.end() != f)
+    if (m_objHashModuleList.end() != f)
     {
         return f->second->strModuleParam.c_str();
     }
@@ -436,8 +435,8 @@ bool CLoadModule::GetAllModuleName(uint32 u4Index, char* pName, uint16 nLen)
     if (nLen <= m_vecModuleNameList[u4Index].length())
     {
         OUR_DEBUG((LM_INFO, "[CLoadModule::GetAllModuleName]pName len(%d) is more than(%d).\n",
-                   m_vecModuleNameList[u4Index].length(),
-                   nLen));
+            m_vecModuleNameList[u4Index].length(),
+            nLen));
         return false;
     }
 

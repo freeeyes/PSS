@@ -16,8 +16,8 @@
 class WaitQuitSignal
 {
 public:
-    void init();
-    bool wait(bool& flag);
+    static void init();
+    static bool wait(bool& flag);
 private:
     static sigset_t m_wait_mask;
     static struct timespec m_time;

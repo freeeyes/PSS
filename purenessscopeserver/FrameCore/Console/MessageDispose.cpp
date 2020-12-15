@@ -283,14 +283,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacke
                 (*pBuffPacket) << u1SModileDescLen;
                 pBuffPacket->WriteStream(pModuleInfo->GetDesc(), u1SModileDescLen);
 
-                std::stringstream ss_format;
-                ss_format << pModuleInfo->dtCreateTime.year()
-                    << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.month()
-                    << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.day()
-                    << " " << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.hour()
-                    << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.minute()
-                    << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.second();
-                string strTime = ss_format.str();
+                string strTime = CTimeStamp::Get_DateTime(pModuleInfo->tvCreateTime);
                 (*pBuffPacket) << strTime;
 
                 //Ð´ÈëModuleµ±Ç°×´Ì¬
@@ -314,12 +307,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacke
                     << "ModuleFilePath(" << pModuleInfo->strModulePath << ")\n"
                     << "ModuleParam(" << pModuleInfo->strModuleParam << ")\n"
                     << "ModuleDesc(" << pModuleInfo->GetDesc() << ")\n"
-                    << "CreeateTime(" << pModuleInfo->dtCreateTime.year()
-                    << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.month()
-                    << "-" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.day()
-                    << " " << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.hour()
-                    << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.minute()
-                    << ":" << std::setfill('0') << std::setw(2) << pModuleInfo->dtCreateTime.second()
+                    << "CreeateTime(" << CTimeStamp::Get_DateTime(pModuleInfo->tvCreateTime)
                     << ")\n"
                     << "ModuleState Run u4ErrorID(" << u4ErrorID << ")\n";
                 string strLineText = ss_format.str();

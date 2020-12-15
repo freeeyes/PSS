@@ -834,9 +834,6 @@
     <ClInclude Include="..\Common\RandomNumber.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\ILogicQueue.hpp">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Common\MakePacket_Common.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
@@ -907,6 +904,12 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\tms.hpp">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ILogicQueue.hpp">
+      <Filter>Common\cppfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\LoadLibrary.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>

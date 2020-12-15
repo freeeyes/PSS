@@ -59,6 +59,8 @@ using int64   = int64_t;
 using float32 = float;
 using float64 = double;
 
+#define PSS_UNUSED_ARG(a) do {/* null */} while (&a == 0)
+
 //自动判定操作系统
 #define PLATFORM_WIN     0
 #define PLATFORM_UNIX    1

@@ -10,11 +10,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#if PSS_PLATFORM == PLATFORM_WIN
-#include <windows.h>
-#else
-#include <dlfcn.h>
-#endif
+#include "LoadLibrary.hpp"
 
 class _ModuleInfo
 {
@@ -22,8 +18,8 @@ public:
     string           strModuleName;         //模块文件名称
     string           strModulePath;         //模块路径
     string           strModuleParam;        //模块启动参数
-    ACE_Date_Time    dtCreateTime;          //模块创建时间
-    ACE_SHLIB_HANDLE hModule                            = nullptr;
+    PSS_Time_Point   tvCreateTime = CTimeStamp::Get_Time_Stamp(); //模块创建时间
+    Pss_Library_Handler hModule                         = nullptr;
     int (*LoadModuleData)(CServerObject* pServerObject) = nullptr;
     int (*InitModule)(CServerObject* pServerObject)     = nullptr;
     int (*UnLoadModuleData)(void)                       = nullptr;
@@ -39,14 +35,14 @@ public:
 class CWaitUnLoadModule
 {
 public:
-    uint32           m_u4UpdateIndex              = 0;         //工作线程总数
-    uint32           m_u4ThreadCurrEndCount       = 0;         //当前已经结束的工作线程个数
-    uint8            m_u1UnloadState              = 0;         //重载状态，1为卸载，2为重载
-    ACE_SHLIB_HANDLE m_hModule                    = nullptr;   //插件的指针
+    uint32              m_u4UpdateIndex              = 0;         //工作线程总数
+    uint32              m_u4ThreadCurrEndCount       = 0;         //当前已经结束的工作线程个数
+    uint8               m_u1UnloadState              = 0;         //重载状态，1为卸载，2为重载
+    Pss_Library_Handler m_hModule                    = nullptr;   //插件的指针
     int (*UnLoadModuleData)(void)                 = nullptr;   //卸载插件的函数指针
-    string           m_strModuleName;                          //模块文件名称
-    string           m_strModulePath;                          //模块路径
-    string           m_strModuleParam;                         //模块启动参数
+    string              m_strModuleName;                          //模块文件名称
+    string              m_strModulePath;                          //模块路径
+    string              m_strModuleParam;                         //模块启动参数
 
     CWaitUnLoadModule() = default;
 };
