@@ -55,19 +55,10 @@ bool CServerManager::Init()
         App_ConnectHandlerPool::instance()->Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
     }
 
-
-    //初始化TMS系统
-#ifdef _CPPUNIT_TEST
-    m_TMService.Init(1);   //打开测试接口
-#else
-    m_TMService.Init();
-#endif
-
     //初始化给插件的对象接口
     auto pConnectManager   = dynamic_cast<IConnectManager*>(App_HandlerManager::instance());
     auto pClientManager    = dynamic_cast<IClientManager*>(App_ClientReConnectManager::instance());
     auto pFrameCommand     = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
-    auto pTMService        = dynamic_cast<ITMService*>(&m_TMService);
     auto pServerManager    = dynamic_cast<IServerManager*>(this);
     auto pTTyClientManager = dynamic_cast<ITTyClientManager*>(App_ReTTyClientManager::instance());
     auto pControlListen    = dynamic_cast<IControlListen*>(App_ControlListen::instance());
@@ -76,7 +67,6 @@ bool CServerManager::Init()
                                   pClientManager,
                                   pFrameCommand,
                                   pServerManager,
-                                  pTMService,
                                   pTTyClientManager,
                                   pControlListen);
 
@@ -578,8 +568,6 @@ void CServerManager::Run_Child_Process_Start(int nNumChlid, const int& fd_lock)
 bool CServerManager::Close()
 {
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close begin....\n"));
-    m_TMService.Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close m_TSThread OK.\n"));
     App_ConnectAcceptorManager::instance()->Close();
     m_ConnectConsoleAcceptor.close();
     OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close Acceptor OK\n"));

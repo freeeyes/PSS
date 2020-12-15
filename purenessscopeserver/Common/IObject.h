@@ -18,9 +18,7 @@
 #include "IServerManager.h"
 #include "IMessageBlockManager.h"
 #include "IFrameCommand.h"
-#include "ITSTimer.h"
 #include "ITTyClientManager.h"
-#include "ITMService.h"
 #include "IEchartlog.h"
 
 class CServerObject
@@ -39,7 +37,6 @@ public:
         m_pMessageBlockManager  = nullptr;
         m_pIModuleInfo          = nullptr;
         m_pFrameCommand         = nullptr;
-        m_pTMService            = nullptr;
         m_pTTyClientManager     = nullptr;
         m_pEchartlog            = nullptr;
     }
@@ -89,11 +86,6 @@ public:
     void SetFrameCommand(IFrameCommand* pFrameCommand)
     {
         m_pFrameCommand = pFrameCommand;
-    }
-
-    void SetTMSServce(ITMService* pTMService)
-    {
-        m_pTMService = pTMService;
     }
 
     void SetTTyClientManager(ITTyClientManager* pTTyClientManager)
@@ -152,11 +144,6 @@ public:
         return m_pFrameCommand;
     }
 
-    ITMService* GetTMService()
-    {
-        return m_pTMService;
-    }
-
     ITTyClientManager* GetTTyClientManager()
     {
         return m_pTTyClientManager;
@@ -179,7 +166,6 @@ private:
     IServerManager*        m_pIServerManager;
     IMessageBlockManager*  m_pMessageBlockManager;
     IFrameCommand*         m_pFrameCommand;
-    ITMService*            m_pTMService;
     ITTyClientManager*     m_pTTyClientManager;
     IEchartlog*            m_pEchartlog;
 };

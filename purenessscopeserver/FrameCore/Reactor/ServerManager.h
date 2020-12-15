@@ -17,7 +17,6 @@
 #include "ControlListen.h"
 #include "FileTestManager.h"
 #include "IpCheck.h"
-#include "TMService.h"
 
 class CServerManager : public IServerManager
 {
@@ -40,7 +39,6 @@ private:
 
     ConnectConsoleAcceptor  m_ConnectConsoleAcceptor;             //后台管理链接
     CFrameCommand           m_objFrameCommand;                    //框架命令
-    CTMService              m_TMService;                          //TS定时器
     vector<shared_ptr<CReactorUDPHander>> m_vecUDPList;           //UDP监听对象列表
 };
 

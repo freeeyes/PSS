@@ -310,9 +310,6 @@
     <ClCompile Include="CppUnit\Unit_TSTimer.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\TMService.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="CppUnit\Unit_TMService.cpp">
       <Filter>CppUnit\cppfile</Filter>
     </ClCompile>
@@ -828,12 +825,6 @@
     <ClInclude Include="CppUnit\Unit_TSTimer.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\ITMService.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\TMService.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="CppUnit\Unit_TMService.h">
       <Filter>CppUnit\hfile</Filter>
     </ClInclude>
@@ -848,15 +839,6 @@
     </ClInclude>
     <ClInclude Include="Common\IDeviceHandler.h">
       <Filter>IObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\TimerNodeList.hpp">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\TimerEvent.hpp">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\ThreadLogic.hpp">
-      <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Threading.hpp">
       <Filter>Common\hfile</Filter>
@@ -928,9 +910,6 @@
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\ConnectCounter.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\ThreadQueue.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\ConvertBuffer.h">

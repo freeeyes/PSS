@@ -45,14 +45,10 @@ bool CProServerManager::Init()
         App_ProConnectHandlerPool::instance()->Init(GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
     }
 
-    //初始化TMS系统
-    m_TMService.Init();
-
     //初始化给插件的对象接口
     IConnectManager* pConnectManager           = dynamic_cast<IConnectManager*>(App_HandlerManager::instance());
     IClientManager*  pClientManager            = dynamic_cast<IClientManager*>(App_ClientProConnectManager::instance());
     IFrameCommand* pFrameCommand               = dynamic_cast<IFrameCommand*>(&m_objFrameCommand);
-    ITMService* pTMService                     = dynamic_cast<ITMService*>(&m_TMService);
     IServerManager* pServerManager             = dynamic_cast<IServerManager*>(this);
     ITTyClientManager* pTTyClientManager       = dynamic_cast<ITTyClientManager*>(App_ProTTyClientManager::instance());
     IControlListen* pControlListen             = dynamic_cast<IControlListen*>(App_ProControlListen::instance());
@@ -61,7 +57,6 @@ bool CProServerManager::Init()
                                   pClientManager,
                                   pFrameCommand,
                                   pServerManager,
-                                  pTMService,
                                   pTTyClientManager,
                                   pControlListen);
 
@@ -371,9 +366,6 @@ bool CProServerManager::Start()
 bool CProServerManager::Close()
 {
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close begin....\n"));
-
-    m_TMService.Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close m_TSThread OK.\n"));
 
     App_ProConnectAcceptManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectAcceptManager OK.\n"));

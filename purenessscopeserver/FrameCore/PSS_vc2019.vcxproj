@@ -193,7 +193,6 @@
     <ClCompile Include="Common\IPAccount.cpp" />
     <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Common\TcpRedirection.cpp" />
-    <ClCompile Include="Common\TMService.cpp" />
     <ClCompile Include="Common\XmlConfig.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
     <ClCompile Include="Console\FrameCommand.cpp" />
@@ -531,7 +530,6 @@
     <ClInclude Include="..\Common\ISendCacheManager.h" />
     <ClInclude Include="..\Common\IServerManager.h" />
     <ClInclude Include="..\Common\ITimerManager.h" />
-    <ClInclude Include="..\Common\ITMService.h" />
     <ClInclude Include="..\Common\ITSTimer.h" />
     <ClInclude Include="..\Common\ITTyClientManager.h" />
     <ClInclude Include="..\Common\IUDPConnectManager.h" />
@@ -544,10 +542,6 @@
     <ClInclude Include="..\Common\RandomNumber.hpp" />
     <ClInclude Include="..\Common\Threading.hpp" />
     <ClInclude Include="..\Common\ThreadLock.h" />
-    <ClInclude Include="..\Common\ThreadLogic.hpp" />
-    <ClInclude Include="..\Common\ThreadQueue.h" />
-    <ClInclude Include="..\Common\TimerEvent.hpp" />
-    <ClInclude Include="..\Common\TimerNodeList.hpp" />
     <ClInclude Include="..\Common\TimeStamp.hpp" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
     <ClInclude Include="..\Common\Trace.h" />
@@ -564,7 +558,6 @@
     <ClInclude Include="Common\MakePacket_Common.h" />
     <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TcpRedirection.h" />
-    <ClInclude Include="Common\TMService.h" />
     <ClInclude Include="Common\XmlConfig.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
     <ClInclude Include="Console\FrameCommand.h" />

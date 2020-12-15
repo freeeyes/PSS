@@ -52,7 +52,6 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IClientManager* pClientManager,
                                    IFrameCommand* pFrameCommand,
                                    IServerManager* pIServerManager,
-                                   ITMService* pTMService,
                                    ITTyClientManager* pTTyClientManager,
                                    IControlListen* pControlListen)
 {
@@ -67,7 +66,6 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
     App_ServerObject::instance()->SetMessageBlockManager(dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()));
     App_ServerObject::instance()->SetFrameCommand(pFrameCommand);
     App_ServerObject::instance()->SetServerManager(pIServerManager);
-    App_ServerObject::instance()->SetTMSServce(pTMService);
     App_ServerObject::instance()->SetTTyClientManager(pTTyClientManager);
     App_ServerObject::instance()->SetEchartlog(dynamic_cast<IEchartlog*>(App_Echartlog::instance()));
 

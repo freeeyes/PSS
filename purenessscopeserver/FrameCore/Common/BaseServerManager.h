@@ -29,7 +29,6 @@ bool Server_Manager_Common_IObject(IConnectManager* pConnectManager,
                                    IClientManager* pClientManager,
                                    IFrameCommand* pFrameCommand,
                                    IServerManager* pIServerManager,
-                                   ITMService* pTMService,
                                    ITTyClientManager* pTTyClientManager,
                                    IControlListen* pControlListen);
 
