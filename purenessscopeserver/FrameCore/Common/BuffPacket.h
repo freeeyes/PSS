@@ -16,7 +16,29 @@ class CBuffPacket : public IBuffPacket
 {
 public:
     CBuffPacket() = default;
+    CBuffPacket(int32 nSize, int32 nMaxBuffSize);
     ~CBuffPacket() final;
+
+    CBuffPacket& operator = (CBuffPacket& other) {
+        //清除当前数据
+        this->Clear();
+
+        //拷贝内存
+        this->WriteStream(other.GetData(), other.GetPacketLen());
+
+        return *this;
+    }
+
+    CBuffPacket(CBuffPacket&& fp) noexcept {
+        this->Clear();
+        //拷贝内存
+        this->WriteStream(fp.GetData(), fp.GetPacketLen());
+    }
+
+    CBuffPacket const& operator=(CBuffPacket&& fp) {
+        CBuffPacket temp(std::move(fp));
+        return *this;
+    }
 
     uint32 GetPacketSize() final;       //得到数据包的格式化长度
     uint32 GetPacketLen() final;        //得到数据包的实际长度

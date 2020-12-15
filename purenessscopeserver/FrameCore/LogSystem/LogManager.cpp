@@ -99,7 +99,7 @@ int CLogManager::PutLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
         return 0;
     }
 
-    if ((int)m_objThreadQueue.Size() >= m_nQueueMax)
+    if (m_objThreadQueue.Size() >= m_nQueueMax)
     {
         OUR_DEBUG((LM_INFO,"[CLogManager::PutLog] CLogManager queue is full!\n"));
         return -1;

@@ -6,6 +6,11 @@
 
 #include "BuffPacket.h"
 
+CBuffPacket::CBuffPacket(int32 nSize, int32 nMaxBuffSize)
+{
+    Init(nSize, nMaxBuffSize);
+}
+
 CBuffPacket::~CBuffPacket()
 {
     Close();

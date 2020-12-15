@@ -10,6 +10,11 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#if PSS_PLATFORM == PLATFORM_WIN
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 
 class _ModuleInfo
 {

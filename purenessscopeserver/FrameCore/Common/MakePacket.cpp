@@ -140,7 +140,7 @@ void CMakePacket::SetMessageSendError(uint32 u4ConnectID, ACE_Message_Block* pBo
 {
     //开始组装数据
     pWorkThreadMessage->m_u4ConnectID   = u4ConnectID;
-    pWorkThreadMessage->m_u2Cmd         = (uint16)CLINET_LINK_SENDERROR;
+    pWorkThreadMessage->m_u2Cmd         = CLINET_LINK_SENDERROR;
     pWorkThreadMessage->m_tvMessage     = tvNow;
     pWorkThreadMessage->m_pmbRecvBody   = pBodyMessage;
     pWorkThreadMessage->m_emDirect      = EM_WORKTHREAD_DIRECT::EM_WORKTHREAD_DIRECT_INPUT;

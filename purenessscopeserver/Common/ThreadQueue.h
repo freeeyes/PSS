@@ -56,7 +56,7 @@ public:
 
     int32_t Size() {
         std::lock_guard<std::mutex> lock(_mutex);
-        return _queue.size();
+        return (int32_t)_queue.size();
     }
 
     bool Empty() {

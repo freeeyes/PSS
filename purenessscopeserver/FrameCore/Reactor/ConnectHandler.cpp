@@ -499,6 +499,7 @@ ENUM_WHILE_STATE CConnectHandler::Recv_Packet_Cut(bool& blRet)
 {
     if (m_pPacketParseInfo->m_u1PacketParseType == PACKET_WITHHEAD)
     {
+        int nBodyLogic = 0;
         //如果是包头模式
         if (m_pBlockRecv->length() < m_pPacketParseInfo->m_u4OrgLength)
         {
@@ -535,11 +536,7 @@ ENUM_WHILE_STATE CConnectHandler::Recv_Packet_Cut(bool& blRet)
                     u4BodyLength);
                 pBody->wr_ptr(u4BodyLength);
 
-                if (0 != Dispose_Paceket_Parse_Body(pBody, u4BodyLength))
-                {
-                    blRet = false;
-                    return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
-                }
+                nBodyLogic = Dispose_Paceket_Parse_Body(pBody, u4BodyLength);
 
                 //处理完成了一个完整的包，整体偏移一下
                 m_pBlockRecv->rd_ptr(u4AllPacketLength);
@@ -552,6 +549,12 @@ ENUM_WHILE_STATE CConnectHandler::Recv_Packet_Cut(bool& blRet)
 
                 Move_Recv_buffer();
                 blRet = true;
+                return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
+            }
+
+            if (0 != nBodyLogic)
+            {
+                blRet = false;
                 return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
             }
         }

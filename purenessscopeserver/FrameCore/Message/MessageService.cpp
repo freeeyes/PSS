@@ -429,7 +429,7 @@ bool CMessageService::SaveThreadInfoData(const PSS_Time_Point& tvNow)
             m_ThreadInfo.m_u2PacketTime,
             m_u2ThreadTimeOut,
             time_interval_second,
-            (int)m_objThreadQueue.Size());
+            m_objThreadQueue.Size());
 
         AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_WORKTHREAD, strLog);
 
@@ -448,7 +448,7 @@ bool CMessageService::SaveThreadInfoData(const PSS_Time_Point& tvNow)
             m_ThreadInfo.m_u4RecvPacketCount,
             m_ThreadInfo.m_u2CommandID,
             m_ThreadInfo.m_u2PacketTime,
-            (int)m_objThreadQueue.Size());
+            m_objThreadQueue.Size());
 
         AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_WORKTHREAD, strLog);
 
