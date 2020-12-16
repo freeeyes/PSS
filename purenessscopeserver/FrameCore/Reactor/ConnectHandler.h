@@ -166,6 +166,6 @@ private:
 };
 
 
-using App_ConnectHandlerPool = ACE_Singleton<CConnectHandlerPool, ACE_Null_Mutex>;
+using App_ConnectHandlerPool = PSS_singleton<CConnectHandlerPool>;
 
 #endif

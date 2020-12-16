@@ -175,6 +175,6 @@ private:
 	CObjectArrayList<CProConnectHandler> m_objHandlerList;                      //数据列表对象
 };
 
-typedef ACE_Singleton<CProConnectHandlerPool, ACE_Null_Mutex> App_ProConnectHandlerPool;
+using App_ProConnectHandlerPool = PSS_singleton<CProConnectHandlerPool>;
 
 #endif

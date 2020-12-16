@@ -20,5 +20,5 @@ public:
     shared_ptr<IBuffPacket> Create(const char* pFileName, uint32 u4Line) final;
 };
 
-using App_BuffPacketManager = ACE_Singleton<CBuffPacketManager, ACE_Null_Mutex>;
+using App_BuffPacketManager = PSS_singleton<CBuffPacketManager>;
 #endif

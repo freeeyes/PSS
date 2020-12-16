@@ -46,7 +46,6 @@ private:
     bool                       m_blTimerState   = true;                          //¶¨Ê±Æ÷¼ì²â
 };
 
-typedef ACE_Singleton<CReTTyClientManager, ACE_Recursive_Thread_Mutex> App_ReTTyClientManager;
-
+using App_ReTTyClientManager = PSS_singleton<CReTTyClientManager>;
 
 #endif

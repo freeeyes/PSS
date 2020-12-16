@@ -108,6 +108,6 @@ private:
     vector<CS2SConnectGetRandyInfo> m_GetReadyInfoList;                        //需要等待连接的数据信息
 };
 
-typedef ACE_Singleton<CClientProConnectManager, ACE_Recursive_Thread_Mutex> App_ClientProConnectManager;
+using App_ClientProConnectManager = PSS_singleton<CClientProConnectManager>;
 
 #endif

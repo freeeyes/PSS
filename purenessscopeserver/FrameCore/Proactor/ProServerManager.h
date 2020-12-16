@@ -30,5 +30,5 @@ private:
     CFrameCommand              m_objFrameCommand;                //¿ò¼ÜÃüÁî
 };
 
-typedef ACE_Singleton<CProServerManager, ACE_Null_Mutex> App_ProServerManager;
+using App_ProServerManager = PSS_singleton<CProServerManager> ;
 #endif

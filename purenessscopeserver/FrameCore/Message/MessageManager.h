@@ -191,5 +191,5 @@ private:
 
 };
 
-using App_MessageManager = ACE_Singleton<CMessageManager, ACE_Null_Mutex>;
+using App_MessageManager = PSS_singleton<CMessageManager>;
 #endif

@@ -28,6 +28,6 @@ private:
 	mapConnectID      m_mapConnectID;
 };
 
-using App_UDPConnectIDManager = ACE_Singleton<CUDPConnectIDManager, ACE_Null_Mutex>;
+using App_UDPConnectIDManager = PSS_singleton<CUDPConnectIDManager>;
 
 #endif

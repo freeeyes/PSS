@@ -268,5 +268,5 @@ private:
     std::thread           m_ttTimerThread;
 };
 
-using App_TimerManager = ACE_Singleton<PSS_Timer_Manager, ACE_Null_Mutex>;
+using App_TimerManager = PSS_singleton<PSS_Timer_Manager>;
 #endif

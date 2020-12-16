@@ -72,6 +72,6 @@ private:
     std::thread                              m_ttQueue;                              //消息队列线程
 };
 
-using AppLogManager = ACE_Singleton<CLogManager, ACE_Recursive_Thread_Mutex>;
+using AppLogManager = PSS_singleton<CLogManager>;
 
 #endif

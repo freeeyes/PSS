@@ -93,5 +93,5 @@ private:
     uint16                             m_u2MaxModuleCount = 0;            //最大模块加载数 
 };
 
-using App_ModuleLoader = ACE_Singleton<CLoadModule, ACE_Null_Mutex>;
+using App_ModuleLoader = PSS_singleton<CLoadModule>;
 #endif

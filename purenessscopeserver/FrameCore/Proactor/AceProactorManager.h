@@ -82,5 +82,5 @@ private:
     char           m_szError[MAX_BUFF_500];
 };
 
-typedef ACE_Singleton<CAceProactorManager, ACE_Null_Mutex> App_ProactorManager;
+using App_ProactorManager = PSS_singleton<CAceProactorManager>;
 #endif

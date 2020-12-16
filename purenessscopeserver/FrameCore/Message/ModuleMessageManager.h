@@ -19,6 +19,6 @@ private:
     CMakePacket m_MakePacket;
 };
 
-using App_ModuleMessageManager = ACE_Singleton<CModuleMessageManager, ACE_Null_Mutex>;
+using App_ModuleMessageManager = PSS_singleton<CModuleMessageManager>;
 
 #endif

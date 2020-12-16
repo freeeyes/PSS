@@ -81,6 +81,6 @@ private:
     int m_nActive = 0;
 };
 
-using App_ForwardManager = ACE_Singleton<CForwardManager, ACE_Null_Mutex>;
+using App_ForwardManager = PSS_singleton<CForwardManager>;
 
 #endif

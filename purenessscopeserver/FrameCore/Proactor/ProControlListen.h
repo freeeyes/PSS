@@ -22,6 +22,6 @@ private:
     vecControlInfo m_vecListenList;
 };
 
-typedef ACE_Singleton<CProControlListen, ACE_Null_Mutex> App_ProControlListen;
+using App_ProControlListen = PSS_singleton<CProControlListen> ;
 
 #endif

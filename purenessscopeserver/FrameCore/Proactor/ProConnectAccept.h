@@ -60,5 +60,5 @@ private:
     char                  m_szError[MAX_BUFF_500];
 };
 
-typedef ACE_Singleton<CProConnectAcceptManager, ACE_Null_Mutex> App_ProConnectAcceptManager;
+using App_ProConnectAcceptManager = PSS_singleton<CProConnectAcceptManager>;
 #endif

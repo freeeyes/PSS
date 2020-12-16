@@ -912,6 +912,9 @@
     <ClInclude Include="..\Common\LoadLibrary.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\singleton.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

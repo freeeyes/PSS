@@ -255,5 +255,5 @@ private:
     ACE_Recursive_Thread_Mutex                          m_ThreadLock;              //用于线程操作的线程锁，保证CurrThreadID的数据正常
 };
 
-using App_MessageServiceGroup = ACE_Singleton<CMessageServiceGroup, ACE_Null_Mutex>;
+using App_MessageServiceGroup = PSS_singleton<CMessageServiceGroup>;
 #endif

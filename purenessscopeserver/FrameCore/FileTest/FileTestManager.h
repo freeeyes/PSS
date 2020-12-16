@@ -62,5 +62,5 @@ private:
 
 };
 
-using App_FileTestManager = ACE_Singleton<CFileTestManager, ACE_Null_Mutex>;
+using App_FileTestManager = PSS_singleton<CFileTestManager>;
 #endif //_FILETESTMANAGER_H_

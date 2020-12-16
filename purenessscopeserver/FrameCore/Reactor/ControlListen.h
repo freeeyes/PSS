@@ -20,6 +20,6 @@ private:
     vecControlInfo m_vecListenList;
 };
 
-using App_ControlListen = ACE_Singleton<CControlListen, ACE_Null_Mutex>;
+using App_ControlListen = PSS_singleton<CControlListen>;
 
 #endif

@@ -65,7 +65,7 @@ private:
     ACE_Recursive_Thread_Mutex       m_ThreadLock;                             //多线程锁
 };
 
-using App_IPAccount = ACE_Singleton<CIPAccount, ACE_Recursive_Thread_Mutex>;
+using App_IPAccount = PSS_singleton<CIPAccount>;
 
 //单位时间连接数统计
 class CConnectAccount
@@ -105,5 +105,5 @@ private:
     uint8  m_u1Minute         = 0;   //当前分钟数
 };
 
-using App_ConnectAccount = ACE_Singleton<CConnectAccount, ACE_Recursive_Thread_Mutex>;
+using App_ConnectAccount = PSS_singleton<CConnectAccount>;
 #endif

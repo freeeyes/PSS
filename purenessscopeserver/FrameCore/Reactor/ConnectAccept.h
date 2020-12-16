@@ -70,5 +70,5 @@ private:
     string             m_strError;
 };
 
-using App_ConnectAcceptorManager = ACE_Singleton<CConnectAcceptorManager, ACE_Null_Mutex>;
+using App_ConnectAcceptorManager = PSS_singleton<CConnectAcceptorManager>;
 #endif

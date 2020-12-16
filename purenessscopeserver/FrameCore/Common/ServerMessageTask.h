@@ -161,6 +161,6 @@ private:
     ACE_Recursive_Thread_Mutex     m_ThreadWritrLock;
 };
 
-using App_ServerMessageTask = ACE_Singleton<CServerMessageManager, ACE_Recursive_Thread_Mutex>;
-using App_ServerMessageInfoPool = ACE_Singleton<CServerMessageInfoPool, ACE_Recursive_Thread_Mutex>;
+using App_ServerMessageTask = PSS_singleton<CServerMessageManager>;
+using App_ServerMessageInfoPool = PSS_singleton<CServerMessageInfoPool>;
 #endif

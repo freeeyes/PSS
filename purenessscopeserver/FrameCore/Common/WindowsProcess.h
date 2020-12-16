@@ -39,7 +39,7 @@ private:
     int m_nOptstartup;
 };
 
-typedef ACE_Singleton<Process, ACE_Mutex> App_Process;
+using App_Process = PSS_singleton<Process>;
 #endif
 
 #endif

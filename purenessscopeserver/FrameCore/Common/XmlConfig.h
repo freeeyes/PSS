@@ -95,7 +95,7 @@ private:
     std::array<IConfigOpeation*, static_cast<int>(XmlConfig::XML_Config_End)> _array;
 };
 
-using App_XmlConfig = ACE_Singleton<XMainConfig, ACE_Null_Mutex>;
+using App_XmlConfig = PSS_singleton<XMainConfig>;
 
 #define GetXmlConfigAttribute(XmlClass) App_XmlConfig::instance()->GetXmlConfig<XmlClass>()
 

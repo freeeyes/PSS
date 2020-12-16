@@ -110,5 +110,5 @@ public:
     vector<CS2SConnectGetRandyInfo> m_GetReadyInfoList;                            //需要等待连接的数据信息
 };
 
-using App_ClientReConnectManager = ACE_Singleton<CClientReConnectManager, ACE_Recursive_Thread_Mutex>;
+using App_ClientReConnectManager = PSS_singleton<CClientReConnectManager>;
 #endif

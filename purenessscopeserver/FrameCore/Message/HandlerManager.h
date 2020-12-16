@@ -22,6 +22,6 @@ public:
 	 EM_Client_Connect_status GetConnectState(uint32 u4ConnectID) final;
 };
 
-using App_HandlerManager = ACE_Singleton<CPSSHandlerManager, ACE_Null_Mutex>;
+using App_HandlerManager = PSS_singleton<CPSSHandlerManager>;
 
 #endif

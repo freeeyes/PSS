@@ -99,6 +99,6 @@ private:
     string              m_strError;
 };
 
-using App_ReactorManager = ACE_Singleton<CAceReactorManager, ACE_Null_Mutex>;
+using App_ReactorManager = PSS_singleton<CAceReactorManager>;
 
 #endif

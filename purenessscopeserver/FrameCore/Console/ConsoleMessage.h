@@ -37,5 +37,5 @@ private:
     mapMessageList      m_objHashMessageLogicList;             //处理函数Hash列表
 };
 
-using App_ConsoleManager = ACE_Singleton<CConsoleMessage, ACE_Null_Mutex>;
+using App_ConsoleManager = PSS_singleton<CConsoleMessage>;
 #endif

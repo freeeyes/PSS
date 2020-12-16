@@ -38,6 +38,8 @@
 #include <memory>
 #include <vector>
 
+#include "singleton.h"
+
 using namespace std;
 
 #define NAMESPACE PSS

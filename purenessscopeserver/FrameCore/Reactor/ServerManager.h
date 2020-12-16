@@ -43,6 +43,6 @@ private:
 };
 
 
-using App_ServerManager = ACE_Singleton<CServerManager, ACE_Null_Mutex>;
+using App_ServerManager = PSS_singleton<CServerManager>;
 
 #endif

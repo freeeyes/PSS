@@ -51,6 +51,6 @@ private:
     int m_nModuleCount = 0;
 };
 
-using App_PacketParseLoader = ACE_Singleton<CLoadPacketParse, ACE_Null_Mutex>;
+using App_PacketParseLoader = PSS_singleton<CLoadPacketParse>;
 
 #endif

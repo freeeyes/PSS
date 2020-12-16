@@ -37,5 +37,5 @@ private:
     uint32 m_u4UsedSize = 0;
 };
 
-using App_MessageBlockManager = ACE_Singleton<CMessageBlockManager,ACE_Null_Mutex>;
+using App_MessageBlockManager = PSS_singleton<CMessageBlockManager>;
 #endif

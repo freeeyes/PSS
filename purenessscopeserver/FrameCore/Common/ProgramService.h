@@ -64,7 +64,7 @@ private:
 };
 
 
-typedef ACE_Singleton<CProgramService, ACE_Mutex> App_Service;
+using App_Service = PSS_singleton<CProgramService>;
 
 #endif
 #endif

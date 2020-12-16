@@ -170,6 +170,6 @@ private:
     IEchartlog*            m_pEchartlog;
 };
 
-typedef ACE_Singleton<CServerObject, ACE_Null_Mutex> App_ServerObject;
+using App_ServerObject = PSS_singleton<CServerObject>;
 
 #endif

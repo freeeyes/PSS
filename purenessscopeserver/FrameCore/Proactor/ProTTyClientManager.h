@@ -46,7 +46,7 @@ private:
     bool                       m_blTimerState = true;                //¶¨Ê±Æ÷¼ì²â
 };
 
-typedef ACE_Singleton<CProTTyClientManager, ACE_Recursive_Thread_Mutex> App_ProTTyClientManager;
+using App_ProTTyClientManager = PSS_singleton<CProTTyClientManager> ;
 
 
 #endif

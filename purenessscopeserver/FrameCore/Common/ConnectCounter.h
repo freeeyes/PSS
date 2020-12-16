@@ -17,6 +17,6 @@ private:
 	ACE_Recursive_Thread_Mutex  m_ThreadWritrLock;
 };
 
-using App_ConnectCounter = ACE_Singleton<CConnectCounter, ACE_Recursive_Thread_Mutex>;
+using App_ConnectCounter = PSS_singleton<CConnectCounter>;
 
 #endif

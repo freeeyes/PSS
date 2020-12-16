@@ -18,5 +18,5 @@ public:
     int RegisterSignal(ACE_Proactor* pProactor = nullptr);
 };
 
-typedef ACE_Singleton<CProSigHandle, ACE_Null_Mutex> App_ProSigHandler;
+using App_ProSigHandler = PSS_singleton<CProSigHandle>;
 #endif

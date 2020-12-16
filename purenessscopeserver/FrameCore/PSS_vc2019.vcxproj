@@ -539,6 +539,7 @@
     <ClInclude Include="..\Common\PerformanceCounter.h" />
     <ClInclude Include="..\Common\ProfileTime.h" />
     <ClInclude Include="..\Common\RandomNumber.hpp" />
+    <ClInclude Include="..\Common\singleton.h" />
     <ClInclude Include="..\Common\Threading.hpp" />
     <ClInclude Include="..\Common\ThreadLock.h" />
     <ClInclude Include="..\Common\TimeStamp.hpp" />

@@ -13,5 +13,5 @@ public:
 
 };
 
-typedef ACE_Singleton<CEchartlog, ACE_Null_Mutex> App_Echartlog;
+using App_Echartlog = PSS_singleton<CEchartlog> ;
 #endif

@@ -54,6 +54,6 @@ private:
     VecForbiddenIP m_VecTempForbiddenIP;              //临时封停的IP列表
 };
 
-using App_ForbiddenIP = ACE_Singleton<CForbiddenIP, ACE_Null_Mutex>;
+using App_ForbiddenIP = PSS_singleton<CForbiddenIP>;
 
 #endif
