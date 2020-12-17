@@ -326,12 +326,6 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
         return false;
     }
 
-    //添加有效的pClientMessage
-    if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
-    {
-        App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
-    }
-
     //添加进hash
     m_objClientTCPList[nServerID] = pClientInfo;
 
@@ -398,12 +392,6 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
 
     //设置本地IP和端口
     pClientInfo->SetLocalAddr(pLocalIP, u2LocalPort, u1LocalIPType);
-
-    //添加有效的pClientMessage
-    if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
-    {
-        App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
-    }
 
     //添加进hash
     m_objClientTCPList[nServerID] = pClientInfo;
@@ -866,14 +854,6 @@ int CClientReConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
                 OUR_DEBUG((LM_INFO, "[CClientReConnectManager::handle_timeout]Run error.\n"));
             }
         }
-        else
-        {
-            //如果是异步模式，则需要检查处理线程是否被挂起
-            if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
-            {
-                App_ServerMessageTask::instance()->CheckServerMessageThread(tv);
-            }
-        }
         });
 
     if (true == m_blTimerState)
@@ -1056,9 +1036,6 @@ bool CClientReConnectManager::GetServerIPInfo( int nServerID, _ClientIPInfo& obj
 bool CClientReConnectManager::DeleteIClientMessage(IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-
-    //将异步回调有效队列中此pClientMessage设置为无效
-    App_ServerMessageTask::instance()->DelClientMessage(pClientMessage);
 
     //一一寻找与之对应的连接以及相关信息并删除之
     for (auto it = m_objClientTCPList.begin(); it != m_objClientTCPList.end();)

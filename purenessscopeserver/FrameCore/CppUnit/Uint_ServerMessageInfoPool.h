@@ -4,7 +4,7 @@
 #ifdef _CPPUNIT_TEST
 
 #include "Unit_Common.h"
-#include "ServerMessageTask.h"
+#include "define.h"
 
 class CUnit_ServerMessageInfoPool : public CppUnit::TestFixture
 {
@@ -22,7 +22,7 @@ public:
     void Test_ServerMessageInfoPool(void);
 
 private:
-    shared_ptr<CServerMessageInfoPool> m_pServerMessageInfoPool = nullptr;
+    int nCount = 0;
 };
 
 #endif

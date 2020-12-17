@@ -310,12 +310,6 @@ bool CProServerManager::Start()
     //开始消息处理线程
     App_MessageServiceGroup::instance()->Start();
 
-    if(GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
-    {
-        //启动异步处理服务器间消息包的过程
-        App_ServerMessageTask::instance()->Start();
-    }
-
     //开始启动tty相关监听
     int nTTyCount = (int)GetXmlConfigAttribute(xmlTTyDrives)->vec.size();
 
@@ -387,9 +381,6 @@ bool CProServerManager::Close()
 
     App_ModuleLoader::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ModuleLoader OK.\n"));
-
-    App_ServerMessageTask::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ServerMessageTask OK.\n"));
 
     AppLogManager::instance()->Close();
     OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close AppLogManager OK\n"));

@@ -106,9 +106,6 @@
     <ClCompile Include="Common\SendMessage.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\ServerMessageTask.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Mail\smtp.cpp">
       <Filter>Mail\cppfile</Filter>
     </ClCompile>
@@ -487,9 +484,6 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\SendMessage.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\ServerMessageTask.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Mail\smtp.h">

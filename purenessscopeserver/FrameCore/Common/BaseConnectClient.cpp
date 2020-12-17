@@ -2,24 +2,10 @@
 
 bool Recv_Common_Dispose_Client_Message(uint16 u2CommandID, ACE_Message_Block* pRecvFinish, const _ClientIPInfo& objServerIPInfo, IClientMessage* pClientMessage)
 {
-    //有数据需要处理，则处理
-    if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 0)
-    {
-        //调用数据包处理
-        pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
-        //回收处理包
-        App_MessageBlockManager::instance()->Close(pRecvFinish);
-    }
-    else
-    {
-        //异步消息处理
-        _Server_Message_Info* pServer_Message_Info = App_ServerMessageInfoPool::instance()->Create();
-        pServer_Message_Info->m_pClientMessage = pClientMessage;
-        pServer_Message_Info->m_objServerIPInfo = objServerIPInfo;
-        pServer_Message_Info->m_pRecvFinish = pRecvFinish;
-        pServer_Message_Info->m_u2CommandID = u2CommandID;
-        App_ServerMessageTask::instance()->PutMessage(pServer_Message_Info);
-    }
+    //调用数据包处理
+    pClientMessage->RecvData(u2CommandID, pRecvFinish, objServerIPInfo);
+    //回收处理包
+    App_MessageBlockManager::instance()->Close(pRecvFinish);
 
     return true;
 }

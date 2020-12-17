@@ -6,7 +6,6 @@
 
 #include "MessageBlockManager.h"
 #include "ClientMessage.h"
-#include "ServerMessageTask.h"
 #include "MessageService.h"
 #include "XmlConfig.h"
 

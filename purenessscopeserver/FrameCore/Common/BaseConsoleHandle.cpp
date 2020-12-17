@@ -64,7 +64,7 @@ bool check_console_ip(const char* pConsoleIP)
         return true;
     }
 
-    bool blRet = std::all_of(GetXmlConfigAttribute(xmlConsoleClients)->vec.cbegin(), GetXmlConfigAttribute(xmlConsoleClients)->vec.cend(), [pConsoleIP](xmlConsoleClients::_ConsoleClient x) {
+    bool blRet = std::all_of(GetXmlConfigAttribute(xmlConsoleClients)->vec.cbegin(), GetXmlConfigAttribute(xmlConsoleClients)->vec.cend(), [pConsoleIP](const xmlConsoleClients::_ConsoleClient& x) {
         if (x.cip == pConsoleIP)
         {
             return false;

@@ -336,12 +336,6 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
         return false;
     }
 
-    //添加有效的pClientMessage
-    if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
-    {
-        App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
-    }
-
     OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
 
     return true;
@@ -382,12 +376,6 @@ bool CClientProConnectManager::Connect(int nServerID, const char* pIP, uint16 u2
     {
         SAFE_DELETE(pClientInfo);
         return false;
-    }
-
-    //添加有效的pClientMessage
-    if (GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
-    {
-        App_ServerMessageTask::instance()->AddClientMessage(pClientMessage);
     }
 
     OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
@@ -789,15 +777,6 @@ int CClientProConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
                     OUR_DEBUG((LM_DEBUG, "[CClientProConnectManager::handle_timeout]Run is fail.\n"));
                 }
             }
-            else
-            {
-                //检查当前连接，是否已挂起或死锁
-                //如果是异步模式，则需要检查处理线程是否被挂起
-                if(GetXmlConfigAttribute(xmlConnectServer)->RunType == 1)
-                {
-                    App_ServerMessageTask::instance()->CheckServerMessageThread(tvNow);
-                }
-            }
         }
     }
 
@@ -1084,9 +1063,6 @@ bool CClientProConnectManager::GetServerIPInfo(int nServerID, _ClientIPInfo& obj
 bool CClientProConnectManager::DeleteIClientMessage(IClientMessage* pClientMessage)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-
-    //将异步回调有效队列中此pClientMessage设置为无效
-    App_ServerMessageTask::instance()->DelClientMessage(pClientMessage);
 
     //一一寻找与之对应的连接以及相关信息并删除之
     vector<CProactorClientInfo*> vecProactorClientInfo;

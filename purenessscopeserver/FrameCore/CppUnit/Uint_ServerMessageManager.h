@@ -4,7 +4,6 @@
 #ifdef _CPPUNIT_TEST
 
 #include "Unit_Common.h"
-#include "ServerMessageTask.h"
 #include "PostServerMessage.h"
 
 class CUnit_ServerMessageManager : public CppUnit::TestFixture
@@ -23,7 +22,7 @@ public:
     void Test_ServerMessageManager(void);
 
 private:
-    shared_ptr<CServerMessageManager> m_pServerMessageManager = nullptr;
+    int nCount = 0;
 };
 
 #endif

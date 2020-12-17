@@ -37,9 +37,6 @@ bool Server_Manager_Common_Pool()
                                          GetXmlConfigAttribute(xmlAlertConnect)->DisConnectMin,
                                          GetXmlConfigAttribute(xmlAlertConnect)->DisConnectMax);
 
-    //初始化服务器间异步接收队列
-    App_ServerMessageInfoPool::instance()->Init(GetXmlConfigAttribute(xmlConnectServer)->Count);
-
     //初始化消息处理线程
     App_MessageServiceGroup::instance()->Init(GetXmlConfigAttribute(xmlMessage)->Msg_Thread,
             GetXmlConfigAttribute(xmlMessage)->Msg_MaxQueue,

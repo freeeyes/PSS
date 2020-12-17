@@ -191,7 +191,6 @@
     <ClCompile Include="Common\BaseTask.cpp" />
     <ClCompile Include="Common\ConnectCounter.cpp" />
     <ClCompile Include="Common\IPAccount.cpp" />
-    <ClCompile Include="Common\ServerMessageTask.cpp" />
     <ClCompile Include="Common\TcpRedirection.cpp" />
     <ClCompile Include="Common\XmlConfig.cpp" />
     <ClCompile Include="Console\ConsolePromiss.cpp" />
@@ -557,7 +556,6 @@
     <ClInclude Include="Common\IDeviceHandler.h" />
     <ClInclude Include="Common\IHandler.h" />
     <ClInclude Include="Common\MakePacket_Common.h" />
-    <ClInclude Include="Common\ServerMessageTask.h" />
     <ClInclude Include="Common\TcpRedirection.h" />
     <ClInclude Include="Common\XmlConfig.h" />
     <ClInclude Include="Console\ConsolePromiss.h" />
