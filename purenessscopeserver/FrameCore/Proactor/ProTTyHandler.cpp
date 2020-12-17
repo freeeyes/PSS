@@ -157,6 +157,9 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
 
         //准备接受数据
         Ready_To_Read_Buff();
+
+        //停止暂停状态
+        SetPause(false);
         return true;
     }
     else

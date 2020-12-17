@@ -30,5 +30,7 @@ public:
 private:
     bool               m_blConnectState;
     int                m_nServerID;
+    ACE_INET_Addr      m_AddrClientRemote;
+    ACE_INET_Addr      m_AddrClientLocal;
 };
 #endif

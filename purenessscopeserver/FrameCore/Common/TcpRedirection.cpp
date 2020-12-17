@@ -35,8 +35,8 @@ int CForwardManager::Init()
     string strSource;
     string strTarget;
 
-    while (objXmlOperation.Read_XML_Data_Multiple_String("Forward", "EventID", strSource, pSource)
-           && objXmlOperation.Read_XML_Data_Multiple_String("Timer", "Name", strTarget, pTarget))
+    while (objXmlOperation.Read_XML_Data_Multiple_String("Forward", "Source", strSource, pSource)
+           && objXmlOperation.Read_XML_Data_Multiple_String("Forward", "Target", strTarget, pTarget))
     {
         //–¥»Î≈‰÷√Œƒº˛
         CForwardInfo objForwardInfo;
