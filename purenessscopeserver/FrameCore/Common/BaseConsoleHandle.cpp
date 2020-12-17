@@ -64,13 +64,16 @@ bool check_console_ip(const char* pConsoleIP)
         return true;
     }
 
-    for (const auto& objConsoleClient : GetXmlConfigAttribute(xmlConsoleClients)->vec)
-    {
-        if (ACE_OS::strcmp(objConsoleClient.cip.c_str(), pConsoleIP) == 0)
+    bool blRet = std::all_of(GetXmlConfigAttribute(xmlConsoleClients)->vec.cbegin(), GetXmlConfigAttribute(xmlConsoleClients)->vec.cend(), [pConsoleIP](xmlConsoleClients::_ConsoleClient x) {
+        if (x.cip == pConsoleIP)
+        {
+            return false;
+        }
+        else
         {
             return true;
         }
-    }
+        });
 
-    return false;
+    return !blRet;
 }

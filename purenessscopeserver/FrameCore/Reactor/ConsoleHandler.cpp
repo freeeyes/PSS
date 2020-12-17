@@ -381,15 +381,16 @@ bool CConsoleHandler::CompareConsoleClinetIP(const char* pIP) const
         return true;
     }
 
-    for (xmlConsoleClients::_ConsoleClient consoleclient : GetXmlConfigAttribute(xmlConsoleClients)->vec)
-    {
-        if (ACE_OS::strcmp(consoleclient.cip.c_str(), pIP) == 0)
+    return !std::all_of(GetXmlConfigAttribute(xmlConsoleClients)->vec.cbegin(), GetXmlConfigAttribute(xmlConsoleClients)->vec.cend(), [pIP](xmlConsoleClients::_ConsoleClient consoleclient) {
+        if (consoleclient.cip == pIP)
+        {
+            return false;
+        }
+        else
         {
             return true;
         }
-    }
-
-    return false;
+        });
 }
 
 bool CConsoleHandler::CheckMessage()

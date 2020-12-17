@@ -66,7 +66,7 @@ int CConsolePromissions::Check_Split_User(const string& pUser, const string& pUs
 
     auto vecUserList = split_string(pUserList, ',');
 
-    for (auto strFrameUser : vecUserList)
+    for (const auto& strFrameUser : vecUserList)
     {
         if (pUser == strFrameUser)
         {

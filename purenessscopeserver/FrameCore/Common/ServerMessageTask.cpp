@@ -369,15 +369,18 @@ bool CServerMessageTask::CheckServerMessageThread(ACE_Time_Value const& tvNow) c
 
 bool CServerMessageTask::CheckValidClientMessage(const IClientMessage* pClientMessage) const
 {
-    for(const IClientMessage* pVecClientMessage : m_vecValidIClientMessage)
-    {
-        if(pVecClientMessage == pClientMessage)
+    bool blRet = std::all_of(m_vecValidIClientMessage.cbegin(), m_vecValidIClientMessage.cend(), [pClientMessage](const IClientMessage* pVecClientMessage) {
+        if (pVecClientMessage == pClientMessage)
+        {
+            return false;
+        }
+        else
         {
             return true;
         }
-    }
+        });
 
-    return false;
+    return !blRet;
 }
 
 int CServerMessageTask::CloseMsgQueue()

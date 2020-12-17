@@ -396,7 +396,7 @@ void DoMessage_WorkThreadState(const _CommandInfo& CommandInfo, shared_ptr<IBuff
 
     (*pBuffPacket) << (uint8)vecWorkThreadList.size();
 
-    for (auto pCurrThreadInfo : vecWorkThreadList)
+    for (const auto& pCurrThreadInfo : vecWorkThreadList)
     {
         if (CommandInfo.m_u1OutputType == 0)
         {

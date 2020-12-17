@@ -62,7 +62,7 @@ void CUDPConnectIDManager::GetClientConnectInfo(vecClientConnectInfo& VecClientC
 	_ClientConnectInfo objClientConnectInfo;
 
 	//遍历所有的UDP客户端地址信息
-	for (auto kv : m_mapConnectManager) 
+	for (const auto& kv : m_mapConnectManager) 
 	{
 		string strKey = kv.first;
 		uint32 u4ConnectID = kv.second;
