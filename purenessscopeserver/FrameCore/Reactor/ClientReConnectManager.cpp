@@ -847,10 +847,8 @@ int CClientReConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
         if (nullptr == pClientInfo->GetConnectClient())
         {
             //如果连接不存在，则重新建立连接
-            if (false == pClientInfo->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
-            {
-                OUR_DEBUG((LM_INFO, "[CClientReConnectManager::handle_timeout]Run error.\n"));
-            }
+            pClientInfo->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT);
+
         }
         });
 

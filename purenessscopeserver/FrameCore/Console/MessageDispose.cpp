@@ -331,7 +331,6 @@ void DoMessage_CommandInfo(const _CommandInfo& CommandInfo, shared_ptr<IBuffPack
     {
         _CommandData objCommandData;
         _CommandData objCommandDataIn;
-        _CommandData objCommandDataOut;
 
         if (objCommandDataIn.m_u2CommandID == u2CommandID)
         {

@@ -292,7 +292,7 @@ bool CConsoleMessage::SetConsoleKey(vector<xmlConsoleKeys::_ConsoleKey> vecConso
 
 bool CConsoleMessage::CheckConsoleKey(const char* pKey) const
 {
-    return !std::all_of(m_vecConsolekeyList.cbegin(), m_vecConsolekeyList.cend(), [pKey](const xmlConsoleKeys::_ConsoleKey conslseKey) {
+    return !std::all_of(m_vecConsolekeyList.cbegin(), m_vecConsolekeyList.cend(), [pKey](const xmlConsoleKeys::_ConsoleKey& conslseKey) {
         if (conslseKey.Key == pKey)
         {
             return false;

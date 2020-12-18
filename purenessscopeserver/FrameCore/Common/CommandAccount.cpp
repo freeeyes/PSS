@@ -144,7 +144,7 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_I
     ACE_UNUSED_ARG(u4PacketSize);
     ACE_UNUSED_ARG(u1CommandType);
 
-    auto u1Minute = (uint8)CTimeStamp::Get_Time_of_Minute(tvTime);
+    auto u1Minute = CTimeStamp::Get_Time_of_Minute(tvTime);
 
     for (_CommandAlertData commandalewrtdata : m_vecCommandAlertData)
     {
