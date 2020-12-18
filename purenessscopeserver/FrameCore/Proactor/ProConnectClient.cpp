@@ -250,8 +250,6 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         if ("" != m_strDeviceName)
         {
             App_ForwardManager::instance()->SendData(m_strDeviceName, &mb);
-            mb.reset();
-            return;
         }
 
         //处理接收数据(这里不区分是不是完整包，交给上层逻辑自己去判定)

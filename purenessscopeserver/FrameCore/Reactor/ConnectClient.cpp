@@ -283,8 +283,6 @@ int CConnectClient::RecvData()
     if ("" != m_strDeviceName)
     {
         App_ForwardManager::instance()->SendData(m_strDeviceName, m_pCurrMessage);
-        m_pCurrMessage->reset();
-        return 0;
     }
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
