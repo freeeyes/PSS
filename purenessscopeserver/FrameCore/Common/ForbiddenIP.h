@@ -10,6 +10,7 @@
 //2013-03-09
 
 #include "define.h"
+#include "TimeStamp.hpp"
 #include "XmlOpeation.h"
 #include "ace/Singleton.h"
 #include <string>
@@ -24,7 +25,7 @@ public:
     EM_CONNECT_IO_TYPE m_u1ConnectType           = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP; //链接的类型，0为TCP，1为UDP
     uint8              m_u1Type                  = 0;                                  //禁止的类型，0为永久禁止，1为时段禁止。
     string             m_strClientIP;                                                  //被禁止的IP
-    ACE_Time_Value     m_tvBegin                 = ACE_OS::gettimeofday();             //时段禁止开始时间
+    PSS_Time_Point     m_tvBegin                 = CTimeStamp::Get_Time_Stamp();       //时段禁止开始时间
 
     _ForbiddenIP() = default;
 };

@@ -28,7 +28,7 @@ void CUnit_WorkThreadAI::Test_WorkThreadAI(void)
         return;
     }
 
-    uint64 u8Now = ACE_OS::gettimeofday().sec();
+    auto u8Now = CTimeStamp::Get_Time_use_second(CTimeStamp::Get_Time_Stamp());
 
     if (true != m_pWorkThreadAI->CheckCurrTimeout(u2Command, u8Now))
     {

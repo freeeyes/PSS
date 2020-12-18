@@ -91,10 +91,10 @@ int CConsoleHandler::open(void*)
     }
 
     OUR_DEBUG((LM_INFO, "[CConsoleHandler::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
-    m_atvConnect      = ACE_OS::gettimeofday();
-    m_atvInput        = ACE_OS::gettimeofday();
-    m_atvOutput       = ACE_OS::gettimeofday();
-    m_atvSendAlive    = ACE_OS::gettimeofday();
+    m_atvConnect      = CTimeStamp::Get_Time_Stamp();
+    m_atvInput        = CTimeStamp::Get_Time_Stamp();
+    m_atvOutput       = CTimeStamp::Get_Time_Stamp();
+    m_atvSendAlive    = CTimeStamp::Get_Time_Stamp();
     m_u4AllRecvCount  = 0;
     m_u4AllSendCount  = 0;
     m_u4AllRecvSize   = 0;
@@ -135,7 +135,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     m_nIOCount++;
     m_ThreadLock.release();
     ACE_Time_Value nowait(MAX_MSG_PACKETTIMEOUT);
-    m_atvInput = ACE_OS::gettimeofday();
+    m_atvInput = CTimeStamp::Get_Time_Stamp();
 
     if (fd == ACE_INVALID_HANDLE || nullptr == m_pPacketParse)
     {
@@ -334,7 +334,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
         {
             OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), errno));
             App_MessageBlockManager::instance()->Close(pMbData);
-            m_atvOutput      = ACE_OS::gettimeofday();
+            m_atvOutput      = CTimeStamp::Get_Time_Stamp();
             return false;
         }
         else if (nDataLen >= nCurrSendSize)  //当数据包全部发送完毕，清空。
@@ -342,14 +342,14 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
             m_u4AllSendCount += 1;
             m_u4AllSendSize  += (uint32)pMbData->length();
             App_MessageBlockManager::instance()->Close(pMbData);
-            m_atvOutput      = ACE_OS::gettimeofday();
+            m_atvOutput      = CTimeStamp::Get_Time_Stamp();
             return true;
         }
         else
         {
             pMbData->rd_ptr(nDataLen);
             nIsSendSize      += nDataLen;
-            m_atvOutput      = ACE_OS::gettimeofday();
+            m_atvOutput      = CTimeStamp::Get_Time_Stamp();
         }
     }
 }

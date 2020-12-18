@@ -205,7 +205,6 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
         {
             //通知框架消息
             Send_Hander_Event(PACKET_TTY_DISCONNECT);
-
         }
 
         return;
@@ -219,57 +218,63 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
 
     ACE_Message_Block& mb = result.message_block();
 
-    if ("" != m_strDeviceName)
+    if (true == m_blPause)
     {
-        App_ForwardManager::instance()->SendData(m_strDeviceName, &mb);
+        //在暂停阶段，不处理数据包直接丢弃
+        Ready_To_Read_Buff();
         return;
     }
 
-    if (false == m_blPause)
+    //接收处理数据
+    if ("" != m_strDeviceName)
     {
-        if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN == m_emDispose && nullptr != m_pTTyMessage)
+        //转发数据
+        App_ForwardManager::instance()->SendData(m_strDeviceName, &mb);
+    }
+
+    //本地处理
+    if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN == m_emDispose && nullptr != m_pTTyMessage)
+    {
+        //回调接收数据函数
+        m_pTTyMessage->RecvData(m_u4ConnectID, mb.rd_ptr(), (uint32)result.bytes_transferred());
+    }
+    else
+    {
+        //调用框架的函数处理
+        if (nullptr != m_pPacketParse)
         {
-            //回调接收数据函数
-            m_pTTyMessage->RecvData(m_u4ConnectID, mb.rd_ptr(), (uint32)result.bytes_transferred());
-        }
-        else
-        {
-            //调用框架的函数处理
-            if (nullptr != m_pPacketParse)
+            _Packet_Info obj_Packet_Info;
+            uint8 n1Ret = m_pPacketParse->Parse_Packet_Stream(m_u4ConnectID,
+                &mb,
+                dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
+                &obj_Packet_Info,
+                EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
+
+            if (PACKET_GET_ENOUGH == n1Ret)
             {
-                _Packet_Info obj_Packet_Info;
-                uint8 n1Ret = m_pPacketParse->Parse_Packet_Stream(m_u4ConnectID,
-                              &mb,
-                              dynamic_cast<IMessageBlockManager*>(App_MessageBlockManager::instance()),
-                              &obj_Packet_Info,
-                              EM_CONNECT_IO_TYPE::CONNECT_IO_TTY);
+                //发送消息给消息框架
+                auto pPacketParse = std::make_shared<CPacketParse>();
+                pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
+                pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
+                pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
+                pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
+                pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
+                pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
+                pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
 
-                if (PACKET_GET_ENOUGH == n1Ret)
-                {
-                    //发送消息给消息框架
-                    auto pPacketParse = std::make_shared<CPacketParse>();
-                    pPacketParse->SetPacket_Head_Message(obj_Packet_Info.m_pmbHead);
-                    pPacketParse->SetPacket_Body_Message(obj_Packet_Info.m_pmbBody);
-                    pPacketParse->SetPacket_CommandID(obj_Packet_Info.m_u2PacketCommandID);
-                    pPacketParse->SetPacket_Head_Src_Length(obj_Packet_Info.m_u4HeadSrcLen);
-                    pPacketParse->SetPacket_Head_Curr_Length(obj_Packet_Info.m_u4HeadCurrLen);
-                    pPacketParse->SetPacket_Body_Src_Length(obj_Packet_Info.m_u4BodySrcLen);
-                    pPacketParse->SetPacket_Body_Curr_Length(obj_Packet_Info.m_u4BodyCurrLen);
+                ACE_INET_Addr m_addrRemote;
 
-                    ACE_INET_Addr m_addrRemote;
+                _MakePacket objMakePacket;
 
-					_MakePacket objMakePacket;
+                objMakePacket.m_u4ConnectID = m_u4ConnectID;
+                objMakePacket.m_pPacketParse = pPacketParse;
+                objMakePacket.m_u1Option = PACKET_PARSE;
+                objMakePacket.m_AddrRemote = m_addrRemote;
+                objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
+                objMakePacket.m_emPacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
 
-					objMakePacket.m_u4ConnectID     = m_u4ConnectID;
-					objMakePacket.m_pPacketParse    = pPacketParse;
-					objMakePacket.m_u1Option        = PACKET_PARSE;
-					objMakePacket.m_AddrRemote      = m_addrRemote;
-					objMakePacket.m_u4PacketParseID = m_u4PacketParseInfoID;
-					objMakePacket.m_emPacketType    = EM_CONNECT_IO_TYPE::CONNECT_IO_TTY;
+                Send_MakePacket_Queue(m_MakePacket, objMakePacket);
 
-					Send_MakePacket_Queue(m_MakePacket, objMakePacket);
-
-                }
             }
         }
     }

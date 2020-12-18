@@ -20,6 +20,7 @@
 
 #include "Ring.h"
 #include "define.h"
+#include "TimeStamp.hpp"
 #include "ConvertBuffer.h"
 
 //相关参数设计

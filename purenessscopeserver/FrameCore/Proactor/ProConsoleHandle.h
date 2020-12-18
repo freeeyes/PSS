@@ -65,10 +65,10 @@ private:
     bool             m_blTimeClose;                  //是否正在关闭
     char             m_szError[MAX_BUFF_500];
     ACE_INET_Addr    m_addrRemote;
-    ACE_Time_Value   m_atvConnect;
-    ACE_Time_Value   m_atvInput;
-    ACE_Time_Value   m_atvOutput;
-    ACE_Time_Value   m_atvSendAlive;
+    PSS_Time_Point   m_atvConnect;
+    PSS_Time_Point   m_atvInput;
+    PSS_Time_Point   m_atvOutput;
+    PSS_Time_Point   m_atvSendAlive;
 
     shared_ptr<CConsolePacketParse> m_pPacketParse;             //数据包解析类
 

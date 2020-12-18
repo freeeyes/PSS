@@ -41,14 +41,6 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
     auto pResponseRecord = f->second;
     if((uint32)(pResponseRecord->m_u1ResponseCount + 1) == m_u4ResponseCount)
     {
-        ACE_Time_Value atvResponse = ACE_OS::gettimeofday();
-
-        if(m_u4ExpectTime <= (uint32)(atvResponse.get_msec() - pResponseRecord->m_u8StartTime))
-        {
-            //应答时间超过期望时间限制
-            OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTime:%d.\n",m_u4ExpectTime));
-        }
-
         App_HandlerManager::instance()->CloseConnect(u4ConnectID);
 
         //回收对象类型

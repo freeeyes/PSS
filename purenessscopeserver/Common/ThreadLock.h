@@ -7,6 +7,7 @@
 #define _THREADLOCK_H
 
 #include "define.h"
+#include "TimeStamp.hpp"
 #if PSS_PLATFORM == PLATFORM_WIN
 #include <Windows.h>
 #else
@@ -54,7 +55,6 @@ public:
 
     void Lock()
     {
-        m_Time = ACE_OS::gettimeofday();
 #if PSS_PLATFORM == PLATFORM_WIN
         EnterCriticalSection(&m_lock);
 #else
@@ -64,8 +64,6 @@ public:
 
     void UnLock()
     {
-        m_Time = ACE_OS::gettimeofday() - m_Time;
-
 #if PSS_PLATFORM == PLATFORM_WIN
         LeaveCriticalSection(&m_lock);
 #else
@@ -75,7 +73,6 @@ public:
 
 private:
     LOCK_MUTEXT m_lock;
-    ACE_Time_Value m_Time;
 };
 
 //自动加锁的类

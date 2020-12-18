@@ -105,7 +105,6 @@ int CLogManager::PutLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
         return -1;
     }
 
-    ACE_Time_Value xtime = ACE_OS::gettimeofday()+ACE_Time_Value(0, MAX_MSG_PUTTIMEOUT);
     m_objThreadQueue.Push(pLogBlockInfo);
 
     return 0;

@@ -30,7 +30,6 @@ public:
     int open(void*) final;
     int handle_input(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
     int handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask) final;
-    int handle_output(ACE_HANDLE fd = ACE_INVALID_HANDLE) final;
     bool Device_Send_Data(const char* pData, ssize_t nLen) final; //透传数据接口
 
     void Close(uint32 u4ConnectID) final;

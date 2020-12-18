@@ -77,7 +77,7 @@ void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPLi
         {
             (*pBuffPacket) << forbidenip.m_strClientIP;
             (*pBuffPacket) << forbidenip.m_u1Type;
-            (*pBuffPacket) << (uint32)forbidenip.m_tvBegin.sec();
+            (*pBuffPacket) << (uint32)CTimeStamp::Get_Time_use_second(forbidenip.m_tvBegin);
             (*pBuffPacket) << forbidenip.m_u4Second;
         }
         else
@@ -85,7 +85,7 @@ void Combo_Common_VecForbiddenIP(uint8 u1OutputType, const VecForbiddenIP* pIPLi
             std::stringstream ss_format;
             ss_format << "IP Forbidden(" << forbidenip.m_strClientIP << ")\n"
                 << "IP Forbidden Type(" << forbidenip.m_u1Type << ")\n"
-                << "IP Forbidden BeginTime(" << forbidenip.m_tvBegin.sec() << ")\n"
+                << "IP Forbidden BeginTime(" << CTimeStamp::Get_Time_use_second(forbidenip.m_tvBegin) << ")\n"
                 << "IP Forbidden IntervalTime(" << forbidenip.m_u4Second << ")\n";
             string strLineText = ss_format.str();
 

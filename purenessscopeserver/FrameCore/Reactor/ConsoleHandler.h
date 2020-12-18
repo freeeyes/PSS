@@ -5,6 +5,7 @@
 //从最初版本就一直相加，但是最近才开始搞，主要是自己懒，这次决定不再给自己这个理由。
 //add by freeeyes
 #include "define.h"
+#include "TimeStamp.hpp"
 
 #include "ace/Reactor.h"
 #include "ace/Svc_Handler.h"
@@ -58,10 +59,10 @@ private:
     uint8                      m_u1IsClosing           = HANDLE_ISCLOSE_NO;  //是否应该关闭 0为否，1为是
     string                     m_strError;
     ACE_INET_Addr              m_addrRemote;
-    ACE_Time_Value             m_atvConnect;
-    ACE_Time_Value             m_atvInput;
-    ACE_Time_Value             m_atvOutput;
-    ACE_Time_Value             m_atvSendAlive;
+    PSS_Time_Point             m_atvConnect;
+    PSS_Time_Point             m_atvInput;
+    PSS_Time_Point             m_atvOutput;
+    PSS_Time_Point             m_atvSendAlive;
     ACE_Recursive_Thread_Mutex m_ThreadLock;
     _TimerCheckID*                  m_pTCClose             = nullptr;
     shared_ptr<CConsolePacketParse> m_pPacketParse         = nullptr;                 //数据包解析类

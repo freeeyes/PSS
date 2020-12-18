@@ -8,6 +8,7 @@
 
 #include "ace/Date_Time.h"
 #include "define.h"
+#include "TimeStamp.hpp"
 #include "LogManager.h"
 #include <string>
 #include <sstream>
@@ -23,7 +24,7 @@ public:
     uint16             m_u2CommandID        = 0;                  //命令的ID
     EM_CONNECT_IO_TYPE m_u1PacketType       = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP;     //数据包来源类型
     uint8              m_u1CommandType      = COMMAND_TYPE_IN;    //命令的类型，0是收到的命令，1是发出的命令
-    ACE_Time_Value     m_tvCommandTime;                           //命令的最后处理时间
+    PSS_Time_Point     m_tvCommandTime;                           //命令的最后处理时间
 
     _CommandData() = default;
 
@@ -39,7 +40,7 @@ public:
         this->m_u8CommandCost  += ar.m_u8CommandCost;
         this->m_u1CommandType  += ar.m_u1CommandType;
         this->m_u4PacketSize   += ar.m_u4PacketSize;
-        this->m_tvCommandTime  += ar.m_tvCommandTime;
+        this->m_tvCommandTime  = ar.m_tvCommandTime;
         return *this;
     }
 };
@@ -90,8 +91,7 @@ public:
     uint32 GetFlowIn()
     {
         //得到此刻的流量入数据
-        ACE_Date_Time dtNowTime(ACE_OS::gettimeofday());
-        auto u1Minute = (uint8)dtNowTime.minute();
+        auto u1Minute = CTimeStamp::Get_Time_of_Minute(CTimeStamp::Get_Time_Stamp());
 
         if (u1Minute != m_u1Minute)
         {
@@ -109,8 +109,7 @@ public:
     uint32 GetFlowOut()
     {
         //得到此刻的流量出数据
-        ACE_Date_Time dtNowTime(ACE_OS::gettimeofday());
-        auto u1Minute = (uint8)dtNowTime.minute();
+        auto u1Minute = CTimeStamp::Get_Time_of_Minute(CTimeStamp::Get_Time_Stamp());
 
         if (u1Minute != m_u1Minute)
         {
@@ -125,11 +124,10 @@ public:
         }
     }
 
-    void SetFlow(uint8 u1CommandType, uint32 u4Size, ACE_Time_Value const& tvNow)
+    void SetFlow(uint8 u1CommandType, uint32 u4Size, PSS_Time_Point const& tvNow)
     {
         //记录端口流量
-        ACE_Date_Time dtNowTime(tvNow);
-        auto u1Minute = (uint8)dtNowTime.minute();
+        auto u1Minute = CTimeStamp::Get_Time_of_Minute(tvNow);
 
         if (u1Minute != m_u1Minute)
         {
@@ -173,8 +171,8 @@ public:
     void Save_Command_To_File(shared_ptr<_CommandData> pCommandData) const;
 
     bool SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
-                         uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                         ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());   //记录命令执行信息
+        uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
+        PSS_Time_Point const& tvTime = CTimeStamp::Get_Time_Stamp());   //记录命令执行信息
     bool SaveCommandDataLog();                         //存储命令执行信息的日志
 
     uint32 GetFlowIn();                                //得到单位时间进入流量
@@ -189,16 +187,16 @@ public:
 
 private:
     bool Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
-                   uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                   ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                    //流量统计
+        uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
+        PSS_Time_Point const& tvTime = CTimeStamp::Get_Time_Stamp());                    //流量统计
 
     bool Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
-                      uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                      ACE_Time_Value const& tvTime = ACE_OS::gettimeofday());                 //命令统计
+        uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
+        PSS_Time_Point const& tvTime = CTimeStamp::Get_Time_Stamp());                 //命令统计
 
     bool Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType = EM_CONNECT_IO_TYPE::CONNECT_IO_TCP,
-                    uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
-                    ACE_Time_Value const& tvTime = ACE_OS::gettimeofday()) const;                 //命令告警统计
+        uint32 u4PacketSize = 0, uint8 u1CommandType = COMMAND_TYPE_IN,
+        PSS_Time_Point const& tvTime = CTimeStamp::Get_Time_Stamp()) const;                 //命令告警统计
 
 public:                                                                                                                                  
     using hashmapPortAccount = unordered_map<uint16, shared_ptr<_Port_Data_Account>>;

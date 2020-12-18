@@ -22,7 +22,7 @@ bool CWorkThreadAI::SaveTimeout(uint16 u2CommandID, uint32 u4TimeCost)
             return false;
         }
 
-        uint64 u8Now = (uint64)ACE_OS::gettimeofday().sec();
+        auto u8Now = CTimeStamp::Get_Time_use_second(CTimeStamp::Get_Time_Stamp());
 
         //如果开启AI功能
         bool blState = false;

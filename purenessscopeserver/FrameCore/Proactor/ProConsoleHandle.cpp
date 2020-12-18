@@ -104,12 +104,10 @@ void CProConsoleHandle::addresses (const ACE_INET_Addr& remote_address, const AC
 
 void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 {
-    ACE_Time_Value tvOpenBegin(ACE_OS::gettimeofday());
-
-    m_atvConnect      = ACE_OS::gettimeofday();
-    m_atvInput        = ACE_OS::gettimeofday();
-    m_atvOutput       = ACE_OS::gettimeofday();
-    m_atvSendAlive    = ACE_OS::gettimeofday();
+    m_atvConnect      = CTimeStamp::Get_Time_Stamp();
+    m_atvInput        = CTimeStamp::Get_Time_Stamp();
+    m_atvOutput       = CTimeStamp::Get_Time_Stamp();
+    m_atvSendAlive    = CTimeStamp::Get_Time_Stamp();
 
     m_u4AllRecvCount    = 0;
     m_u4AllSendCount    = 0;
@@ -119,9 +117,6 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     m_blTimeClose       = false;
     m_u4RecvPacketCount = 0;
     m_nIOCount          = 1;
-
-    ACE_Time_Value tvOpenEnd(ACE_OS::gettimeofday());
-    ACE_Time_Value tvOpen(tvOpenEnd - tvOpenBegin);
 
     this->handle(h);
 
@@ -193,8 +188,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         return;
     }
 
-    m_atvInput = ACE_OS::gettimeofday();
-
+    m_atvInput = CTimeStamp::Get_Time_Stamp();
 
     const char* pData = mb.rd_ptr();
     uint32 u4Len = (uint32)mb.length();
@@ -294,7 +288,7 @@ void CProConsoleHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
     {
         //Á´½Ó¶Ï¿ª
         OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] write(%d)...\n",GetConnectID(), errno));
-        m_atvOutput = ACE_OS::gettimeofday();
+        m_atvOutput = CTimeStamp::Get_Time_Stamp();
         App_MessageBlockManager::instance()->Close(&result.message_block());
         Close();
         return;
@@ -303,7 +297,7 @@ void CProConsoleHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
     {
         //¶Ì¶Á²»¿¼ÂÇ
         m_blCanWrite = true;
-        m_atvOutput = ACE_OS::gettimeofday();
+        m_atvOutput = CTimeStamp::Get_Time_Stamp();
         App_MessageBlockManager::instance()->Close(&result.message_block());
         m_u4AllSendSize += (uint32)result.bytes_to_write();
         Close();
@@ -363,7 +357,7 @@ bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
         else
         {
             m_u4AllSendCount += 1;
-            m_atvOutput      = ACE_OS::gettimeofday();
+            m_atvOutput      = CTimeStamp::Get_Time_Stamp();
             return true;
         }
     }

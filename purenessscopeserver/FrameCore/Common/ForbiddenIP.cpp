@@ -61,7 +61,9 @@ bool CForbiddenIP::CheckIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectType)
         if((*b).m_u1ConnectType == u1ConnectType && CompareIP((*b).m_strClientIP.c_str(), pIP) == true)
         {
             //如果是禁止时间段内，则返回false，否则删除定时信息。
-            if ((*b).m_tvBegin + ACE_Time_Value((*b).m_u4Second, 0) > ACE_OS::gettimeofday())
+            auto time_begin = (*b).m_tvBegin;
+            auto time_expire = CTimeStamp::Add_Time_Milliseconds(time_begin, (*b).m_u4Second * 1000);
+            if (time_expire > CTimeStamp::Get_Time_Stamp())
             {
                 return false;
             }
@@ -96,7 +98,6 @@ bool CForbiddenIP::AddTempIP(const char* pIP, uint32 u4Second, EM_CONNECT_IO_TYP
     _ForbiddenIP ForbiddenIP;
     ForbiddenIP.m_strClientIP   = pIP;
     ForbiddenIP.m_u1Type        = 1;
-    ForbiddenIP.m_tvBegin       = ACE_OS::gettimeofday();
     ForbiddenIP.m_u4Second      = u4Second;
     ForbiddenIP.m_u1ConnectType = u1ConnectType;
     m_VecTempForbiddenIP.push_back(ForbiddenIP);

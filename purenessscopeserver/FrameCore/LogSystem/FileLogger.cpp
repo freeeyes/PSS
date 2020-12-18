@@ -308,21 +308,19 @@ void CLogFile::SetServerName(const char* szServerName)
 
 bool CLogFile::Run()
 {
-    ACE_Date_Time dt;
+    auto tvNow = CTimeStamp::Get_Time_Stamp();
     string strDate = fmt::format("{0:04d}_{1:02d}_{2:02d}_{3}.log", 
-        dt.year(),
-        dt.month(),
-        dt.day(),
+        CTimeStamp::Get_Date_Year(tvNow),
+        CTimeStamp::Get_Date_Month(tvNow),
+        CTimeStamp::Get_Date_Day(tvNow),
         m_u2CurrFileIndex);
-
-    dt.update(ACE_OS::gettimeofday());
 
     CreatePath();       //如果目录不存在则创建目录
 
     m_strLogTime = fmt::format("{0:04d}-{1:02d}-{2:02d}",
-        dt.year(),
-        dt.month(),
-        dt.day());
+        CTimeStamp::Get_Date_Year(tvNow),
+        CTimeStamp::Get_Date_Month(tvNow),
+        CTimeStamp::Get_Date_Day(tvNow));
 
     string strLogModulePath = m_strFileRoot.c_str();
     string strLogName = strLogModulePath
@@ -349,14 +347,11 @@ bool CLogFile::Run()
 
 void CLogFile::CheckTime()
 {
-    ACE_Date_Time dt;
-
-    dt.update(ACE_OS::gettimeofday());
-
+    auto tvNow = CTimeStamp::Get_Time_Stamp();
     string strDate = fmt::format("{0:04d}-{1:02d}-{2:02d}",
-        dt.year(),
-        dt.month(),
-        dt.day());
+        CTimeStamp::Get_Date_Year(tvNow),
+        CTimeStamp::Get_Date_Month(tvNow),
+        CTimeStamp::Get_Date_Day(tvNow));
 
     if (strDate != m_strLogTime && false == Run())
     {

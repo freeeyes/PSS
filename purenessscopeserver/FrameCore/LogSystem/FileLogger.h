@@ -7,6 +7,7 @@
 #include "ace/Date_Time.h"
 
 #include "define.h"
+#include "TimeStamp.hpp"
 #include "ILogObject.h"
 #include "smtps.h"
 #include "XmlConfig.h"

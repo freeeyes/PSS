@@ -106,32 +106,7 @@ void CConnectClient::ClientClose()
     //这里主动关闭，不在要求回调连接断开消息
     SetClientMessage(nullptr);
 
-    //将消息放入队列，让output在反应器线程发送。
-    ACE_Time_Value xtime = ACE_OS::gettimeofday();
-
-    //队列已满，不能再放进去了,就不放进去了
-    if (msg_queue()->is_full() == true)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::ClientClose] Connectid=%d,putq is full(%d).\n", GetServerID(), msg_queue()->message_count()));
-        App_MessageBlockManager::instance()->Close(pMbData);
-        return;
-    }
-
-    if (this->putq(pMbData, &xtime) == -1)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::ClientClose] Connectid=%d,putq(%d) output errno = [%d].\n", GetServerID(), msg_queue()->message_count(), errno));
-        App_MessageBlockManager::instance()->Close(pMbData);
-    }
-    else
-    {
-        m_u1ConnectState = CONNECTSTATE::CONNECT_CLIENT_CLOSE;
-        int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
-
-        if (-1 == nWakeupRet)
-        {
-            OUR_DEBUG((LM_ERROR, "CConnectClient::ClientClose] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetServerID(), nWakeupRet, errno));
-        }
-    }
+    Close();
 }
 
 int CConnectClient::open(void* p)
@@ -433,95 +408,6 @@ int CConnectClient::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
     return 0;
 }
 
-int CConnectClient::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
-{
-    if (fd == ACE_INVALID_HANDLE)
-    {
-        m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_output]fd == ACE_INVALID_HANDLE.\n"));
-        return -1;
-    }
-
-    ACE_Message_Block* pmbSendData = nullptr;
-    ACE_Time_Value nowait(ACE_OS::gettimeofday());
-
-    while (-1 != this->getq(pmbSendData, &nowait))
-    {
-        if (nullptr == pmbSendData)
-        {
-            OUR_DEBUG((LM_INFO, "[CConnectClient::handle_output]ConnectID=%d pmbSendData is nullptr.\n", GetServerID()));
-            break;
-        }
-
-        //如果是断开指令，则执行连接断开操作
-        if (pmbSendData->msg_type() == ACE_Message_Block::MB_STOP)
-        {
-            return -1;
-        }
-
-        //发送数据
-        const char* pData = pmbSendData->rd_ptr();
-
-        if (nullptr == pData)
-        {
-            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, pData is nullptr.\n", GetServerID()));
-            App_MessageBlockManager::instance()->Close(pmbSendData);
-            return -1;
-        }
-
-        auto nSendLen = (int)pmbSendData->length();   //发送数据的总长度
-        int nIsSendSize = 0;
-
-        //循环发送，直到数据发送完成。
-        while (true)
-        {
-            if (nSendLen <= 0)
-            {
-                OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, nCurrSendSize error is %d.\n", GetServerID(), nSendLen));
-                App_MessageBlockManager::instance()->Close(pmbSendData);
-                return -1;
-            }
-
-            int nCurrSendSize = nSendLen - nIsSendSize;
-            auto nDataLen = (int)this->peer().send(pmbSendData->rd_ptr(), nCurrSendSize, &nowait);
-
-            if (nDataLen <= 0)
-            {
-                _ClientIPInfo objServerIPInfo;
-                objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
-                objServerIPInfo.m_u2Port      = m_addrRemote.get_port_number();
-                m_pClientMessage->ConnectError(ACE_OS::last_error(), objServerIPInfo);
-
-                OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));
-                App_MessageBlockManager::instance()->Close(pmbSendData);
-                return -1;
-            }
-            else if (nDataLen + nIsSendSize >= nSendLen)  //当数据包全部发送完毕，清空。
-            {
-                App_MessageBlockManager::instance()->Close(pmbSendData);
-                m_u4SendSize += (uint32)nSendLen;
-                m_u4SendCount++;
-                break;
-            }
-            else
-            {
-                pmbSendData->rd_ptr(nDataLen);
-                nIsSendSize += nDataLen;
-            }
-        }
-
-    }
-
-    int nWakeupRet = reactor()->cancel_wakeup(this, ACE_Event_Handler::WRITE_MASK);
-
-    if (-1 == nWakeupRet)
-    {
-        OUR_DEBUG((LM_INFO, "[CConnectClient::handle_output]ConnectID=%d,nWakeupRet=%d, errno=%d.\n", GetServerID(), nWakeupRet, errno));
-    }
-
-    return 0;
-}
-
 bool CConnectClient::Device_Send_Data(const char* pData, ssize_t nLen)
 {
     ACE_Message_Block* pmb = App_MessageBlockManager::instance()->Create((uint32)nLen);
@@ -571,39 +457,44 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     //如果是DEBUG状态，记录当前接受包的二进制数据
     Output_Debug_Data(pmblk, LOG_SYSTEM_DEBUG_CLIENTSEND, m_addrRemote);
 
-    ACE_Time_Value     nowait(MAX_MSG_PACKETTIMEOUT);
+    auto nSendLen = (int)pmblk->length();   //发送数据的总长度
+    int nIsSendSize = 0;
 
-    if (get_handle() == ACE_INVALID_HANDLE)
+    //循环发送，直到数据发送完成。
+    while (true)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID()));
-        m_strError = fmt::format("[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.", GetServerID());
-        App_MessageBlockManager::instance()->Close(pmblk);
-        return false;
-    }
-
-    //将消息放入队列，让output在反应器线程发送。
-    ACE_Time_Value xtime = ACE_OS::gettimeofday();
-
-    //队列已满，不能再放进去了,就不放进去了
-    if (msg_queue()->is_full() == true)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessage] Connectid=%d,putq is full(%d).\n", GetServerID(), msg_queue()->message_count()));
-        App_MessageBlockManager::instance()->Close(pmblk);
-        return false;
-    }
-
-    if (this->putq(pmblk, &xtime) == -1)
-    {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessage] Connectid=%d,putq(%d) output errno = [%d].\n", GetServerID(), msg_queue()->message_count(), errno));
-        App_MessageBlockManager::instance()->Close(pmblk);
-    }
-    else
-    {
-        int nWakeupRet = reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK);
-
-        if (-1 == nWakeupRet)
+        if (nSendLen <= 0)
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessage] Connectid=%d, nWakeupRet(%d) output errno = [%d].\n", GetServerID(), nWakeupRet, errno));
+            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, nCurrSendSize error is %d.\n", GetServerID(), nSendLen));
+            App_MessageBlockManager::instance()->Close(pmblk);
+            return false;
+        }
+
+        ACE_Time_Value nowait(ACE_OS::gettimeofday());
+        auto nDataLen = (int)this->peer().send(pmblk->rd_ptr(), pmblk->length(), &nowait);
+
+        if (nDataLen <= 0)
+        {
+            _ClientIPInfo objServerIPInfo;
+            objServerIPInfo.m_strClientIP = m_addrRemote.get_host_addr();
+            objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
+            m_pClientMessage->ConnectError(ACE_OS::last_error(), objServerIPInfo);
+
+            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));
+            App_MessageBlockManager::instance()->Close(pmblk);
+            return false;
+        }
+        else if (nDataLen + nIsSendSize >= nSendLen)  //当数据包全部发送完毕，清空。
+        {
+            App_MessageBlockManager::instance()->Close(pmblk);
+            m_u4SendSize += (uint32)nSendLen;
+            m_u4SendCount++;
+            break;
+        }
+        else
+        {
+            pmblk->rd_ptr(nDataLen);
+            nIsSendSize += nDataLen;
         }
     }
 

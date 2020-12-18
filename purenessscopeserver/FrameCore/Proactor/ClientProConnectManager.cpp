@@ -753,8 +753,6 @@ void CClientProConnectManager::Close()
 
 int CClientProConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    ACE_Time_Value tvNow = ACE_OS::gettimeofday();
-
     if(m_ProAsynchConnect.GetConnectState() == true)
     {
         return 0;

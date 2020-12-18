@@ -19,7 +19,7 @@ public:
         return std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
     };   
 
-    //根据时间戳得到当前的日期
+    //根据时间戳得到当前的日期时间
     static string Get_DateTime(const PSS_Time_Point& time_point)
     {
         auto tt = std::chrono::system_clock::to_time_t(time_point);
@@ -40,6 +40,50 @@ public:
             now->tm_sec);
 
         return strDate;
+    };
+
+    //根据时间戳得到当前的年
+    static uint16 Get_Date_Year(const PSS_Time_Point& time_point)
+    {
+        auto tt = std::chrono::system_clock::to_time_t(time_point);
+#if PSS_PLATFORM == PLATFORM_WIN
+        struct tm tmNow_s;
+        localtime_s(&tmNow_s, &tt);
+        struct tm* now = &tmNow_s;
+#else
+        std::tm* now = std::localtime(&tt);
+#endif
+
+        return now->tm_year + 1900;
+    };
+
+    //根据时间戳得到当前的月
+    static uint16 Get_Date_Month(const PSS_Time_Point& time_point)
+    {
+        auto tt = std::chrono::system_clock::to_time_t(time_point);
+#if PSS_PLATFORM == PLATFORM_WIN
+        struct tm tmNow_s;
+        localtime_s(&tmNow_s, &tt);
+        struct tm* now = &tmNow_s;
+#else
+        std::tm* now = std::localtime(&tt);
+#endif
+
+        return now->tm_mon + 1;
+    };
+
+    //根据时间戳得到当前的日
+    static uint16 Get_Date_Day(const PSS_Time_Point& time_point)
+    {
+        auto tt = std::chrono::system_clock::to_time_t(time_point);
+#if PSS_PLATFORM == PLATFORM_WIN
+        struct tm tmNow_s;
+        localtime_s(&tmNow_s, &tt);
+        struct tm* now = &tmNow_s;
+#else
+        std::tm* now = std::localtime(&tt);
+#endif
+        return now->tm_mday;
     };
 
     //得到两个时间差，单位是毫秒

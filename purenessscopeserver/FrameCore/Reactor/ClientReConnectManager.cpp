@@ -841,9 +841,7 @@ int CClientReConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
     
-    ACE_Time_Value tv = ACE_OS::gettimeofday();
-
-    for_each(m_objClientTCPList.begin(), m_objClientTCPList.end(), [this, tv](const std::pair<int, shared_ptr<CReactorClientInfo>>& iter) {
+    for_each(m_objClientTCPList.begin(), m_objClientTCPList.end(), [this](const std::pair<int, shared_ptr<CReactorClientInfo>>& iter) {
         auto pClientInfo = iter.second;
 
         if (nullptr == pClientInfo->GetConnectClient())

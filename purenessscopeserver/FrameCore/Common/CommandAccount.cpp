@@ -35,7 +35,6 @@ void CCommandAccount::Save_Command_To_File(shared_ptr<_CommandData> pCommandData
 {
     if (pCommandData != nullptr)
     {
-        ACE_Date_Time dtLastTime(pCommandData->m_tvCommandTime);
         ACE_TString   strCommandType;
         ACE_TString   strPacketType;
 
@@ -70,7 +69,7 @@ void CCommandAccount::Close()
     OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]End.\n"));
 }
 
-bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, PSS_Time_Point const& tvTime)
 {
     ACE_UNUSED_ARG(u2CommandID);
     shared_ptr<_Port_Data_Account> p_Port_Data_Account = nullptr;
@@ -98,7 +97,7 @@ bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO
     return true;
 }
 
-bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, PSS_Time_Point const& tvTime)
 {
     ACE_UNUSED_ARG(u2Port);
 
@@ -138,15 +137,14 @@ bool CCommandAccount::Save_Command(uint16 u2CommandID, uint16 u2Port, EM_CONNECT
     return true;
 }
 
-bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime) const
+bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, PSS_Time_Point const& tvTime) const
 {
     ACE_UNUSED_ARG(u2Port);
     ACE_UNUSED_ARG(u1PacketType);
     ACE_UNUSED_ARG(u4PacketSize);
     ACE_UNUSED_ARG(u1CommandType);
 
-    ACE_Date_Time dtNowTime(tvTime);
-    auto u1Minute = (uint8)dtNowTime.minute();
+    auto u1Minute = (uint8)CTimeStamp::Get_Time_of_Minute(tvTime);
 
     for (_CommandAlertData commandalewrtdata : m_vecCommandAlertData)
     {
@@ -184,7 +182,7 @@ bool CCommandAccount::Save_Alert(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_I
     return true;
 }
 
-bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, ACE_Time_Value const& tvTime)
+bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, PSS_Time_Point const& tvTime)
 {
     //如果流量开关打开，则记录流量(单位是分钟)
     bool blRet = true;

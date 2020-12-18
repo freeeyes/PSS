@@ -127,7 +127,7 @@ void CForwardManager::SendData(const string& strTarget, ACE_Message_Block* pmb)
 
     if (nullptr != pIHandler)
     {
-        pIHandler->Device_Send_Data(pmb->wr_ptr(), pmb->length());
+        pIHandler->Device_Send_Data(pmb->rd_ptr(), pmb->length());
         pmb->wr_ptr(pmb->length());
     }
 }

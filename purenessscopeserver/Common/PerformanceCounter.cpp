@@ -22,13 +22,13 @@ void CPerformanceCounter::counter()
 
 	if (m_u4CurrCount == 1)
 	{
-		m_tvBegin = ACE_OS::gettimeofday();
+		m_tvBegin = CTimeStamp::Get_Time_Stamp();
 		
 	}
 	else if(m_u4CurrCount == m_u4MaxCount)
 	{
-		ACE_Time_Value tvCost = ACE_OS::gettimeofday() - m_tvBegin;
-		OUR_DEBUG((LM_INFO, "[%s]m_u4MaxCount=%d, cost=%d.\n", m_strName.c_str(), m_u4MaxCount, tvCost.msec()));
+		auto tvCost = CTimeStamp::Get_Time_Difference(CTimeStamp::Get_Time_Stamp(), m_tvBegin);
+		OUR_DEBUG((LM_INFO, "[%s]m_u4MaxCount=%d, cost=%d.\n", m_strName.c_str(), m_u4MaxCount, tvCost));
 		m_u4CurrCount = 0;
 	}
 
@@ -36,7 +36,7 @@ void CPerformanceCounter::counter()
 
 void CPerformanceCounter::set_start()
 {
-	m_tvBegin = ACE_OS::gettimeofday();
+	m_tvBegin = CTimeStamp::Get_Time_Stamp();
 }
 
 void CPerformanceCounter::reset()
