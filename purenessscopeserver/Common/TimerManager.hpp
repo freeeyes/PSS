@@ -1,6 +1,6 @@
 // ConnectHandle.h
-// ¾õµÃÒÀÀµ·´Ó¦Æ÷µÄ¶¨Ê±Æ÷ÓĞºÜ´óµÄÏŞÖÆĞÔ£¬±ÈÈçReactorºÍProactorÏÂÊ¹ÓÃ¶¨Ê±Æ÷µÄÊ±ºò»á·Ç³£Âé·³¡£
-// ¼ÈÈ»ÈÃÏµÍ³Ö§³ÖÁ½ÖÖÄ£Ê½£¬Ë÷ĞÔ¸ÄµÄºÃÒ»Ğ©£¬½«¶¨Ê±Æ÷¹ÜÀíÆ÷³éÏó³öÀ´¡£¸ºÔğËùÓĞ·şÎñÆ÷ÖĞÓÃµ½µÄ¶¨Ê±Æ÷²Ù×÷¡£
+// è§‰å¾—ä¾èµ–ååº”å™¨çš„å®šæ—¶å™¨æœ‰å¾ˆå¤§çš„é™åˆ¶æ€§ï¼Œæ¯”å¦‚Reactorå’ŒProactorä¸‹ä½¿ç”¨å®šæ—¶å™¨çš„æ—¶å€™ä¼šéå¸¸éº»çƒ¦ã€‚
+// æ—¢ç„¶è®©ç³»ç»Ÿæ”¯æŒä¸¤ç§æ¨¡å¼ï¼Œç´¢æ€§æ”¹çš„å¥½ä¸€äº›ï¼Œå°†å®šæ—¶å™¨ç®¡ç†å™¨æŠ½è±¡å‡ºæ¥ã€‚è´Ÿè´£æ‰€æœ‰æœåŠ¡å™¨ä¸­ç”¨åˆ°çš„å®šæ—¶å™¨æ“ä½œã€‚
 // add by freeeyes
 // 2009-08-25
 
@@ -19,10 +19,10 @@
 #include <condition_variable>
 #include <thread>
 
-//µ±¶¨Ê±Æ÷ÖĞÃ»ÓĞÊı¾İ£¬×î¶àµÈ´ıµÄÊ±¼ä
+//å½“å®šæ—¶å™¨ä¸­æ²¡æœ‰æ•°æ®ï¼Œæœ€å¤šç­‰å¾…çš„æ—¶é—´
 const uint16 timer_default_wait = 300;
 
-//¶¨Ê±Æ÷×é¼ş
+//å®šæ—¶å™¨ç»„ä»¶
 namespace brynet {
 
     enum class EM_TIMER_STATE
@@ -113,7 +113,7 @@ namespace brynet {
                 std::bind(std::forward<F>(callback), std::forward<TArgs>(args)...));
             mTimers.push(timer);
 
-            //»½ĞÑÏß³Ì
+            //å”¤é†’çº¿ç¨‹
             timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_ADD_TIMER;
             cv.notify_one();
             return timer;
@@ -122,7 +122,7 @@ namespace brynet {
         void addTimer(const Timer::Ptr& timer)
         {
             mTimers.push(timer);
-            //»½ĞÑÏß³Ì
+            //å”¤é†’çº¿ç¨‹
             timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_ADD_TIMER;
             cv.notify_one();
         }
@@ -130,7 +130,7 @@ namespace brynet {
         void Close()
         {
             timer_run_ = false;
-            //»½ĞÑÏß³Ì
+            //å”¤é†’çº¿ç¨‹
             timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_ADD_TIMER;
             cv.notify_one();
         }
@@ -141,7 +141,7 @@ namespace brynet {
 
             if (mTimers.empty())
             {
-                //µ±Ç°Ã»ÓĞ¶¨Ê±Æ÷£¬µÈ´ı»½ĞÑ
+                //å½“å‰æ²¡æœ‰å®šæ—¶å™¨ï¼Œç­‰å¾…å”¤é†’
                 cv.wait_for(lck, std::chrono::seconds(timer_default_wait));
             }
 
@@ -159,7 +159,7 @@ namespace brynet {
             auto timer_wait = tmp->getLeftTime();
             if (timer_wait > std::chrono::nanoseconds::zero())
             {
-                //»¹ĞèÒªµÈ´ıÏÂÒ»¸öµ½ÆÚÊ±¼ä
+                //è¿˜éœ€è¦ç­‰å¾…ä¸‹ä¸€ä¸ªåˆ°æœŸæ—¶é—´
                 cv.wait_for(lck, timer_wait);
 
                 if (timer_wakeup_state == EM_TIMER_STATE::TIMER_STATE_ADD_TIMER)
@@ -257,11 +257,28 @@ namespace brynet {
 class PSS_Timer_Manager
 {
 public:
-    void Start();
+    void Start()
+    {
+        m_timerMgr = std::make_shared<brynet::TimerMgr>();
 
-    void Close();
+        m_ttTimerThread = std::thread([this]()
+            {
+                m_timerMgr->schedule();
+                OUR_DEBUG((LM_INFO, "[PSS_Timer_Manager::start]End.\n"));
+            });
+    };
 
-    brynet::TimerMgr::Ptr GetTimerPtr() const;
+    void Close()
+    {
+        m_timerMgr->Close();
+
+        m_ttTimerThread.join();
+    };
+
+    brynet::TimerMgr::Ptr GetTimerPtr() const
+    {
+        return m_timerMgr;
+    };
 
 private:
     brynet::TimerMgr::Ptr m_timerMgr;

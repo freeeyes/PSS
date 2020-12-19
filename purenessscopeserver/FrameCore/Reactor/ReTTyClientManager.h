@@ -8,7 +8,7 @@
 #include "ReTTyHandler.h"
 #include "HashTable.h"
 #include "XmlConfig.h"
-#include "TimerManager.h"
+#include "TimerManager.hpp"
 
 class CReTTyClientManager : public ITTyClientManager
 {

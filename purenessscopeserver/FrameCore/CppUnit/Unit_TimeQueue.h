@@ -4,7 +4,7 @@
 #ifdef _CPPUNIT_TEST
 
 #include "Unit_Common.h"
-#include "TimerManager.h"
+#include "TimerManager.hpp"
 
 //定时器处理函数
 class CTimeTask

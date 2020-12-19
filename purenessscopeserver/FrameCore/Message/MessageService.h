@@ -13,7 +13,7 @@
 #include "LogManager.h"
 #include "ThreadInfo.h"
 #include "BuffPacket.h"
-#include "TimerManager.h"
+#include "TimerManager.hpp"
 #include "WorkThreadAI.h"
 #include "MessageDyeingManager.h"
 #include "ObjectLru.h"

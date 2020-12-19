@@ -8,7 +8,7 @@
 #include "ace/INET_Addr.h"
 #include "ace/Guard_T.h"
 
-#include "TimerManager.h"
+#include "TimerManager.hpp"
 #include "ProAsynchConnect.h"
 #include "BaseClientConnectManager.h"
 #include "ProactorUDPClient.h"

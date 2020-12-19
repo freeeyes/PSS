@@ -4,7 +4,7 @@
 #include "ace/Connector.h"
 #include "ace/SOCK_Connector.h"
 
-#include "TimerManager.h"
+#include "TimerManager.hpp"
 #include "BaseClientConnectManager.h"
 #include "ReactorUDPClient.h"
 #include "HashTable.h"

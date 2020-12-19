@@ -444,12 +444,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Common\TimerManager.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Common\WindowsCPU.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -541,6 +535,7 @@
     <ClInclude Include="..\Common\singleton.h" />
     <ClInclude Include="..\Common\Threading.hpp" />
     <ClInclude Include="..\Common\ThreadLock.h" />
+    <ClInclude Include="..\Common\TimerManager.hpp" />
     <ClInclude Include="..\Common\TimeStamp.hpp" />
     <ClInclude Include="..\Common\TimeWheelLink.h" />
     <ClInclude Include="..\Common\tms.hpp" />

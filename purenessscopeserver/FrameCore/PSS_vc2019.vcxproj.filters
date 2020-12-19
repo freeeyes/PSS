@@ -112,9 +112,6 @@
     <ClCompile Include="Common\ThreadInfo.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\TimerManager.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="TinyXML\tinystr.cpp">
       <Filter>tinyXML\cppfile</Filter>
     </ClCompile>
@@ -907,6 +904,9 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\singleton.h">
+      <Filter>Common\hfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\TimerManager.hpp">
       <Filter>Common\hfile</Filter>
     </ClInclude>
   </ItemGroup>
