@@ -25,7 +25,7 @@ void CUnit_ConnectUdp::Test_Connect_Udp_Server(void)
             EM_UDP_TYPE::UDP_SINGLE,
             (IClientUDPMessage* )&objUdpPostServerData))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Udp_Server]Connect[127.0.0.1:10003]Udp connect is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Udp_Server]Connect[127.0.0.1:10003]Udp connect is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Udp_Server]Connect[127.0.0.1:10003]Udp connect is fail.", true == blRet);
         return;
     }
@@ -55,7 +55,7 @@ void CUnit_ConnectUdp::Test_Connect_Udp_Server(void)
 
     if (false == App_ClientReConnectManager::instance()->SendDataUDP(m_nServerID, "127.0.0.1", 10003, pData, nSendLen, false))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Udp_Server]Send UDP [127.0.0.1:10003] is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Udp_Server]Send UDP [127.0.0.1:10003] is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Udp_Server]Send TCP [127.0.0.1:10003] is fail.\n", true == blRet);
     }
 
@@ -64,7 +64,7 @@ void CUnit_ConnectUdp::Test_Connect_Udp_Server(void)
     ACE_OS::sleep(tvSleep);
 
     App_ClientReConnectManager::instance()->CloseUDP(m_nServerID);
-    OUR_DEBUG((LM_INFO, "[Test_Connect_Udp_Server]Close OK.\n"));
+    PSS_LOGGER_DEBUG("[Test_Connect_Udp_Server]Close OK.");
     m_nTestCount++;
 }
 

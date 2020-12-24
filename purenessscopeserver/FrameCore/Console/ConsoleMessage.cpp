@@ -62,7 +62,7 @@ EM_CONSOLE_MESSAGE CConsoleMessage::Dispose(const ACE_Message_Block* pmb, shared
     //处理命令
     if(nullptr == pmb)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::Dispose]pmb is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::Dispose]pmb is nullptr.");
         return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
@@ -115,7 +115,7 @@ bool CConsoleMessage::GetCommandInfo(const string& strCommand, _CommandInfo& Com
 
     if(nLen > MAX_BUFF_100*2 + 1)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]pCommand is too long.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::GetCommandInfo]pCommand is too long.");
         return false;
     }
 
@@ -126,7 +126,7 @@ bool CConsoleMessage::GetCommandInfo(const string& strCommand, _CommandInfo& Com
 
     if (nullptr == pKeyBegin)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]OutputType is no find.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::GetCommandInfo]OutputType is no find.");
         return false;
     }
 
@@ -146,7 +146,7 @@ bool CConsoleMessage::GetCommandInfo(const string& strCommand, _CommandInfo& Com
 
     if (nullptr == pCommandBegin)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]CommandBegin is no find.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::GetCommandInfo]CommandBegin is no find.");
         return false;
     }
 
@@ -157,7 +157,7 @@ bool CConsoleMessage::GetCommandInfo(const string& strCommand, _CommandInfo& Com
 
     if (true == blCheck && false == CheckConsoleKey(strKey.c_str()))
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]szKey is invalid.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::GetCommandInfo]szKey is invalid.");
         return false;
     }
 
@@ -166,7 +166,7 @@ bool CConsoleMessage::GetCommandInfo(const string& strCommand, _CommandInfo& Com
 
     if (nullptr == pParamBegin)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::GetCommandInfo]ParamBegin is no find.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::GetCommandInfo]ParamBegin is no find.");
         return false;
     }
 
@@ -197,7 +197,7 @@ EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand_Plugin(const char* pCommand, sh
 
     if (false == GetCommandInfo(pCommand, CommandInfo, false))
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::ParseCommand]pCommand format is error.");
         return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
@@ -215,13 +215,13 @@ EM_CONSOLE_MESSAGE CConsoleMessage::ParseCommand(const char* pCommand, shared_pt
 
     if(nullptr == pCurrBuffPacket)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.");
         return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
     if(false == GetCommandInfo(pCommand, CommandInfo))
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCommand format is error.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::ParseCommand]pCommand format is error.");
         return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
@@ -245,7 +245,7 @@ EM_CONSOLE_MESSAGE CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, s
 
     if (nullptr == pCurrBuffPacket)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::ParseCommand]pCurrBuffPacket is nullptr.");
         return EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL;
     }
 
@@ -260,7 +260,7 @@ EM_CONSOLE_MESSAGE CConsoleMessage::DoCommand(const _CommandInfo& CommandInfo, s
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleMessage::ParseCommand]Command is no Find.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleMessage::ParseCommand]Command is no Find.");
     }
 
     //拼接返回数据包内容

@@ -11,13 +11,13 @@ CProgramService::~CProgramService(void)
 {
     if (ACE_Reactor::instance ()->cancel_timer(this) == -1)
     {
-        OUR_DEBUG ((LM_ERROR,"Service::~Service failed to cancel_timer.\n"));
+        PSS_LOGGER_DEBUG("Service::~Service failed to cancel_timer.");
     }
 }
 
 int CProgramService::svc( void )
 {
-    OUR_DEBUG ((LM_DEBUG,ACE_TEXT ("Service::svc\n")));
+    PSS_LOGGER_DEBUG("Service::svc.");
 
     if (report_status (SERVICE_RUNNING) == 0)
     {
@@ -37,7 +37,7 @@ int CProgramService::svc( void )
     }
 
     // Cleanly terminate connections, terminate threads.
-    OUR_DEBUG ((LM_DEBUG,ACE_TEXT ("Shutting down Service::svc\n")));
+    PSS_LOGGER_DEBUG("Shutting down Service::svc end.");
     reactor ()->cancel_timer (this);
     return 0;
 }
@@ -48,7 +48,7 @@ void CProgramService::handle_control(DWORD control_code)
     {
         report_status (SERVICE_STOP_PENDING);
 
-        OUR_DEBUG ((LM_INFO,ACE_TEXT ("Service control stop requested\n")));
+        PSS_LOGGER_DEBUG("Service control stop requested");
 
         m_blsStop = true;
         App_ProServerManager::instance()->Close();

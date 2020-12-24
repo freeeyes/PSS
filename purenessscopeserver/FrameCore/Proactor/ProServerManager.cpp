@@ -77,7 +77,7 @@ bool CProServerManager::Init()
 
     if (!App_ProConnectAcceptManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientProactorCount))
     {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Init]%s.\n", App_ProConnectAcceptManager::instance()->GetError()));
+        PSS_LOGGER_DEBUG("[CProServerManager::Init]{0}.", App_ProConnectAcceptManager::instance()->GetError());
         return false;
     }
 
@@ -87,24 +87,24 @@ bool CProServerManager::Init()
     //初始化反应器
     for (int i = 0; i < nReactorCount; i++)
     {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Init()]... i=[%d].\n", i));
+        PSS_LOGGER_DEBUG("[CProServerManager::Init()]... i=[{0}].", i);
 
         if (GetXmlConfigAttribute(xmlNetWorkMode)->Mode == NETWORKMODE::NETWORKMODE_PRO_IOCP)
         {
             blState = App_ProactorManager::instance()->AddNewProactor(i, 
                 Proactor_WIN32, 
                 GetXmlConfigAttribute(xmlNetWorkMode)->ThreadCount);
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.\n"));
+            PSS_LOGGER_DEBUG("[CProServerManager::Init]AddNewProactor NETWORKMODE = Proactor_WIN32.");
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor NETWORKMODE Error.\n"));
+            PSS_LOGGER_DEBUG("[CProServerManager::Init]AddNewProactor NETWORKMODE Error.");
             return false;
         }
 
         if (!blState)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Init]AddNewProactor [%d] Error.\n", i));
+            PSS_LOGGER_DEBUG("[CProServerManager::Init]AddNewProactor [{0}] Error.", i);
             return false;
         }
     }
@@ -138,7 +138,7 @@ bool CProServerManager::Start()
 
         if(nullptr == pConnectAcceptor)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start]pConnectAcceptor[%d] is nullptr.\n", i));
+            PSS_LOGGER_DEBUG("[CProServerManager::Start]pConnectAcceptor[{0}] is nullptr.", i);
             return false;
         }
 
@@ -159,12 +159,12 @@ bool CProServerManager::Start()
 
         if(-1 == nRet)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start] pConnectAcceptor->open[%d] is error.\n", i));
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start] Listen from [%s:%d] error(%d).\n",listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
+            PSS_LOGGER_DEBUG("[CProServerManager::Start] pConnectAcceptor->open[{0}] is error.", i);
+            PSS_LOGGER_DEBUG("[CProServerManager::Start] Listen from [{0}:{1}] error({2}).",listenAddr.get_host_addr(), listenAddr.get_port_number(), errno);
             return false;
         }
 
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Start] Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+        PSS_LOGGER_DEBUG("[CProServerManager::Start] Listen from [{0}:{1}] OK.", listenAddr.get_host_addr(), listenAddr.get_port_number());
     }
 
     //启动UDP监听
@@ -178,7 +178,7 @@ bool CProServerManager::Start()
 
         if(nullptr == pProactorUDPHandler)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start] pProactorUDPHandler is nullptr[%d] is error.\n", i));
+            PSS_LOGGER_DEBUG("[CProServerManager::Start] pProactorUDPHandler is nullptr[{0}] is error.", i);
             return false;
         }
         else
@@ -198,7 +198,7 @@ bool CProServerManager::Start()
 
             if(nullptr == pProactor)
             {
-                OUR_DEBUG((LM_INFO, "[CProServerManager::Start]UDP App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is nullptr.\n"));
+                PSS_LOGGER_DEBUG("[CProServerManager::Start]UDP App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is nullptr.");
                 return false;
             }
 
@@ -206,11 +206,11 @@ bool CProServerManager::Start()
 
             if(0 != pProactorUDPHandler->OpenAddress(listenAddr, pProactor))
             {
-                OUR_DEBUG((LM_INFO, "[CProServerManager::Start] UDP Listen from [%s:%d] error(%d).\n",listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
+                PSS_LOGGER_DEBUG("[CProServerManager::Start] UDP Listen from [{0}:{1}] error({2}).",listenAddr.get_host_addr(), listenAddr.get_port_number(), errno);
                 return false;
             }
 
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start] UDP Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+            PSS_LOGGER_DEBUG("[CProServerManager::Start] UDP Listen from [{0}:{1}] OK.", listenAddr.get_host_addr(), listenAddr.get_port_number());
         }
     }
 
@@ -250,7 +250,7 @@ bool CProServerManager::Start()
 
         if(nErr != 0)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start]listenConsoleAddr set_address error[%d].\n", errno));
+            PSS_LOGGER_DEBUG("[CProServerManager::Start]listenConsoleAddr set_address error[{0}].", errno);
             return false;
         }
 
@@ -258,7 +258,7 @@ bool CProServerManager::Start()
 
         if(nullptr == pProactor)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is nullptr.\n"));
+            PSS_LOGGER_DEBUG("[CProServerManager::Start]App_ProactorManager::instance()->GetAce_Proactor(REACTOR_CLIENTDEFINE) is nullptr.");
             return false;
         }
 
@@ -266,8 +266,8 @@ bool CProServerManager::Start()
 
         if(-1 == nRet)
         {
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start] m_ProConsoleConnectAcceptor.open is error.\n"));
-            OUR_DEBUG((LM_INFO, "[CProServerManager::Start] Listen from [%s:%d] error(%d).\n",listenConsoleAddr.get_host_addr(), listenConsoleAddr.get_port_number(), errno));
+            PSS_LOGGER_DEBUG("[CProServerManager::Start] m_ProConsoleConnectAcceptor.open is error.");
+            PSS_LOGGER_DEBUG("[CProServerManager::Start] Listen from [{0}:{1}] error({2}).",listenConsoleAddr.get_host_addr(), listenConsoleAddr.get_port_number(), errno);
             return false;
         }
     }
@@ -285,7 +285,7 @@ bool CProServerManager::Start()
     //启动反应器(其他的反应器，因为插件第三方需要)
     if(!App_ProactorManager::instance()->StartOtherProactor())
     {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartOtherProactor is error.\n"));
+        PSS_LOGGER_DEBUG("[CProServerManager::Start]App_ProactorManager::instance()->StartOtherProactor is error.");
         return false;
     }
 
@@ -303,7 +303,7 @@ bool CProServerManager::Start()
     //加载所有的插件初始化动作
     if (false == App_ModuleLoader::instance()->InitModule())
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ModuleLoader::instance()->InitModule() is error.\n"));
+        PSS_LOGGER_DEBUG("[CServerManager::Run]App_ModuleLoader::instance()->InitModule() is error.");
         return false;
     }
 
@@ -350,7 +350,7 @@ bool CProServerManager::Start()
     //开闸，让客户端数据进来
     if (!App_ProactorManager::instance()->StartClientProactor())
     {
-        OUR_DEBUG((LM_INFO, "[CProServerManager::Start]App_ProactorManager::instance()->StartClientProactor is error.\n"));
+        PSS_LOGGER_DEBUG("[CProServerManager::Start]App_ProactorManager::instance()->StartClientProactor is error.");
         return false;
     }
 
@@ -359,56 +359,56 @@ bool CProServerManager::Start()
 
 bool CProServerManager::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close begin....\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close begin....");
 
     App_ProConnectAcceptManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProConnectAcceptManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_ProConnectAcceptManager OK.");
 
     m_ProConsoleConnectAcceptor.cancel();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close Acceptor OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close Acceptor OK.");
 
     App_ClientProConnectManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ClientProConnectManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_ClientProConnectManager OK.");
 
     App_ProTTyClientManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ProTTyClientManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_ProTTyClientManager OK.");
 
     App_MessageManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_MessageManager OK.");
 
     App_MessageServiceGroup::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageServiceGroup OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_MessageServiceGroup OK.");
 
     App_ModuleLoader::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ModuleLoader OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_ModuleLoader OK.");
 
     AppLogManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close AppLogManager OK\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close AppLogManager OK");
 
     App_ProactorManager::instance()->StopProactor();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ReactorManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_ReactorManager OK.");
 
     App_ForwardManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ForwardManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_ForwardManager OK.");
     App_IPAccount::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_IPAccount OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_IPAccount OK.");
     App_MessageBlockManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_MessageBlockManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_MessageBlockManager OK.");
     App_FileTestManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_FileTestManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_FileTestManager OK.");
     App_ProConnectHandlerPool::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConnectHandlerPool OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_ConnectHandlerPool OK.");
     App_ConsoleManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close App_ConsoleManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close App_ConsoleManager OK.");
     App_TimerManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_TimerManager OK.\n"));
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]Close end....\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_TimerManager OK.");
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]Close end....");
 
     //等待所有资源释放完毕
     ACE_Time_Value tvSleep(0, 100);
     ACE_OS::sleep(tvSleep);
 
-    OUR_DEBUG((LM_INFO, "[CProServerManager::Close]EndLogStrategy end....\n"));
+    PSS_LOGGER_DEBUG("[CProServerManager::Close]EndLogStrategy end....");
 
     return true;
 }

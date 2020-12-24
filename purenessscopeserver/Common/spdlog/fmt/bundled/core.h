@@ -843,6 +843,8 @@ template <typename T = char> class counting_buffer final : public buffer<T> {
     count_ += this->size();
     this->clear();
   }
+  
+  virtual ~counting_buffer() = default;
 
  public:
   counting_buffer() : buffer<T>(data_, 0, buffer_size) {}

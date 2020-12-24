@@ -10,7 +10,7 @@ void CUnit_ServerMessageManager::setUp(void)
 void CUnit_ServerMessageManager::tearDown(void)
 {
     nCount--;
-    OUR_DEBUG((LM_INFO, "[CUnit_ServerMessageManager::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ServerMessageManager::tearDown]Finish.");
 }
 
 void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
@@ -19,7 +19,7 @@ void CUnit_ServerMessageManager::Test_ServerMessageManager(void)
     bool blRet = true;
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ServerMessageManager]m_pServerMessageManager->Start() false.\n"));
+        PSS_LOGGER_DEBUG("[Test_ServerMessageManager]m_pServerMessageManager->Start() false.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageManager]m_pServerMessageManager->Start() false.", true == blRet);
         return;
     }

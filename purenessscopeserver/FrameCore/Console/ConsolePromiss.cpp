@@ -9,7 +9,7 @@ void CConsolePromissions::Init(const char* pFileName)
 
     if (false == m_ConcoleConfig.Init(pFileName))
     {
-        OUR_DEBUG((LM_INFO, "[CConsolePromissions::Init]File Read Error = %s.\n", pFileName));
+        PSS_LOGGER_DEBUG("[CConsolePromissions::Init]File Read Error = {0}.", pFileName);
         return;
     }
 
@@ -51,7 +51,7 @@ int CConsolePromissions::Check_Promission(const string& pCommandName, const stri
     
     if (m_objHashCommandList.end() == f)
     {
-        OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission](%s)CommandName is nullptr.\n", pCommandName.c_str()));
+        PSS_LOGGER_DEBUG("[CConsolePromissions::Check_Promission]({0})CommandName is nullptr.\n", pCommandName);
         return -1;
     }
 
@@ -74,7 +74,7 @@ int CConsolePromissions::Check_Split_User(const string& pUser, const string& pUs
         }
     }
 
-    OUR_DEBUG((LM_INFO, "[CConsolePromissions::Check_Promission][%s]user is no promission.\n", pUser.c_str()));
+    PSS_LOGGER_DEBUG("[CConsolePromissions::Check_Promission][{0}]user is no promission.", pUser);
     return -2;
 }
 

@@ -105,7 +105,7 @@ int32 GetProcessMemorySize_Linux()
 
     auto lines = split_string(strContent, '\n');
 
-    OUR_DEBUG((LM_INFO, "[strContent]lines=%d.\n", lines.size()));
+    PSS_LOGGER_DEBUG("[strContent]lines={0}.", lines.size());
 
     for (const auto& strline : lines)
     {

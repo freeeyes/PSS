@@ -24,7 +24,7 @@ bool CBuffPacket::Init(int32 nSize, int32 nMaxBuffSize)
 
         if(nSize >= (int32)m_u4MaxPacketSize)
         {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::Init] nSize [%d] is more than m_u4MaxPacketSize.\n", nSize));
+            PSS_LOGGER_DEBUG("[CBuffPacket::Init] nSize [{0}] is more than m_u4MaxPacketSize.", nSize);
 			std::string strError = fmt::format("[CBuffPacket::Init] nSize [{0}]is more than m_u4MaxPacketSize.", nSize);
 			throw std::domain_error(strError);
         }
@@ -83,7 +83,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 
         if(u4Size + m_u4WritePtr >= m_u4MaxPacketSize)
         {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", u4Size, m_u4PacketLen));
+            PSS_LOGGER_DEBUG("[CBuffPacket::AddBuff] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", u4Size, m_u4PacketLen);
 
 			stringstream ss_format;
 			ss_format << "[CBuffPacket::AddBuff] nSize = ["
@@ -109,7 +109,7 @@ bool CBuffPacket::AddBuff(uint32 u4Size)
 
         if(nullptr == szNewData)
         {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::AddBuff] nSize [%d] is new error.\n", m_u4PacketLen));
+            PSS_LOGGER_DEBUG("[CBuffPacket::AddBuff] nSize [{0}] is new error.", m_u4PacketLen);
 			stringstream ss_format;
 			ss_format << "[CBuffPacket::AddBuff] nSize ["
 				<< m_u4PacketLen
@@ -232,7 +232,7 @@ bool CBuffPacket::RollBack(uint32 u4Len)
     {
         if(u4Len > m_u4WritePtr)
         {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::RollBack] Error u4Len(%d) m_u4WritePtr(%d).\n", u4Len, m_u4WritePtr));
+            PSS_LOGGER_DEBUG("[CBuffPacket::RollBack] Error u4Len({0}) m_u4WritePtr({1}).", u4Len, m_u4WritePtr);
             return false;
         }
 
@@ -260,7 +260,7 @@ bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
 
     if(u4Len + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::WriteStream] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize(%d).\n", u4Len, m_u4PacketLen, m_u4MaxPacketSize));
+        PSS_LOGGER_DEBUG("[CBuffPacket::WriteStream] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize({2}).", u4Len, m_u4PacketLen, m_u4MaxPacketSize);
         return false;
     }
 
@@ -268,7 +268,7 @@ bool CBuffPacket::WriteStream(const char* pData, uint32 u4Len)
     {
         if(false == AddBuff(u4Len))
         {
-            OUR_DEBUG((LM_ERROR, "[CBuffPacket::WriteStream] nSize = [%d] m_u4PacketLen = [%d] AddBuff false.\n", u4Len, m_u4PacketLen));
+            PSS_LOGGER_DEBUG("[CBuffPacket::WriteStream] nSize = [{0}] m_u4PacketLen = [{1}] AddBuff false.", u4Len, m_u4PacketLen);
             return false;
         }
 
@@ -560,7 +560,7 @@ CBuffPacket& CBuffPacket::operator << (uint8 u1Data)
 {
     if( (uint32)sizeof(u1Data) + m_u4PacketLen >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u1Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(u1Data), m_u4PacketLen);
         return *this;
     }
 
@@ -589,7 +589,7 @@ CBuffPacket& CBuffPacket::operator << (uint16 u2Data)
 {
     if( (uint32)sizeof(u2Data) + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u2Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(u2Data), m_u4PacketLen);
         return *this;
     }
 
@@ -642,7 +642,7 @@ CBuffPacket& CBuffPacket::operator << (uint32 u4Data)
 {
     if( (uint32)sizeof(u4Data) + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u4Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(u4Data), m_u4PacketLen);
         return *this;
     }
 
@@ -695,7 +695,7 @@ CBuffPacket& CBuffPacket::operator << (uint64 u8Data)
 {
     if( (uint32)sizeof(u8Data) + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u8Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(u8Data), m_u4PacketLen);
         return *this;
     }
 
@@ -748,7 +748,7 @@ CBuffPacket& CBuffPacket::operator << (int8 n1Data)
 {
     if( (uint32)sizeof(n1Data) + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(n1Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(n1Data), m_u4PacketLen);
         return *this;
     }
 
@@ -777,7 +777,7 @@ CBuffPacket& CBuffPacket::operator << (int16 n2Data)
 {
     if( (uint32)sizeof(n2Data) + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(n2Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(n2Data), m_u4PacketLen);
         return *this;
     }
 
@@ -828,7 +828,7 @@ CBuffPacket& CBuffPacket::operator << (int32 n4Data)
 {
     if( (uint32)sizeof(n4Data) + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(n4Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(n4Data), m_u4PacketLen);
         return *this;
     }
 
@@ -879,7 +879,7 @@ CBuffPacket& CBuffPacket::operator << (float32 f4Data)
 {
     if( (uint32)sizeof(f4Data) + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(f4Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(f4Data), m_u4PacketLen);
         return *this;
     }
 
@@ -908,7 +908,7 @@ CBuffPacket& CBuffPacket::operator << (float64 f8Data)
 {
     if( (uint32)sizeof(f8Data) + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(f8Data), m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(f8Data), m_u4PacketLen);
         return *this;
     }
 
@@ -937,7 +937,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARS_STR& str)
 {
     if( (uint32)sizeof(str.u1Len) + str.u1Len + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(str.u1Len) + str.u1Len, m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(str.u1Len) + str.u1Len, m_u4PacketLen);
         return *this;
     }
 
@@ -974,7 +974,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARM_STR& str)
 {
     if( (uint32)sizeof(str.u2Len) + str.u2Len + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(str.u2Len) + str.u2Len, m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(str.u2Len) + str.u2Len, m_u4PacketLen);
         return *this;
     }
 
@@ -1011,7 +1011,7 @@ CBuffPacket& CBuffPacket::operator << (VCHARB_STR& str)
 {
     if((uint32)sizeof(str.u4Len) + str.u4Len + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(str.u4Len) + str.u4Len, m_u4PacketLen));
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(str.u4Len) + str.u4Len, m_u4PacketLen);
         return *this;
     }
 
@@ -1050,7 +1050,7 @@ CBuffPacket& CBuffPacket::operator << (string& str)
 
     if((uint32)sizeof(u4Len) + u4Len + GetPacketLen() >= m_u4MaxPacketSize)
     {
-        OUR_DEBUG((LM_ERROR, "[CBuffPacket::operator << ] nSize = [%d] m_u4PacketLen = [%d] is more than m_u4MaxPacketSize.\n", (uint32)sizeof(u4Len) + u4Len, m_u4PacketLen));        
+        PSS_LOGGER_DEBUG("[CBuffPacket::operator << ] nSize = [{0}] m_u4PacketLen = [{1}] is more than m_u4MaxPacketSize.", sizeof(u4Len) + u4Len, m_u4PacketLen);
         return *this;
     }
 

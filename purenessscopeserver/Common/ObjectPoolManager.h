@@ -55,7 +55,7 @@ public:
 
                 if(-1 == nHashPos)
                 {
-                    OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Init]mAdd_Hash_Data_By_Key_Unit32 error.\n"));
+                    PSS_LOGGER_DEBUG("[CObjectPoolManager::Init]mAdd_Hash_Data_By_Key_Unit32 error.");
                 }
             }
         }
@@ -121,10 +121,10 @@ public:
 
             for (int i = 0; i < n4Size; i++)
             {
-                OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Create]FileName=%s,m_u4Line=%d,m_u4Count=%d.\n",
-                           objCreateList[i].m_strCreateFileName.c_str(),
+                PSS_LOGGER_DEBUG("[CObjectPoolManager::Create]FileName={0},m_u4Line={1},m_u4Count={2}.",
+                           objCreateList[i].m_strCreateFileName,
                            objCreateList[i].m_u4Line,
-                           objCreateList[i].m_u4Count));
+                           objCreateList[i].m_u4Count);
             }
 
             return nullptr;
@@ -139,7 +139,7 @@ public:
 
         if (-1 == nPos)
         {
-            OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Delete]szPacketID=%d(0x%08x).\n", u4Pos, pObject));
+            PSS_LOGGER_DEBUG("[CObjectPoolManager::Delete]szPacketID={0}({1}).", u4Pos, fmt::ptr(pObject));
             return false;
         }
 
@@ -154,7 +154,7 @@ public:
 
 		if (-1 == nPos)
 		{
-			OUR_DEBUG((LM_INFO, "[CObjectPoolManager::Delete]szPacketID=%d(0x%08x).\n", u4Pos, pObject));
+            PSS_LOGGER_DEBUG("[CObjectPoolManager::Delete]szPacketID={0}({1}).", u4Pos, fmt::ptr(pObject));
 			return false;
 		}
 
@@ -276,7 +276,7 @@ public:
 
                     if ((int)ioFile.send (szLog, strlen(szLog)) != (int)strlen(szLog))
                     {
-                        OUR_DEBUG((LM_INFO, "[CObjectPoolManager::OutputCreateInfo]Write filename:%s Error.\n",strFileName.c_str()));
+                        PSS_LOGGER_DEBUG("[CObjectPoolManager::OutputCreateInfo]Write filename:{0} Error.", strFileName);
                     }
                 }
 
@@ -284,7 +284,7 @@ public:
             }
             else
             {
-                OUR_DEBUG((LM_INFO, "[CObjectPoolManager::OutputCreateInfo]Open filename:%s Error.\n",strFileName.c_str()));
+                PSS_LOGGER_DEBUG("[CObjectPoolManager::OutputCreateInfo]Open filename:{0} Error.", strFileName);
             }
         }
     }

@@ -9,7 +9,7 @@ void CUnit_ProfileTime::setUp(void)
 
 void CUnit_ProfileTime::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_ProfileTime::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ProfileTime::tearDown]Finish.");
 }
 
 void CUnit_ProfileTime::Test_ProfileTime(void)
@@ -18,7 +18,7 @@ void CUnit_ProfileTime::Test_ProfileTime(void)
 
     if (false == m_pProfileTime->Start())
     {
-        OUR_DEBUG((LM_INFO, "[Test_ProfileTime]m_pProfileTime->Start() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_ProfileTime]m_pProfileTime->Start() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ProfileTime]m_pProfileTime->Start() Error.", true == blRet);
         return;
     }
@@ -30,7 +30,7 @@ void CUnit_ProfileTime::Test_ProfileTime(void)
 
     if (0 == u8TimeCost)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ProfileTime]m_pProfileTime->Stop() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_ProfileTime]m_pProfileTime->Stop() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ProfileTime]m_pProfileTime->Stop() Error.", true == blRet);
     }
 }

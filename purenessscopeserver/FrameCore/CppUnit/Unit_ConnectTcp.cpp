@@ -26,7 +26,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
         (IClientMessage*)&objPostServerData, 
         0))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]Connect[127.0.0.1:10002]Tcp connect is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server]Connect[127.0.0.1:10002]Tcp connect is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]Connect[127.0.0.1:10002]Tcp connect is fail.", true == blRet);
         return;
     }
@@ -40,7 +40,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
 
     if (1 != VecClientConnectInfo.size())
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectInfo() is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectInfo() is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectInfo() is fail.", true == blRet);
         return;
     }
@@ -50,7 +50,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
 
     if (emConnectState != EM_Server_Connect_State::SERVER_CONNECT_OK)
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectState is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectState is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectState is fail.", true == blRet);
         return;
     }
@@ -64,7 +64,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
     //设置OK
     if (false == App_ClientReConnectManager::instance()->SetServerConnectState(m_nServerID, EM_Server_Connect_State::SERVER_CONNECT_OK))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->SetServerConnectState is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->SetServerConnectState is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->SetServerConnectState is fail.", true == blRet);
         return;
     }
@@ -91,7 +91,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
 
     if (false == App_ClientReConnectManager::instance()->SendData(m_nServerID, pData, nSendLen, false))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]Send TCP [127.0.0.1:10002] is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server]Send TCP [127.0.0.1:10002] is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]Send TCP [127.0.0.1:10002] is fail.\n", true == blRet);
         return;
     }
@@ -102,7 +102,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
 
     if (false == App_ClientReConnectManager::instance()->DeleteIClientMessage((IClientMessage*)&objPostServerData))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server]Close TCP [127.0.0.1:10002] is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server]Close TCP [127.0.0.1:10002] is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server]Close TCP [127.0.0.1:10002] is fail.\n", true == blRet);
     }
 
@@ -126,7 +126,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
         (IClientMessage*)&objPostServerData, 
         0))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]Connect[127.0.0.1:10002]Tcp connect is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server_With_Local]Connect[127.0.0.1:10002]Tcp connect is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]Connect[127.0.0.1:10002]Tcp connect is fail.", true == blRet);
         return;
     }
@@ -136,7 +136,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
 
     if (false == App_ClientReConnectManager::instance()->Close(2))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]Close TCP [127.0.0.1:10002] is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server_With_Local]Close TCP [127.0.0.1:10002] is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]Close TCP [127.0.0.1:10002] is fail.\n", true == blRet);
         return;
     }
@@ -144,7 +144,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server_With_Local(void)
     //测试关闭错误的连接
     if (false != App_ClientReConnectManager::instance()->ConnectErrorClose(3))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Connect_Tcp_Server_With_Local]ConnectErrorClose is fail.\n", true == blRet);
     }
 

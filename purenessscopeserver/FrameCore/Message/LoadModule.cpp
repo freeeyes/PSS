@@ -34,7 +34,7 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 
     if (nullptr == pModuleInfo)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] new _ModuleInfo is error!\n"));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadMoudle] new _ModuleInfo is error!");
         return false;
     }
 
@@ -62,21 +62,21 @@ bool CLoadModule::LoadModule(const char* pModulePath, const char* pModuleName, c
 
     if (nRet != 0)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] strModuleName = %s, Execute Function LoadModuleData is error!\n", strModuleName.c_str()));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadMoudle] strModuleName = {0}, Execute Function LoadModuleData is error!", strModuleName);
         return false;
     }
 
     //将注册成功的模块，加入到Hash数组中
     m_objHashModuleList[pModuleInfo->GetName()] = pModuleInfo;
 
-    OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadMoudle] Begin Load ModuleName[%s] OK!\n", pModuleInfo->GetName()));
+    PSS_LOGGER_DEBUG("[CLoadModule::LoadMoudle] Begin Load ModuleName[{0}] OK!", pModuleInfo->GetName());
     return true;
 }
 
 bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
 {
     string strModuleName = szModuleName;
-    OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule]szResourceName=%s.\n", szModuleName));
+    PSS_LOGGER_DEBUG("[CLoadModule::UnLoadModule]szResourceName={0}.", szModuleName);
     auto f = m_objHashModuleList.find(strModuleName);
 
     if (m_objHashModuleList.end() == f)
@@ -97,7 +97,7 @@ bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
             m_objHashModuleList.erase(f);
         }
 
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::UnLoadModule] Close Module=%s!\n", strModuleName.c_str()));
+        PSS_LOGGER_DEBUG("[CLoadModule::UnLoadModule] Close Module={0}!", strModuleName);
 
         return true;
     }
@@ -106,7 +106,7 @@ bool CLoadModule::UnLoadModule(const char* szModuleName, bool blIsDelete)
 bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex, uint32 u4ThreadCount, uint8 u1UnLoadState, const string& strModulePath, const string& strModuleName, const string& strModuleParam)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_tmModule);
-    OUR_DEBUG((LM_ERROR, "[CLoadModule::MoveUnloadList]szResourceName=%s.\n", szModuleName));
+    PSS_LOGGER_DEBUG("[CLoadModule::MoveUnloadList]szResourceName={0}.", szModuleName);
     auto f = m_objHashModuleList.find(szModuleName);
 
     if (m_objHashModuleList.end() == f)
@@ -131,7 +131,7 @@ bool CLoadModule::MoveUnloadList(const char* szModuleName, uint32 u4UpdateIndex,
 
         //删除存在m_objHashModuleList的插件信息
         m_objHashModuleList.erase(f);
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::MoveUnloadList]szResourceName=%s Move Finish.\n", szModuleName));
+        PSS_LOGGER_DEBUG("[CLoadModule::MoveUnloadList]szResourceName={0} Move Finish.", szModuleName);
         return true;
     }
 }
@@ -161,7 +161,7 @@ int CLoadModule::UnloadListUpdate(uint32 u4UpdateIndex)
             (*itr).UnLoadModuleData();
 
             //回收插件端口资源
-            OUR_DEBUG((LM_ERROR, "[CLoadModule::UnloadListUpdate]szResourceName=%s UnLoad.\n", (*itr).m_strModuleName.c_str()));
+            PSS_LOGGER_DEBUG("[CLoadModule::UnloadListUpdate]szResourceName=%s UnLoad.", (*itr).m_strModuleName);
             CLoadLibrary::PSS_dlClose((*itr).m_hModule);
 
             //判断是否需要重载插件
@@ -236,7 +236,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, pModuleInfo is nullptr!\n", strModuleName.c_str()));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, pModuleInfo is nullptr!", strModuleName);
         return false;
     }
 
@@ -250,7 +250,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo->hModule || !pModuleInfo->hModule)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, pModuleInfo->hModule is nullptr(%s)!\n", strModuleName.c_str(), CLoadLibrary::PSS_dlerror()));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, pModuleInfo->hModule is nullptr({1})!", strModuleName, CLoadLibrary::PSS_dlerror());
         m_tmModule.release();
         return false;
     }
@@ -259,7 +259,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo->LoadModuleData)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function LoadMoudle is error!\n", strModuleName.c_str()));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, Function LoadMoudle is error!", strModuleName);
         m_tmModule.release();
         return false;
     }
@@ -268,7 +268,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo->UnLoadModuleData)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function UnloadModule is error!\n", strModuleName.c_str()));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, Function UnloadModule is error!", strModuleName);
         m_tmModule.release();
         return false;
     }
@@ -277,7 +277,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo->GetDesc)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetDesc is error!\n", strModuleName.c_str()));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, Function GetDesc is error!", strModuleName);
         m_tmModule.release();
         return false;
     }
@@ -286,7 +286,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo->GetName)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetName is error!\n", strModuleName.c_str()));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, Function GetName is error!", strModuleName);
         m_tmModule.release();
         return false;
     }
@@ -295,7 +295,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo->GetModuleKey)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetModuleKey is error!\n", strModuleName.c_str()));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, Function GetModuleKey is error!", strModuleName);
         m_tmModule.release();
         return false;
     }
@@ -304,7 +304,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo->DoModuleMessage)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function DoModuleMessage is error(%d)!\n", strModuleName.c_str(), errno));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, Function DoModuleMessage is error({1})!", strModuleName, errno);
         m_tmModule.release();
         return false;
     }
@@ -313,7 +313,7 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
 
     if (nullptr == pModuleInfo->GetModuleState)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadModule::LoadModuleInfo] strModuleName = %s, Function GetModuleState is error(%d)!\n", strModuleName.c_str(), errno));
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, Function GetModuleState is error({1})!", strModuleName, errno);
         m_tmModule.release();
         return false;
     }
@@ -434,9 +434,9 @@ bool CLoadModule::GetAllModuleName(uint32 u4Index, char* pName, uint16 nLen)
 
     if (nLen <= m_vecModuleNameList[u4Index].length())
     {
-        OUR_DEBUG((LM_INFO, "[CLoadModule::GetAllModuleName]pName len(%d) is more than(%d).\n",
+        PSS_LOGGER_DEBUG("[CLoadModule::GetAllModuleName]pName len({0}) is more than({1}).",
             m_vecModuleNameList[u4Index].length(),
-            nLen));
+            nLen);
         return false;
     }
 

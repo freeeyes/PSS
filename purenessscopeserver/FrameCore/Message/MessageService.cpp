@@ -77,7 +77,7 @@ int CMessageService::open()
 {
     m_blRun = true;
 
-    OUR_DEBUG((LM_INFO,"[CMessageService::open] m_u4HighMask = [%d] m_u4LowMask = [%d]\n", m_u4HighMask, m_u4LowMask));
+    PSS_LOGGER_DEBUG("[CMessageService::open] m_u4HighMask = [{0}] m_u4LowMask = [{1}].", m_u4HighMask, m_u4LowMask);
 
     //开启一个线程队列处理
     m_ttQueue = std::thread([this]()
@@ -102,7 +102,7 @@ int CMessageService::svc(void)
 
 		if (pthread_setaffinity_np(pthread_self(), sizeof(mask), &mask) != 0)
 		{
-			OUR_DEBUG((LM_ERROR, "[CMessageService::svc](%d)cound not get thread affinity.\n", m_u4ThreadID));
+            PSS_LOGGER_DEBUG("[CMessageService::svc]({0})cound not get thread affinity.", m_u4ThreadID);
 		}
 
 #endif
@@ -141,7 +141,7 @@ int CMessageService::svc(void)
 
     m_WorkThreadAI.Close();
 
-    OUR_DEBUG((LM_INFO,"[CMessageService::svc] svc finish!\n"));
+    PSS_LOGGER_DEBUG("[CMessageService::svc] svc finish!");
     return 0;
 }
 
@@ -218,9 +218,9 @@ shared_ptr<CWorkThread_Handler_info> CMessageService::ProcessRecvMessage(shared_
 
 	if (nullptr == pWorkThread_Handler_info)
 	{
-		OUR_DEBUG((LM_ERROR, "[CMessageService::ProcessMessage] [%d](%d)pWorkThread_Handler_info is nullptr.\n", 
+        PSS_LOGGER_DEBUG("[CMessageService::ProcessMessage] [{0}]({1})pWorkThread_Handler_info is nullptr.",
             u4ThreadID,
-            pMessage->m_u4ConnectID));
+            pMessage->m_u4ConnectID);
 		DeleteMessage(pMessage);
 		return nullptr;
 	}
@@ -333,9 +333,9 @@ bool CMessageService::ProcessSendMessage(shared_ptr<CWorkThreadMessage> pMessage
     else
     {
         nRet = false;
-        OUR_DEBUG((LM_INFO, "[CMessageService::ProcessSendMessage](ThreadID=%d)(CommandID=%d)Handler is nullptr.\n", 
+        PSS_LOGGER_DEBUG("[CMessageService::ProcessSendMessage](ThreadID={0})(CommandID={1})Handler is nullptr.",
             u4ThreadID,
-            pMessage->m_u4ConnectID));
+            pMessage->m_u4ConnectID);
     }
 
     DeleteMessage(pMessage);
@@ -356,9 +356,9 @@ bool CMessageService::ProcessSendClose(shared_ptr<CWorkThreadMessage> pMessage, 
 	else
 	{
 		nRet = false;
-		OUR_DEBUG((LM_INFO, "[CMessageService::ProcessSendClose](ThreadID=%d)(CommandID=%d)Handler is nullptr.\n",
+        PSS_LOGGER_DEBUG("[CMessageService::ProcessSendClose](ThreadID={0})(CommandID={1})Handler is nullptr.",
 			u4ThreadID,
-			pMessage->m_u4ConnectID));
+			pMessage->m_u4ConnectID);
 	}
 
     DeleteMessage(pMessage);
@@ -405,7 +405,7 @@ int CMessageService::Close()
         //等待线程处理完毕
         m_ttQueue.join();
 
-        OUR_DEBUG((LM_INFO, "[CMessageService::Close] Close Finish.\n"));
+        PSS_LOGGER_DEBUG("[CMessageService::Close] Close Finish.");
     }
 
     return 0;
@@ -491,7 +491,7 @@ bool CMessageService::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16&
 {
     if (nullptr == pMessage)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pMessage is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CMessageService::DoMessage] pMessage is nullptr.");
         return false;
     }
 
@@ -511,7 +511,7 @@ bool CMessageService::DoMessage(IMessage* pMessage, uint16& u2CommandID, uint16&
             AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_ERROR, strLog);
 		}
 
-        OUR_DEBUG((LM_ERROR, "[CMessageService::DoMessage] pClientCommandList no find(%d).\n", u2CommandID));
+        PSS_LOGGER_DEBUG("[CMessageService::DoMessage] pClientCommandList no find({0}).", u2CommandID);
         return false;
     }
 
@@ -785,9 +785,9 @@ void CMessageService::Check_Handler_Recv_Timeout()
         auto time_interval_millisecond = CTimeStamp::Get_Time_Difference(tvNow, pHandlerInfo->m_tvInput);
         if (m_u4MaxRecvWait < time_interval_millisecond)
         {
-            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d last tvNow=%s.\n", pHandlerInfo->m_u4ConnectID, CTimeStamp::Get_DateTime(tvNow).c_str()));
-            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d last m_tvInput=%s.\n", pHandlerInfo->m_u4ConnectID, CTimeStamp::Get_DateTime(pHandlerInfo->m_tvInput).c_str()));
-            OUR_DEBUG((LM_INFO, "[CMessageService::Check_Handler_Recv_Timeout]u2CommandID=%d is recv timeout.\n", pHandlerInfo->m_u4ConnectID));
+            PSS_LOGGER_DEBUG("[CMessageService::Check_Handler_Recv_Timeout]u2CommandID={0} last tvNow={1}.", pHandlerInfo->m_u4ConnectID, CTimeStamp::Get_DateTime(tvNow));
+            PSS_LOGGER_DEBUG("[CMessageService::Check_Handler_Recv_Timeout]u2CommandID={0} last m_tvInput={1}.", pHandlerInfo->m_u4ConnectID, CTimeStamp::Get_DateTime(pHandlerInfo->m_tvInput));
+            PSS_LOGGER_DEBUG("[CMessageService::Check_Handler_Recv_Timeout]u2CommandID={0} is recv timeout.", pHandlerInfo->m_u4ConnectID);
 
             //超时了，发送链接断开消息
 			CSendMessageInfo objSendMessageInfo;
@@ -910,19 +910,19 @@ int CMessageServiceGroup::timer_task(brynet::TimerMgr::Ptr timerMgr)
     //检查所有工作线程
     if (false == CheckWorkThread(tv))
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckWorkThread is fail.\n"));
+        PSS_LOGGER_DEBUG("[CMessageServiceGroup::handle_timeout]CheckWorkThread is fail.");
     }
 
     //记录统计CPU和内存的使用
     if (false == CheckCPUAndMemory())
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckCPUAndMemory is fail.\n"));
+        PSS_LOGGER_DEBUG("[CMessageServiceGroup::handle_timeout]CheckCPUAndMemory is fail.");
     }
 
     //检查所有插件状态
     if (false == CheckPlugInState())
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPlugInState is fail.\n"));
+        PSS_LOGGER_DEBUG("[CMessageServiceGroup::handle_timeout]CheckPlugInState is fail.");
     }
 
     if (m_blTimerState)
@@ -936,7 +936,7 @@ int CMessageServiceGroup::timer_task(brynet::TimerMgr::Ptr timerMgr)
 
 void CMessageServiceGroup::start_new_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::start_new_task]new timer(%d) is set.\n", m_u2ThreadTimeCheck));
+    PSS_LOGGER_DEBUG("[CMessageServiceGroup::start_new_task]new timer({0}) is set.", m_u2ThreadTimeCheck);
     auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2ThreadTimeCheck), [this, timerMgr]() {
         timer_task(timerMgr);
         });
@@ -953,7 +953,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     m_u2CurrThreadID = 0;
 
     //时序模式开启
-    OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]Timing sequence Start.\n"));
+    PSS_LOGGER_DEBUG("[CMessageServiceGroup::Init]Timing sequence Start.");
 
     //获得当前CPU的数量
 #if PSS_PLATFORM == PLATFORM_WIN
@@ -964,7 +964,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
     m_u2CpuNumber = (uint16)sysconf(_SC_NPROCESSORS_CONF);
 #endif
 
-    OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Init]CPU NUmber is %d.\n", m_u2CpuNumber));
+    PSS_LOGGER_DEBUG("[CMessageServiceGroup::Init]CPU NUmber is {0}.", m_u2CpuNumber);
 
     //初始化所有的Message对象
     for (uint32 i = 0; i < u4ThreadCount; i++)
@@ -973,7 +973,7 @@ bool CMessageServiceGroup::Init(uint32 u4ThreadCount, uint32 u4MaxQueue, uint32 
 
         if (nullptr == pMessageService)
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::Init](%d)pMessageService is nullptr.\n", i));
+            PSS_LOGGER_DEBUG("[CMessageServiceGroup::Init]({0})pMessageService is nullptr.", i);
             return false;
         }
 
@@ -1002,7 +1002,7 @@ bool CMessageServiceGroup::PutMessage(shared_ptr<CWorkThreadMessageList> pMessag
 
     if (false == pMessageService->PutMessage(pMessage))
     {
-        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
+        PSS_LOGGER_DEBUG("[CMessageServiceGroup::PutMessage]({0})pMessageService fail.", pMessageService->GetThreadID());
     }
 
     return true;
@@ -1015,7 +1015,7 @@ bool CMessageServiceGroup::PutUpdateCommandMessage(uint32 u4UpdateIndex) const
     {
         if (nullptr != pMessageService && false == pMessageService->PutUpdateCommandMessage(u4UpdateIndex))
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::PutMessage](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
+            PSS_LOGGER_DEBUG("[CMessageServiceGroup::PutMessage]({0})pMessageService fail.", pMessageService->GetThreadID());
             return false;
         }
     }
@@ -1027,7 +1027,7 @@ void CMessageServiceGroup::Close()
 {
     if (false == KillTimer())
     {
-        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Close]KillTimer error.\n"));
+        PSS_LOGGER_DEBUG("[CMessageServiceGroup::Close]KillTimer error.");
     }
 
     ACE_Time_Value tvSleep(0, 1000);
@@ -1036,7 +1036,7 @@ void CMessageServiceGroup::Close()
     {
         if (nullptr != pMessageService && 0 != pMessageService->Close())
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Close](%d)pMessageService fail.\n", pMessageService->GetThreadID()));
+            PSS_LOGGER_DEBUG("[CMessageServiceGroup::Close]({0})pMessageService fail.", pMessageService->GetThreadID());
         }
 
         ACE_OS::sleep(tvSleep);
@@ -1053,17 +1053,17 @@ bool CMessageServiceGroup::Start()
         return false;
     }
 
-    OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start]Work thread count=%d.\n", m_vecMessageService.size()));
+    PSS_LOGGER_DEBUG("[CMessageServiceGroup::Start]Work thread count={0}.", m_vecMessageService.size());
 
     for (auto pMessageService : m_vecMessageService)
     {
         if (nullptr != pMessageService && false == pMessageService->Start())
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is fail.\n", pMessageService->GetThreadID()));
+            PSS_LOGGER_DEBUG("[CMessageServiceGroup::Start]({0})WorkThread is fail.", pMessageService->GetThreadID());
             return false;
         }
 
-        OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::Start](%d)WorkThread is OK.\n", pMessageService->GetThreadID()));
+        PSS_LOGGER_DEBUG("[CMessageServiceGroup::Start]({0})WorkThread is OK.", pMessageService->GetThreadID());
     }
 
     return true;
@@ -1071,7 +1071,7 @@ bool CMessageServiceGroup::Start()
 
 bool CMessageServiceGroup::StartTimer()
 {
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::StartTimer] begin....\n"));
+    PSS_LOGGER_DEBUG("[CMessageServiceGroup::StartTimer] begin....");
 
     m_blTimerState = true;
 
@@ -1082,14 +1082,14 @@ bool CMessageServiceGroup::StartTimer()
 
 bool CMessageServiceGroup::KillTimer()
 {
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] begin....\n"));
+    PSS_LOGGER_DEBUG("[CMessageServiceGroup::KillTimer] begin....");
 
     if(m_blTimerState == true)
     {
         m_blTimerState = false;
     }
 
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::KillTimer] end....\n"));
+    PSS_LOGGER_DEBUG("[CMessageServiceGroup::KillTimer] end....");
     return true;
 }
 
@@ -1109,7 +1109,7 @@ bool CMessageServiceGroup::CheckWorkThread(const PSS_Time_Point& tvNow) const
     {
         if (nullptr != pMessageService && false == pMessageService->SaveThreadInfoData(tvNow))
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::CheckWorkThread]SaveThreadInfo error.\n"));
+            PSS_LOGGER_DEBUG("[CMessageServiceGroup::CheckWorkThread]SaveThreadInfo error.");
         }
 
         //目前在工作线程发生阻塞的时候不在杀死工程线程，杀了工作线程会导致一些内存问题。
@@ -1133,7 +1133,7 @@ bool CMessageServiceGroup::CheckCPUAndMemory(bool blTest) const
 
         if (u4CurrCpu > GetXmlConfigAttribute(xmlMonitor)->CpuMax || u4MessageCount > GetXmlConfigAttribute(xmlMonitor)->MemoryMax)
         {
-            OUR_DEBUG((LM_INFO, "[CMessageServiceGroup::handle_timeout]CPU Rote=%d,u4MessageCount=%d ALERT.\n", u4CurrCpu, u4MessageCount));
+            PSS_LOGGER_DEBUG("[CMessageServiceGroup::handle_timeout]CPU Rote={0},u4MessageCount={1} ALERT.", u4CurrCpu, u4MessageCount);
 
             string strLog = fmt::format("[Monitor] CPU Rote={0},u4MessageCount={1}.",
                 u4CurrCpu, 
@@ -1228,7 +1228,7 @@ bool CMessageServiceGroup::CheckPlugInState() const
             {
                 string strTitle = "ModuleStateError";
 
-                string strLog = fmt::format("Module ErrorID={0}.\n",
+                string strLog = fmt::format("Module ErrorID={0}.",
                     u4ErrorID);
 
                 //发送邮件
@@ -1385,7 +1385,7 @@ void CMessageServiceGroup::CopyMessageManagerList() const
     {
         if (nullptr == pMessageService)
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::CopyMessageManagerList](%d)pMessageService is nullptr.\n", pMessageService->GetThreadID()));
+            PSS_LOGGER_DEBUG("[CMessageServiceGroup::CopyMessageManagerList]({0})pMessageService is nullptr.", pMessageService->GetThreadID());
         }
         else
         {

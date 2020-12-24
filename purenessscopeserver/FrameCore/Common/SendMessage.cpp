@@ -31,11 +31,11 @@ void CSendMessagePool::Init(int32 nObjcetCount)
 
 void CSendMessagePool::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CSendMessagePool::Close]Begin.\n"));
+    PSS_LOGGER_DEBUG("[CSendMessagePool::Close]Begin.");
     //清理所有已存在的指针
     m_objHashHandleList.Close();
 
-    OUR_DEBUG((LM_INFO, "[CSendMessagePool::Close]End.\n"));
+    PSS_LOGGER_DEBUG("[CSendMessagePool::Close]End.");
 }
 
 _SendMessage* CSendMessagePool::Create()
@@ -67,7 +67,7 @@ bool CSendMessagePool::Delete(_SendMessage* pObject)
 
     if(false == blState)
     {
-        OUR_DEBUG((LM_INFO, "[CSendMessagePool::Delete]HashID=%s(0x%08x).\n", strHashID.c_str(), pObject));
+        PSS_LOGGER_DEBUG("[CSendMessagePool::Delete]HashID={0}({1}).", strHashID, fmt::ptr(pObject));
     }
 
     return true;

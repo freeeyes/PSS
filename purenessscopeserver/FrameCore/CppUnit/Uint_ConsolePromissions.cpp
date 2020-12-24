@@ -10,7 +10,7 @@ void CUnit_ConsolePromissions::setUp(void)
 
 void CUnit_ConsolePromissions::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_ConsolePromissions::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ConsolePromissions::tearDown]Finish.");
 }
 
 void CUnit_ConsolePromissions::Test_Promission_User(void)
@@ -20,7 +20,7 @@ void CUnit_ConsolePromissions::Test_Promission_User(void)
 
     if (0 != nPromission)
     {
-        OUR_DEBUG((LM_INFO, "[Test_Promission_User]freeeyes user valid fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Promission_User]freeeyes user valid fail.");
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]freeeyes user valid fail.", true == blRet);
     }
 }

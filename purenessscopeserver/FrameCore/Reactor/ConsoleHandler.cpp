@@ -31,7 +31,7 @@ void CConsoleHandler::Close(int nIOCount)
         }
 
         shutdown();
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::Close]Close(%d) OK.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::Close]Close({0}) OK.", GetConnectID());
         SAFE_DELETE(m_pTCClose);
         delete this;
     }
@@ -39,7 +39,7 @@ void CConsoleHandler::Close(int nIOCount)
 
 bool CConsoleHandler::ServerClose()
 {
-    OUR_DEBUG((LM_ERROR, "[CConsoleHandler::ServerClose]Close(%d) OK.\n", GetConnectID()));
+    PSS_LOGGER_DEBUG("[CConsoleHandler::ServerClose]Close({0}) OK.", GetConnectID());
     shutdown();
     m_u1ConnectState = CONNECTSTATE::CONNECT_SERVER_CLOSE;
     return true;
@@ -62,7 +62,7 @@ int CConsoleHandler::open(void*)
 
     if (nRet != 0)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [%d].\n", nRet));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [{0}].", nRet);
         m_strError = fmt::format("[CConsoleHandler::open]ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>::open() error [{0}].", nRet);
         return -1;
     }
@@ -70,7 +70,7 @@ int CConsoleHandler::open(void*)
     //设置链接为非阻塞模式
     if (this->peer().enable(ACE_NONBLOCK) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
         m_strError = "CConsoleHandler::open]this->peer().enable  = ACE_NONBLOCK error.";
         return -1;
     }
@@ -78,7 +78,7 @@ int CConsoleHandler::open(void*)
     //获得远程链接地址和端口
     if (this->peer().get_remote_addr(m_addrRemote) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::open]this->peer().get_remote_addr error.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::open]this->peer().get_remote_addr error.");
         m_strError = "[CConsoleHandler::open]this->peer().get_remote_addr error.";
         return -1;
     }
@@ -86,11 +86,11 @@ int CConsoleHandler::open(void*)
     //判断是否在服务器允许的IP范围内
     if (CompareConsoleClinetIP(m_addrRemote.get_host_addr()) == false)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::open]this IP is abort.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::open]this IP is abort.");
         return -1;
     }
 
-    OUR_DEBUG((LM_INFO, "[CConsoleHandler::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+    PSS_LOGGER_DEBUG("[CConsoleHandler::open] Connection from [{0}:{1}].", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
     m_atvConnect      = CTimeStamp::Get_Time_Stamp();
     m_atvInput        = CTimeStamp::Get_Time_Stamp();
     m_atvOutput       = CTimeStamp::Get_Time_Stamp();
@@ -120,7 +120,7 @@ int CConsoleHandler::open(void*)
             m_u4AllSendCount);
 
         AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
-        OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandle::RecvClinetPacket] pmb new is nullptr.");
         return -1;
     }
 
@@ -140,7 +140,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     if (fd == ACE_INVALID_HANDLE || nullptr == m_pPacketParse)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is nullptr.");
         m_strError = "[CConsoleHandler::handle_input]fd == ACE_INVALID_HANDLE or m_pPacketParse is nullptr.";
         return -1;
     }
@@ -149,7 +149,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     if (m_pCurrMessage == nullptr)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input]m_pCurrMessage == nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::handle_input]m_pCurrMessage == nullptr.");
         m_strError = "[CConsoleHandler::handle_input]m_pCurrMessage == nullptr.";
 
         Clear_PacketParse();
@@ -161,7 +161,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     //这里需要对m_u4CurrSize进行检查。
     if (nCurrCount < 0)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetConnectID(), m_u4CurrSize));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::handle_input][{0}] nCurrCount < 0 m_u4CurrSize = {1}.", GetConnectID(), m_u4CurrSize);
         m_u4CurrSize = 0;
 
         Clear_PacketParse();
@@ -174,7 +174,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
     {
         m_u4CurrSize = 0;
         auto u4Error = (uint32)errno;
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::handle_input] ConnectID = {0}, recv data is error nDataLen = [{1}] errno = [{2}].", GetConnectID(), nDataLen, u4Error);
         m_strError = fmt::format("[CConsoleHandler::handle_input] ConnectID = {0}, recv data is error[{1}].", GetConnectID(), nDataLen);
 
         Clear_PacketParse();
@@ -186,8 +186,6 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
     const char* pData = m_pCurrMessage->rd_ptr();
     auto u4Len = (uint32)m_pCurrMessage->length();
-
-    OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]End is(0x%02x).\n", pData[nDataLen - 1]));
 
     //如果没有读完，短读
     if (pData[u4Len - 1] != '&' && pData[u4Len - 1] != 0x0d && pData[u4Len - 1] != 0x0a)
@@ -211,7 +209,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
 
             if (false == CheckMessage())
             {
-                OUR_DEBUG((LM_INFO, "[CConsoleHandler::handle_input]CheckMessage error.\n"));
+                PSS_LOGGER_DEBUG("[CConsoleHandler::handle_input]CheckMessage error.");
                 return -1;
             }
 
@@ -231,7 +229,7 @@ int CConsoleHandler::handle_input(ACE_HANDLE fd)
                 m_u4AllSendCount);
 
             AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
-            OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvClinetPacket] pmb new is nullptr.\n"));
+            PSS_LOGGER_DEBUG("[CConnectHandle::RecvClinetPacket] pmb new is nullptr.");
             return -1;
         }
 
@@ -246,10 +244,10 @@ int CConsoleHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 {
     if (h == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_DEBUG, "[CConsoleHandler::handle_close] h is nullptr mask=%d.\n", (int)mask));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::handle_close] h is nullptr mask={0}.", (int)mask);
     }
 
-    OUR_DEBUG((LM_DEBUG, "[CConsoleHandler::handle_close]Connectid=[%d] begin(%d)...\n", GetConnectID(), errno));
+    PSS_LOGGER_DEBUG("[CConsoleHandler::handle_close]Connectid=[{0}] begin({1})...", GetConnectID(), errno);
     Close(2);
     return 0;
 }
@@ -280,7 +278,7 @@ bool CConsoleHandler::SendMessage(shared_ptr<IBuffPacket> pBuffPacket, uint8 u1O
 
     if (false == PutSendPacket(pMbData))
     {
-        OUR_DEBUG((LM_INFO, "[CConsoleHandler::SendMessage]PutSendPacket error.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::SendMessage]PutSendPacket error.");
     }
 
     return true;
@@ -292,13 +290,13 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
     if (nullptr == pMbData)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::SendPacket] ConnectID = {0}, get_handle() == ACE_INVALID_HANDLE.", GetConnectID());
         return false;
     }
 
     if (get_handle() == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::SendPacket] ConnectID = {0}, get_handle() == ACE_INVALID_HANDLE.", GetConnectID());
         m_strError = fmt::format("[CConsoleHandler::SendPacket] ConnectID = {0}, get_handle() == ACE_INVALID_HANDLE.", GetConnectID());
         App_MessageBlockManager::instance()->Close(pMbData);
         return false;
@@ -309,7 +307,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
     if (nullptr == pData)
     {
-        OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, pData is nullptr.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::SendPacket] ConnectID = {0}, pData is nullptr.", GetConnectID());
         App_MessageBlockManager::instance()->Close(pMbData);
         return false;
     }
@@ -323,7 +321,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
         if (nCurrSendSize <= 0)
         {
-            OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", GetConnectID(), nCurrSendSize));
+            PSS_LOGGER_DEBUG("[CConsoleHandler::SendPacket] ConnectID = {0], nCurrSendSize error is {1}.", GetConnectID(), nCurrSendSize);
             App_MessageBlockManager::instance()->Close(pMbData);
             return false;
         }
@@ -332,7 +330,7 @@ bool CConsoleHandler::PutSendPacket(ACE_Message_Block* pMbData)
 
         if (nDataLen <= 0)
         {
-            OUR_DEBUG((LM_ERROR, "[CConsoleHandler::SendPacket] ConnectID = %d, error = %d.\n", GetConnectID(), errno));
+            PSS_LOGGER_DEBUG("[CConsoleHandler::SendPacket] ConnectID = {0}, error = {1}.", GetConnectID(), errno);
             App_MessageBlockManager::instance()->Close(pMbData);
             m_atvOutput      = CTimeStamp::Get_Time_Stamp();
             return false;
@@ -404,7 +402,7 @@ bool CConsoleHandler::CheckMessage()
 
     if (true == blRet && false == SendMessage(pBuffPacket, u1Output))
     {
-        OUR_DEBUG((LM_INFO, "[CConsoleHandler::CheckMessage]SendMessage error.\n"));
+        PSS_LOGGER_DEBUG("[CConsoleHandler::CheckMessage]SendMessage error.");
         return false;
     }
     else

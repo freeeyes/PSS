@@ -10,7 +10,7 @@ void CUnit_PacketParse::setUp(void)
 void CUnit_PacketParse::tearDown(void)
 {
     nCount = 0;
-    OUR_DEBUG((LM_INFO, "[CUnit_PacketParse::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_PacketParse::tearDown]Finish.");
 }
 
 void CUnit_PacketParse::Test_PacketParsePool(void)
@@ -20,7 +20,7 @@ void CUnit_PacketParse::Test_PacketParsePool(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_PacketParsePool]m_pPacketParsePool->Create().\n"));
+        PSS_LOGGER_DEBUG("[Test_PacketParsePool]m_pPacketParsePool->Create().");
         CPPUNIT_ASSERT_MESSAGE("[Test_PacketParsePool]m_pPacketParsePool->Create() is fail.", true == blRet);
         return;
     }

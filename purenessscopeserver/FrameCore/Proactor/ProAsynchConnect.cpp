@@ -66,7 +66,7 @@ int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& res
 
         ACE_INET_Addr remoteaddr = App_ClientProConnectManager::instance()->GetServerAddr(m_nServerID);
         App_ClientProConnectManager::instance()->SetServerConnectState(m_nServerID, EM_Server_Connect_State::SERVER_CONNECT_FAIL);
-        OUR_DEBUG((LM_ERROR, "[CProAsynchConnect::validate_connection](%s:%d) connection fails,error=%d(ServerID=%d).\n", remoteaddr.get_host_addr(), remoteaddr.get_port_number(), nError, m_nServerID));
+        PSS_LOGGER_DEBUG("[CProAsynchConnect::validate_connection]({0}:{1}) connection fails,error={2}(ServerID={3}).", remoteaddr.get_host_addr(), remoteaddr.get_port_number(), nError, m_nServerID);
         m_nServerID = 0;
 
         return 1;
@@ -83,7 +83,6 @@ int CProAsynchConnect::validate_connection(const ACE_Asynch_Connect::Result& res
     m_AddrClientRemote = remote;
     m_AddrClientLocal  = local;
 
-    //OUR_DEBUG((LM_ERROR, "[CProAsynchConnect::validate_connection]Connect IP=%s,Port=%d OK.\n", remote.get_host_addr(), remote.get_port_number()));
     return 0;
 }
 

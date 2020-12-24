@@ -20,7 +20,7 @@ void CUnit_LogManager::Test_Write_Log(void)
     //测试二进制写入
     if (-1 == AppLogManager::instance()->WriteLogBinary(LOG_SYSTEM, strName))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Write_Log]WriteLogBinary is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Write_Log]WriteLogBinary is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Write_Log]WriteLogBinary is fail.", true == blRet);
     }
 

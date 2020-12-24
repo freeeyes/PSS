@@ -149,7 +149,7 @@ public:
 
                     if(-1 == n4Result)
                     {
-                        OUR_DEBUG ((LM_INFO, "[Add_TimeWheel_Object](%s)(%d)\n", szKey,n4Result));
+                        PSS_LOGGER_DEBUG("[Add_TimeWheel_Object]({0})({1})", szKey, n4Result);
                         return false;
                     }
 
@@ -179,7 +179,7 @@ public:
 
                 if (-1 == m_htIndexList.Del_Hash_Data(szKey))
                 {
-                    OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Add_TimeWheel_Object]Deltet(%s) error.\n", szKey));
+                    PSS_LOGGER_DEBUG("[CTimeWheelLink::Add_TimeWheel_Object]Deltet({0}) error.", szKey);
                 }
 
                 if (0 > m_vecHashContain[m_nCurrBlockID]->Add_Hash_Data(szKey, pEntey))
@@ -198,7 +198,7 @@ public:
 
                         if(-1 == n4Result)
                         {
-                            OUR_DEBUG ((LM_INFO, "[Add_TimeWheel_Object](%s)(%d)\n", szKey,n4Result));
+                            PSS_LOGGER_DEBUG("[Add_TimeWheel_Object]({0})({1}).", szKey, n4Result);
                             return false;
                         }
 
@@ -231,7 +231,7 @@ public:
         //清理索引信息
         if (-1 == m_htIndexList.Del_Hash_Data(szKey))
         {
-            OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Del_TimeWheel_Object]Delete(%s) no exist.\n", szKey));
+            PSS_LOGGER_DEBUG("[CTimeWheelLink::Del_TimeWheel_Object]Delete({0}) no exist.", szKey);
         }
     }
 
@@ -305,12 +305,11 @@ public:
                 m_fn_Timeout_Callback(m_pArgContext, vecEntey);
             }
 
-            //OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]nLastBlockID=%d, m_nCurrBlockID=%d.\n", nLastBlockID, m_nCurrBlockID));
             m_vecHashContain[nLastBlockID]->Clear();
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CTimeWheelLink::Tick]m_vecHashContain is nullptr,nLastBlockID=%d.\n", nLastBlockID));
+            PSS_LOGGER_DEBUG("[CTimeWheelLink::Tick]m_vecHashContain is nullptr,nLastBlockID={0}.", nLastBlockID);
         }
 
         m_nCurrBlockID = nLastBlockID;

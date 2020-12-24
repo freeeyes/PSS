@@ -25,7 +25,7 @@ void CUnit_MessageDyeingManager::Test_MessageDyeingManager(void)
     //测试数据染色接口
     if (false == m_pMessageDyeingManager->AddDyeingCommand(u2CommandID, 5))
     {
-        OUR_DEBUG((LM_INFO, "[Test_MessageDyeingManager]AddDyeingCommand is false.\n"));
+        PSS_LOGGER_DEBUG("[Test_MessageDyeingManager]AddDyeingCommand is false.");
         CPPUNIT_ASSERT_MESSAGE("[Test_MessageDyeingManager]AddDyeingCommand is false.\n", true == blRet);
         return;
     }
@@ -37,7 +37,7 @@ void CUnit_MessageDyeingManager::Test_MessageDyeingManager(void)
 
     if (1 != objList.size())
     {
-        OUR_DEBUG((LM_INFO, "[GetDyeingCommand]GetDyeingCommand is not 1.\n"));
+        PSS_LOGGER_DEBUG("[GetDyeingCommand]GetDyeingCommand is not 1.");
         CPPUNIT_ASSERT_MESSAGE("[GetDyeingCommand]GetDyeingCommand is not 1.\n", true == blRet);
         return;
     }
@@ -46,7 +46,7 @@ void CUnit_MessageDyeingManager::Test_MessageDyeingManager(void)
 
     if (0 == strTraceID.length())
     {
-        OUR_DEBUG((LM_INFO, "[GetDyeingCommand]GetTraceID is error.\n"));
+        PSS_LOGGER_DEBUG("[GetDyeingCommand]GetTraceID is error.");
         CPPUNIT_ASSERT_MESSAGE("[GetDyeingCommand]GetTraceID is error.\n", true == blRet);
     }
 }

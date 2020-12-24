@@ -66,7 +66,7 @@ bool CMessageManager::UnloadModuleCommand(const char* pModuleName, uint8 u1LoadS
         //卸载插件信息(不在这里卸载，在定时器检测所有工作线程都处理完了，再卸载指定的模块,先将需要卸载的模块放入需要卸载的队列)
         if (false == App_ModuleLoader::instance()->MoveUnloadList(pModuleName, u4TmpUpdateIndex, u4ThreadCount, u1LoadState, strModulePath, strModuleN, strModuleParam))
         {
-            OUR_DEBUG((LM_ERROR, "[CMessageManager::UnloadModuleCommand]MoveUnloadList error(%s).\n", pModuleName));
+            PSS_LOGGER_DEBUG("[CMessageManager::UnloadModuleCommand]MoveUnloadList error({0}).", pModuleName);
         }
     }
 
@@ -125,7 +125,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, shared_ptr<CClient
 {
     if (nullptr == pClientCommand)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand_Ex] u2CommandID = %d pClientCommand is nullptr.\n", u2CommandID));
+        PSS_LOGGER_DEBUG("[CMessageManager::AddClientCommand_Ex] u2CommandID = {0} pClientCommand is nullptr.", u2CommandID);
         return false;
     }
 
@@ -138,7 +138,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, shared_ptr<CClient
     {
         Add_ClientCommandList(pCommandTimeout, pClientCommandList, u2CommandID, pClientCommand, pModuleName, pListenInfo);
 
-        OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand_Ex] u2CommandID = %d Add OK***.\n", u2CommandID));
+        PSS_LOGGER_DEBUG("[CMessageManager::AddClientCommand_Ex] u2CommandID = {0} Add OK***.", u2CommandID);
     }
     else
     {
@@ -149,7 +149,7 @@ bool CMessageManager::AddClientCommand_Ex(uint16 u2CommandID, shared_ptr<CClient
 
         m_objClientCommandList[u2CommandID] = pClientCommandList;
         m_u4CurrCommandCount++;
-        OUR_DEBUG((LM_ERROR, "[CMessageManager::AddClientCommand_Ex]AddClientCommand u2CommandID = %d Add OK***.\n", u2CommandID));
+        PSS_LOGGER_DEBUG("[CMessageManager::AddClientCommand_Ex]AddClientCommand u2CommandID = {0} Add OK***.", u2CommandID);
     }
 
     return true;
@@ -173,11 +173,11 @@ void CMessageManager::DeleteCommandByModule(shared_ptr<_ClientCommandInfo> pClie
             //找到了，释放之
             if (false == pClientCommandList->DelClientCommand(pClientCommandInfo->m_pClientCommand))
             {
-                OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is fail.\n", pClientCommandInfo->m_u2CommandID));
+                PSS_LOGGER_DEBUG("[CMessageManager::UnloadModuleCommand]DelClientCommand({0}) is fail.", pClientCommandInfo->m_u2CommandID);
             }
             else
             {
-                OUR_DEBUG((LM_INFO, "[CMessageManager::UnloadModuleCommand]DelClientCommand(%d) is OK.\n", pClientCommandInfo->m_u2CommandID));
+                PSS_LOGGER_DEBUG("[CMessageManager::UnloadModuleCommand]DelClientCommand({0}) is OK.", pClientCommandInfo->m_u2CommandID);
             }
 
             break;
@@ -223,7 +223,7 @@ bool CMessageManager::DelClientCommand(uint16 u2CommandID, shared_ptr<CClientCom
 
     if (m_objClientCommandList.end() == f)
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d is not exist.\n", u2CommandID));
+        PSS_LOGGER_DEBUG("[CMessageManager::DelClientCommand] u2CommandID = {0} is not exist.", u2CommandID);
         return false;
     }
 
@@ -232,11 +232,11 @@ bool CMessageManager::DelClientCommand(uint16 u2CommandID, shared_ptr<CClientCom
     if (true == pClientCommandList->DelClientCommand(pClientCommand))
     {
         m_objClientCommandList.erase(f);
-        OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d List Del OK.\n", u2CommandID));
+        PSS_LOGGER_DEBUG("[CMessageManager::DelClientCommand] u2CommandID = {0} List Del OK.", u2CommandID);
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CMessageManager::DelClientCommand] u2CommandID = %d Del Command OK.\n", u2CommandID));
+        PSS_LOGGER_DEBUG("[CMessageManager::DelClientCommand] u2CommandID = {0} Del Command OK.", u2CommandID);
     }
 
     return true;

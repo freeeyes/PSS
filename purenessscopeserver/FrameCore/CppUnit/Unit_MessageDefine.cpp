@@ -71,10 +71,10 @@ void CUnit_MessageDefine::Test_GetFileInfo(void)
         blRet = true;
     }
 
-    OUR_DEBUG((LM_INFO, "[Test_GetFileInfo]m_szFileName=%s,m_szFilePath=%s,m_szFileParam=%s.",
-               FileInfo.m_strFileName.c_str(),
-               FileInfo.m_strFilePath.c_str(),
-               FileInfo.m_strFileParam.c_str()));
+    PSS_LOGGER_DEBUG("[Test_GetFileInfo]m_szFileName={0},m_szFilePath={1},m_szFileParam={2}.",
+               FileInfo.m_strFileName,
+               FileInfo.m_strFilePath,
+               FileInfo.m_strFileParam);
     CPPUNIT_ASSERT_MESSAGE("[Test_GetFileInfo]GetFileInfo Data is fail.", true == blRet);
     m_nTestCount++;
 }

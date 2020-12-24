@@ -1599,7 +1599,7 @@ inline int Checkfilelimit(int nMaxOpenFile)
     }
     else
     {
-        PSS_LOGGER_DEBUG("[Checkfilelimit]rfilelimit.rlim_cur=%d,nMaxOpenFile=%d.\n", rfilelimit.rlim_cur, nMaxOpenFile);
+        PSS_LOGGER_DEBUG("[Checkfilelimit]rfilelimit.rlim_cur=%d,nMaxOpenFile=%d.", rfilelimit.rlim_cur, nMaxOpenFile);
 
         //提示同时文件打开数不足，需要设置。
         if ((int)rfilelimit.rlim_cur < nMaxOpenFile)

@@ -91,13 +91,13 @@ void CUnit_Basehandler::Test_Tcp_Common_Send_Input_To_Cache(void)
     //测试缓冲区小于发送数据的分支
     obj_Input_To_Cache_Param.m_u4SendMaxBuffSize = 2;
 
-    OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Input_To_Cache]Begin,\n"));
+    PSS_LOGGER_DEBUG("[Tcp_Common_Send_Input_To_Cache]Begin,");
     Tcp_Common_Send_Input_To_Cache(MakePacket,
         obj_Input_To_Cache_Param,
         pMB,
         u4PacketSize,
         pBuffPacket);
-    OUR_DEBUG((LM_INFO, "[Tcp_Common_Send_Input_To_Cache]End,\n"));
+    PSS_LOGGER_DEBUG("[Tcp_Common_Send_Input_To_Cache]End,");
 }
 
 void CUnit_Basehandler::Test_Tcp_Common_Manager_Timeout_CheckInfo(void)
@@ -160,7 +160,7 @@ void CUnit_Basehandler::Test_Udp_Common_Recv_Stream(void)
 
     if (false == Udp_Common_Recv_Stream(1, pmb, pPacketParse, pPacketParseInfo))
     {
-        OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Recv_Stream]Udp_Common_Recv_Stream is fail.", true == blRet);
     }
 
@@ -201,7 +201,7 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 
     if (blState == true)
     {
-        OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(300.0.0.1) is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(300.0.0.1) is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(300.0.0.1) is fail.", true == blRet);
         return;
     }
@@ -217,7 +217,7 @@ void CUnit_Basehandler::Test_Udp_Common_Send_Message(void)
 
     if (blState == true)
     {
-        OUR_DEBUG((LM_INFO, "[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(127.0.0.1) is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(127.0.0.1) is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Udp_Common_Send_Message]Udp_Common_Send_Message(127.0.0.1) is fail.", true == blRet);
         return;
     }
@@ -260,7 +260,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
 
     if (blState == true)
     {
-        OUR_DEBUG((LM_INFO, "[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.", true == blRet);
         return;
     }
@@ -275,7 +275,7 @@ void CUnit_Basehandler::Test_Tcp_Common_Make_Send_Packet(void)
 
     if (blState == false)
     {
-        OUR_DEBUG((LM_INFO, "[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_Tcp_Common_Make_Send_Packet]Tcp_Common_Make_Send_Packet(m_u4SendMaxBuffSize=1) is fail.", true == blRet);
         return;
     }

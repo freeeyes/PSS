@@ -51,8 +51,6 @@ void CReTTyClientManager::Close()
     vector<CReTTyHandler*> vecTTyClientHandlerInfo;
     m_objTTyClientHandlerList.Get_All_Used(vecTTyClientHandlerInfo);
 
-    OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Close]Count=%d.\n", vecTTyClientHandlerInfo.size()));
-
     for (int i = 0; i < (int)vecTTyClientHandlerInfo.size(); i++)
     {
         CReTTyHandler* pTTyClientHandler = vecTTyClientHandlerInfo[i];
@@ -79,7 +77,7 @@ bool CReTTyClientManager::Close(uint16 u2ConnectID)
 
     if (nullptr == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Close](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Close](u2ConnectID={0}) is no exist.", u2ConnectID);
         return false;
     }
     else
@@ -103,7 +101,7 @@ bool CReTTyClientManager::Pause(uint16 u2ConnectID)
 
     if (nullptr == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Pause](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Pause](u2ConnectID={0}) is no exist.", u2ConnectID);
         return false;
     }
     else
@@ -125,7 +123,7 @@ bool CReTTyClientManager::Resume(uint16 u2ConnectID)
 
     if (nullptr == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Resume](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Resume](u2ConnectID={0}) is no exist.", u2ConnectID);
         return false;
     }
     else
@@ -147,7 +145,7 @@ bool CReTTyClientManager::SendMessage(uint16 u2ConnectID, char*& pMessage, uint3
 
     if (nullptr == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::SendMessage](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::SendMessage](u2ConnectID={0}) is no exist.", u2ConnectID);
         return false;
     }
     else
@@ -160,7 +158,7 @@ int CReTTyClientManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
 
-    OUR_DEBUG((LM_INFO, "[CReTTyClientManager::handle_timeout](%d)Run.\n", m_objTTyClientHandlerList.Get_Count()));
+    PSS_LOGGER_DEBUG("[CReTTyClientManager::handle_timeout]({0})Run.", m_objTTyClientHandlerList.Get_Count());
 
     //遍历所有的已存在的连接，看看有没有需要重启的
     vector<CReTTyHandler*> vecTTyClientHandlerInfo;
@@ -186,7 +184,7 @@ int CReTTyClientManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 
 void CReTTyClientManager::start_new_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    OUR_DEBUG((LM_ERROR, "[CReTTyClientManager::start_new_task]new timer is set(%d).\n", m_u2TimeCheck));
+    PSS_LOGGER_DEBUG("[CReTTyClientManager::start_new_task]new timer is set({0}).", m_u2TimeCheck);
     auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2TimeCheck), [this, timerMgr]() {
         timer_task(timerMgr);
         });
@@ -204,7 +202,7 @@ int CReTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDevP
 
     if (nullptr != pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s) is exist.\n", pName));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Connect]({0}) is exist.", pName);
         return -1;
     }
 
@@ -234,14 +232,14 @@ int CReTTyClientManager::Connect(uint16 u2ConnectID, const char* pName, _TTyDevP
 
     if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, pMessageRecv))
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s)pTTyClientHandler Init Error.\n", pName));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Connect]({0})pTTyClientHandler Init Error.", pName);
         SAFE_DELETE(pTTyClientHandler);
         return -1;
     }
 
     if (false == m_objTTyClientHandlerList.Add_Hash_Data(szConnectID, pTTyClientHandler))
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s)Add_Hash_Data Error.\n", pName));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Connect]({0})Add_Hash_Data Error.", pName);
         SAFE_DELETE(pTTyClientHandler);
         return -1;
     }
@@ -261,7 +259,7 @@ int CReTTyClientManager::ConnectFrame(uint16 u2ConnectID, const char* pName, _TT
 
     if (nullptr != pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s) is exist.\n", pName));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Connect]({0}) is exist.", pName);
         return -1;
     }
 
@@ -291,14 +289,14 @@ int CReTTyClientManager::ConnectFrame(uint16 u2ConnectID, const char* pName, _TT
 
     if (false == pTTyClientHandler->Init(u2ConnectID, pName, inTTyParams, nullptr, EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME, u4PacketParseID))
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s)pTTyClientHandler Init Error.\n", pName));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Connect]({0})pTTyClientHandler Init Error.", pName);
         SAFE_DELETE(pTTyClientHandler);
         return -1;
     }
 
     if (false == m_objTTyClientHandlerList.Add_Hash_Data(szConnectID, pTTyClientHandler))
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::Connect](%s)Add_Hash_Data Error.\n", pName));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::Connect]({0})Add_Hash_Data Error.", pName);
         SAFE_DELETE(pTTyClientHandler);
         return -1;
     }
@@ -318,7 +316,7 @@ bool CReTTyClientManager::GetClientDevInfo(uint16 u2ConnectID, _TTyDevParam& out
 
     if (nullptr == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyClientManager::GetClientDevInfo](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        PSS_LOGGER_DEBUG("[CReTTyClientManager::GetClientDevInfo](u2ConnectID={0}) is no exist.", u2ConnectID);
         return false;
     }
 
@@ -353,7 +351,7 @@ bool CReTTyClientManager::IsConnect(uint16 u2ConnectID)
 
     if (nullptr == pTTyClientHandler)
     {
-        OUR_DEBUG((LM_INFO, "[ CReTTyClientManager::IsConnect](u2ConnectID=%d) is no exist.\n", u2ConnectID));
+        PSS_LOGGER_DEBUG("[ CReTTyClientManager::IsConnect](u2ConnectID={0}) is no exist.", u2ConnectID);
         return false;
     }
 

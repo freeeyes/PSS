@@ -9,7 +9,7 @@ bool GetCommandParam(const string& strCommand, const char* pTag, string& strValu
     //判断是否包含指定的关键字
     if (nullptr == pPosBegin)
     {
-        OUR_DEBUG((LM_INFO, "[GetCommandParam](%s)no find(%s) key.\n", strCommand.c_str(), pTag));
+        PSS_LOGGER_DEBUG("[GetCommandParam]({0})no find({1}) key.", strCommand, pTag);
         return false;
     }
 

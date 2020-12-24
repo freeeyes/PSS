@@ -88,13 +88,13 @@ void CAceReactor::Create_DEV_POLL(int nMaxHandleCount)
 
     m_emReactorType = EM_REACTOR_MODULE::Reactor_DEV_POLL;
 #else
-    OUR_DEBUG((LM_INFO, "[CAceReactor::Create_DEV_POLL]this OS isn't support.\n"));
+    PSS_LOGGER_DEBUG("[CAceReactor::Create_DEV_POLL]this OS isn't support.");
 #endif
 }
 
 void CAceReactor::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CAceReactor::Close]Begin.\n"));
+    PSS_LOGGER_DEBUG("[CAceReactor::Close]Begin.");
 
     if (nullptr != m_pReactor)
     {
@@ -105,7 +105,7 @@ void CAceReactor::Close()
     m_emReactorType = EM_REACTOR_MODULE::Reactor_DEV_POLL;
     m_nThreadCount  = 0;
     m_blRun         = false;
-    OUR_DEBUG((LM_INFO, "[CAceReactor::Close]End.\n"));
+    PSS_LOGGER_DEBUG("[CAceReactor::Close]End.");
 }
 
 bool CAceReactor::Init(EM_REACTOR_MODULE emReactorType, int nThreadCount, int nMaxHandleCount)
@@ -138,7 +138,7 @@ bool CAceReactor::Init(EM_REACTOR_MODULE emReactorType, int nThreadCount, int nM
 #endif
 
         default:
-            OUR_DEBUG((LM_INFO, "[CAceReactor::Init]Unknow nReactorType(%d).\n", emReactorType));
+            PSS_LOGGER_DEBUG("[CAceReactor::Init]Unknow nReactorType({0}).", emReactorType);
             return false;
         }
 
@@ -154,16 +154,16 @@ bool CAceReactor::Init(EM_REACTOR_MODULE emReactorType, int nThreadCount, int nM
 
 int CAceReactor::open()
 {
-    OUR_DEBUG((LM_ERROR, "[CAceReactor::Open] Begin nReactorID= [%d].\n", m_u4ReactorID));
+    PSS_LOGGER_DEBUG("[CAceReactor::Open] Begin nReactorID= [{0}].", m_u4ReactorID);
 
     if (activate(THREAD_PARAM, m_nThreadCount)  == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Open]activate error ReactorType = [%d] nThreadCount = [%d] Start!\n", m_emReactorType, m_nThreadCount));
+        PSS_LOGGER_DEBUG("[CAceReactor::Open]activate error ReactorType = [{0}] nThreadCount = [{1}] Start!", m_emReactorType, m_nThreadCount);
         return -1;
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "CAceReactor::Open Begin nReactorID= [%d] OK\n", m_u4ReactorID));
+        PSS_LOGGER_DEBUG("CAceReactor::Open Begin nReactorID= [{0}] OK.", m_u4ReactorID);
         return 0;
     }
 }
@@ -172,7 +172,7 @@ int CAceReactor::svc()
 {
     if (nullptr == m_pReactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Svc]m_pReactor is nullptr.\n", m_emReactorType, m_nThreadCount));
+        PSS_LOGGER_DEBUG("[CAceReactor::Svc]m_pReactor is nullptr.");
         return -1;
     }
     else
@@ -187,14 +187,14 @@ int CAceReactor::svc()
         }
 
         Close();
-        OUR_DEBUG((LM_ERROR, "CAceReactor::Svc]nReactorID= [%d] end .... \n", m_u4ReactorID));
+        PSS_LOGGER_DEBUG("CAceReactor::Svc]nReactorID= [{0}] end .... ", m_u4ReactorID);
         return 0;
     }
 }
 
 bool CAceReactor::Start()
 {
-    OUR_DEBUG((LM_INFO, "[CAceReactor::Start] ReactorID = [%d] ReactorType = [%d] nThreadCount = [%d] Start!\n", GetReactorID(), m_emReactorType, m_nThreadCount));
+    PSS_LOGGER_DEBUG("[CAceReactor::Start] ReactorID = [{0}] ReactorType = [{1}] nThreadCount = [{2}] Start!", GetReactorID(), m_emReactorType, m_nThreadCount);
 
     if (0 == open())
     {
@@ -211,15 +211,15 @@ bool CAceReactor::Stop()
 {
     if (nullptr == m_pReactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Stop]m_pReactor is nullptr.\n", m_emReactorType, m_nThreadCount));
+        PSS_LOGGER_DEBUG("[CAceReactor::Stop]m_pReactor is nullptr.");
         return false;
     }
 
     if (m_blRun == true)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Stop] nReactorID= [%d] Begin.\n", m_u4ReactorID));
+        PSS_LOGGER_DEBUG("[CAceReactor::Stop] nReactorID= [{0}] Begin.", m_u4ReactorID);
         m_pReactor->end_reactor_event_loop();
-        OUR_DEBUG((LM_ERROR, "[CAceReactor::Stop] nReactorID= [%d] End.\n", m_u4ReactorID));
+        PSS_LOGGER_DEBUG("[CAceReactor::Stop] nReactorID= [{0}] End.", m_u4ReactorID);
         m_blRun = false;
     }
 
@@ -248,7 +248,7 @@ ACE_Reactor* CAceReactor::GetReactor()
 
 void CAceReactorManager::Close()
 {
-    OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] Begin.\n"));
+    PSS_LOGGER_DEBUG("[CAceReactor::Close] Begin.");
 
     for_each(m_pReactorList.begin(), m_pReactorList.end(), [](const std::pair<uint16, CAceReactor*>& iter) {
         //Çå³ý¶ÔÏó
@@ -265,7 +265,7 @@ void CAceReactorManager::Close()
     m_pReactorList.clear();
 
     m_u2RectorCount = 0;
-    OUR_DEBUG((LM_ERROR, "[CAceReactor::Close] End.\n"));
+    PSS_LOGGER_DEBUG("[CAceReactor::Close] End.");
 }
 
 void CAceReactorManager::Init(uint16 u2Count)
@@ -301,7 +301,7 @@ bool CAceReactorManager::AddNewReactor(int nReactorID, EM_REACTOR_MODULE emReact
     }
 
     m_pReactorList[u2ReactorID] = pAceReactor;
-    OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]New [%d] ReactorTxype = [%d] nThreadCount = [%d]. pAceReactor=[%@]\n", nReactorID, emReactorType, nThreadCount, pAceReactor));
+    PSS_LOGGER_DEBUG("[CAceReactorManager::AddNewReactor]New [{0}] ReactorTxype = [{1}] nThreadCount = [{2}]. pAceReactor=[{3}]", nReactorID, emReactorType, nThreadCount, fmt::ptr(pAceReactor));
     return true;
 }
 
@@ -313,7 +313,7 @@ bool CAceReactorManager::StartOtherReactor() const
 
         if (nullptr != pAceReactor && pAceReactor->GetReactorID() != 0 && false == pAceReactor->Start())
         {
-            OUR_DEBUG((LM_INFO, "[CAceReactorManager::AddNewReactor]Start error.\n"));
+            PSS_LOGGER_DEBUG("[CAceReactorManager::AddNewReactor]Start error.");
         }
         });
 
@@ -343,7 +343,7 @@ bool CAceReactorManager::StopReactor() const
 
         if (false == pAceReactor->Stop())
         {
-            OUR_DEBUG((LM_ERROR, "[CAceReactorManager::StopReactor]pAceReactor Stop.\n"));
+            PSS_LOGGER_DEBUG("[CAceReactorManager::StopReactor]pAceReactor Stop.");
         }
         });
 

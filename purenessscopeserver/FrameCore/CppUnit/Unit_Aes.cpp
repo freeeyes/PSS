@@ -23,7 +23,7 @@ void CUnit_Aes::setUp(void)
 
 void CUnit_Aes::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_Aes::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_Aes::tearDown]Finish.");
 }
 
 void CUnit_Aes::Test_Aes(void)
@@ -47,14 +47,14 @@ void CUnit_Aes::Test_Aes(void)
     memset(pOut, '\0', 2 * (nEncryLength) + 1);
     Byte2Hex((unsigned char* )szEncry, nEncryLength, pOut);
 
-    OUR_DEBUG((LM_INFO, "[Test_Aes]encry is(%s).\n", pOut));
+    PSS_LOGGER_DEBUG("[Test_Aes]encry is({0}).", pOut);
 
     //ÏÔÊ¾½âÃÜ×Ö·û´®
     m_pAES->InvCipher(szEncry, nEncryLength);
 
     sprintf_safe(szDecry, MAX_BUFF_100, "%s", szEncry);
 
-    OUR_DEBUG((LM_INFO, "[Test_Aes]szDecry is(%s).\n", szDecry));
+    PSS_LOGGER_DEBUG("[Test_Aes]szDecry is({0}).\n", szDecry);
 
     if (ACE_OS::strcmp(szDecry, szTest) == 0)
     {

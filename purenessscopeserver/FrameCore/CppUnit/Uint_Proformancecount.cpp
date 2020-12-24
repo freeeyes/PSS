@@ -10,7 +10,7 @@ void CUnit_ProformanceCounter::setUp(void)
 
 void CUnit_ProformanceCounter::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_ProformanceCounter::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ProformanceCounter::tearDown]Finish.");
 }
 
 void CUnit_ProformanceCounter::Test_ProformanceCounter(void)
@@ -25,7 +25,7 @@ void CUnit_ProformanceCounter::Test_ProformanceCounter(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ProformanceCounter]AddNewReactor Reactor_Select is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_ProformanceCounter]AddNewReactor Reactor_Select is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ProformanceCounter]AddNewReactor Reactor_Select is fail.", true == blRet);
         return;
     }

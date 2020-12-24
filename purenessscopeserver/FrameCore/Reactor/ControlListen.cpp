@@ -7,7 +7,7 @@ bool CControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IP
     if(true == blState)
     {
         //当前监听已经存在，不可以重复建设
-        OUR_DEBUG((LM_INFO, "[CServerManager::AddListen](%s:%d) is exist.\n", pListenIP, u2Port));
+        PSS_LOGGER_DEBUG("[CServerManager::AddListen]({0}:{1}) is exist.", pListenIP, u2Port);
         return false;
     }
 
@@ -27,7 +27,7 @@ bool CControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IP
 
     if (nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)set_address error[%d].\n", pListenIP, u2Port, errno));
+        PSS_LOGGER_DEBUG("[CControlListen::AddListen]({0}:{1})set_address error[{2}].", pListenIP, u2Port, errno);
         return false;
     }
 
@@ -36,7 +36,7 @@ bool CControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IP
 
     if (nullptr == pConnectAcceptor)
     {
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d)pConnectAcceptor is nullptr.\n", pListenIP, u2Port));
+        PSS_LOGGER_DEBUG("[CControlListen::AddListen]({0}:{1})pConnectAcceptor is nullptr.", pListenIP, u2Port);
         return false;
     }
 
@@ -49,13 +49,14 @@ bool CControlListen::AddListen( const char* pListenIP, uint16 u2Port, uint8 u1IP
 
     if (-1 == nRet)
     {
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen] Listen from [%s:%d] error(%d).\n",
-                   listenAddr.get_host_addr(),
-                   listenAddr.get_port_number(), errno));
+        PSS_LOGGER_DEBUG("[CControlListen::AddListen] Listen from [{0}:{1}] error({2}).",
+            listenAddr.get_host_addr(),
+            listenAddr.get_port_number(), 
+            errno);
         return false;
     }
 
-    OUR_DEBUG((LM_INFO, "[CControlListen::AddListen] Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+    PSS_LOGGER_DEBUG("[CControlListen::AddListen] Listen from [{0}:{1}] OK.", listenAddr.get_host_addr(), listenAddr.get_port_number());
 
     return true;
 }
@@ -67,7 +68,7 @@ bool CControlListen::DelListen( const char* pListenIP, uint16 u2Port )
     if(false == blState)
     {
         //当前监听已经存在，不可以重复建设
-        OUR_DEBUG((LM_INFO, "[CControlListen::AddListen](%s:%d) is exist.\n", pListenIP, u2Port));
+        PSS_LOGGER_DEBUG("[CControlListen::AddListen]({0}:{1}) is exist.", pListenIP, u2Port);
         return false;
     }
 

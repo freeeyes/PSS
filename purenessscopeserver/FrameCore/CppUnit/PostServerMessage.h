@@ -37,7 +37,7 @@ public:
 
         if(nullptr == mbSend)
         {
-            OUR_DEBUG((LM_INFO, "[CPostServerData::Send_Format_data](%d)Format Create Data nullptr(%d) OK.\n", m_u4ServerID, u4Len));
+            PSS_LOGGER_DEBUG("[CPostServerData::Send_Format_data]({0})Format Create Data nullptr({1}) OK.", m_u4ServerID, u4Len);
             return false;
         }
 
@@ -57,7 +57,7 @@ public:
         //判断返回数据块是否小于8或者超过最大缓冲大小
         if(m_u2RecvBuffLength + mbRecv->length() < 8 || mbRecv->length() >= RECV_BUFF_SIZE)
         {
-            OUR_DEBUG((LM_INFO, "[CPostServerData::Recv_Format_data]Get Data Error(%d).\n", mbRecv->length()));
+            PSS_LOGGER_DEBUG("[CPostServerData::Recv_Format_data]Get Data Error({0}).", mbRecv->length());
             return false;
         }
         else
@@ -102,13 +102,13 @@ public:
 
     void ReConnect(int nServerID) final
     {
-        OUR_DEBUG((LM_INFO, "[CPostServerData::ReConnect]nServerID=%d.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CPostServerData::ReConnect]nServerID={0}.", nServerID);
     }
 
     bool ConnectError(int nError, _ClientIPInfo const& objServerIPInfo) final
     {
         ACE_UNUSED_ARG(objServerIPInfo);
-        OUR_DEBUG((LM_INFO, "[CPostServerData::ConnectError]nServerID=%d, nError=%d.\n", m_u4ServerID, nError));
+        PSS_LOGGER_DEBUG("[CPostServerData::ConnectError]nServerID={0}, nError={1}.", m_u4ServerID, nError);
         return true;
     }
 

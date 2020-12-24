@@ -195,7 +195,7 @@ namespace brynet {
                 }
             }
 
-            OUR_DEBUG((LM_INFO, "[TimerMgr::schedule]Time manager is end.\n"));
+            PSS_LOGGER_DEBUG("[TimerMgr::schedule]Time manager is end.");
         }
 
         bool isEmpty() const
@@ -261,7 +261,7 @@ public:
         m_ttTimerThread = std::thread([this]()
             {
                 m_timerMgr->schedule();
-                OUR_DEBUG((LM_INFO, "[PSS_Timer_Manager::start]End.\n"));
+                PSS_LOGGER_DEBUG("[PSS_Timer_Manager::start]End.");
             });
     };
 

@@ -22,10 +22,10 @@ void CUnit_FileTestManager::Test_FileTestStart(void)
         objInfo.n4ProNum != 1 ||
         objInfo.n4Result != FILE_TEST_RESULT::RESULT_OK)
     {
-        OUR_DEBUG((LM_INFO, "[Test_FileTestStart]objInfo.n4ConnectNum=%d.\n", objInfo.n4ConnectNum));
-        OUR_DEBUG((LM_INFO, "[Test_FileTestStart]objInfo.n4TimeInterval=%d.\n", objInfo.n4TimeInterval));
-        OUR_DEBUG((LM_INFO, "[Test_FileTestStart]objInfo.n4ProNum=%d.\n", objInfo.n4ProNum));
-        OUR_DEBUG((LM_INFO, "[Test_FileTestStart]objInfo.n4Result=%d.\n", objInfo.n4Result));
+        PSS_LOGGER_DEBUG("[Test_FileTestStart]objInfo.n4ConnectNum={0}.", objInfo.n4ConnectNum);
+        PSS_LOGGER_DEBUG("[Test_FileTestStart]objInfo.n4TimeInterval={0}.", objInfo.n4TimeInterval);
+        PSS_LOGGER_DEBUG("[Test_FileTestStart]objInfo.n4ProNum={0}.", objInfo.n4ProNum);
+        PSS_LOGGER_DEBUG("[Test_FileTestStart]objInfo.n4Result={0}.", objInfo.n4Result);
         CPPUNIT_ASSERT_MESSAGE("[Test_FileTestStart]FileTestResultInfoSt error.", true == blRet);
     }
 }
@@ -58,7 +58,7 @@ void CUnit_FileTestManager::Test_handle_timeout(void)
 
     if (1 != objInfo.n4ConnectNum)
     {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pFileTestManager->FileTestStart() fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_FileLogger]m_pFileTestManager->FileTestStart() fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pFileTestManager->FileTestStart() fail.", true == blRet);
         return;
     }

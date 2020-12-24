@@ -7,7 +7,7 @@ CReTTyHandler::CReTTyHandler()
 
 CReTTyHandler::~CReTTyHandler()
 {
-    OUR_DEBUG((LM_INFO, "[CReTTyHandler::~CReTTyHandler].\n"));
+    PSS_LOGGER_DEBUG("[CReTTyHandler::~CReTTyHandler].");
     Close(GetConnectID());
 
     //回收资源
@@ -26,20 +26,20 @@ bool CReTTyHandler::ConnectTTy()
     //连接设备描述符
     if (m_ReConnector.connect(m_ReTtyio, ACE_DEV_Addr(m_szName), 0, ACE_Addr::sap_any, 0, O_RDWR | FILE_FLAG_OVERLAPPED) == -1)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyHandler::ConnectTTy]m_Connector.connect(%s) fail.\n", m_szName));
+        PSS_LOGGER_DEBUG("[CReTTyHandler::ConnectTTy]m_Connector.connect({0}) fail.", m_szName);
         return false;
     }
 
     //关联设备本身
     if (m_ReTtyio.control(ACE_TTY_IO::SETPARAMS, &m_ObjParams) == -1)
     {
-        OUR_DEBUG((LM_INFO, "[CReTTyHandler::ConnectTTy]m_Ttyio SETPARAMS(%s) fail.\n", m_szName));
+        PSS_LOGGER_DEBUG("[CReTTyHandler::ConnectTTy]m_Ttyio SETPARAMS({0]) fail.", m_szName);
         return false;
     }
 
     if (this->reactor()->register_handler(m_ReTtyio.get_handle(), this, ACE_Event_Handler::READ_MASK) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CReTTyHandler::ConnectTTy](%s) Could not register with reactor for %p\n", m_szName));
+        PSS_LOGGER_DEBUG("[CReTTyHandler::ConnectTTy]({0}) Could not register with reactor.", m_szName);
         return false;
     }
 
@@ -122,7 +122,7 @@ bool CReTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Seri
     if (nullptr == m_pPacketParse)
     {
         //找不到解析器
-        OUR_DEBUG((LM_INFO, "[CProTTyHandler::Init]u4PacketParseInfoID is not exist.\n"));
+        PSS_LOGGER_DEBUG("[CProTTyHandler::Init]u4PacketParseInfoID is not exist.");
         return false;
     }
 
@@ -177,7 +177,7 @@ int CReTTyHandler::handle_input(ACE_HANDLE handle)
     if (bytes_read <= 0)
     {
         //接收设备数据异常
-        OUR_DEBUG((LM_ERROR, "[CReTTyHandler::handle_input]Error:%d.\n", (int)errno));
+        PSS_LOGGER_DEBUG("[CReTTyHandler::handle_input]Error:{0}.", (int)errno);
 
         //通知上层应用
         m_pTTyMessage->ReportMessage(m_u4ConnectID, (uint32)errno, EM_TTY_EVENT_RW_ERROR);
@@ -252,7 +252,7 @@ int CReTTyHandler::handle_signal(int signum, siginfo_t* psinfo, ucontext_t* cont
     ACE_UNUSED_ARG(psinfo);
     ACE_UNUSED_ARG(context);
 
-    OUR_DEBUG((LM_ERROR, "[CReTTyHandler::handle_signal]Error:%d.\n", (int)signum));
+    PSS_LOGGER_DEBUG("[CReTTyHandler::handle_signal]Error:{0}.", signum);
     return 0;
 }
 
@@ -261,7 +261,7 @@ int CReTTyHandler::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_mask)
     ACE_UNUSED_ARG(handle);
     ACE_UNUSED_ARG(close_mask);
 
-    OUR_DEBUG((LM_ERROR, "[CReTTyHandler::handle_close]Error:%d.\n", (int)errno));
+    PSS_LOGGER_DEBUG("[CReTTyHandler::handle_close]Error:{0}.", errno);
     return 0;
 }
 
@@ -270,7 +270,7 @@ int CReTTyHandler::handle_timeout(const ACE_Time_Value& tvNow, const void*  p)
     ACE_UNUSED_ARG(tvNow);
     ACE_UNUSED_ARG(p);
 
-    OUR_DEBUG((LM_ERROR, "[CReTTyHandler::handle_timeout]Run.\n"));
+    PSS_LOGGER_DEBUG("[CReTTyHandler::handle_timeout]Run.");
     return 0;
 }
 

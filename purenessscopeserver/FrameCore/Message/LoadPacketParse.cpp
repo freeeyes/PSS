@@ -15,7 +15,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if (nullptr == pPacketParseInfo)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] pPacketParseInfo is nullptr!\n"));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] pPacketParseInfo is nullptr!");
         return false;
     }
 
@@ -29,7 +29,7 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if(nullptr == pPacketParseInfo->m_hModule)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, pModuleInfo->hModule is nullptr(%s)!\n", szPacketParseName, CLoadLibrary::PSS_dlerror()));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, pModuleInfo->hModule is nullptr({1})!", szPacketParseName, CLoadLibrary::PSS_dlerror());
         return false;
     }
 
@@ -37,9 +37,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Head_Info)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Head_Info is error!\n", szPacketParseName));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, Function Parse_Packet_Head_Info is error!", szPacketParseName);
         CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
         return false;
     }
 
@@ -47,9 +47,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Body_Info)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Body_Info is error!\n", szPacketParseName));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, Function Parse_Packet_Body_Info is error!", szPacketParseName);
         CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
         return false;
     }
 
@@ -57,9 +57,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Parse_Packet_Stream)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Parse_Packet_Stream is error!\n", szPacketParseName));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, Function Parse_Packet_Stream is error!", szPacketParseName);
         CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
         return false;
     }
 
@@ -67,9 +67,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Make_Send_Packet)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Make_Send_Packet is error!\n", szPacketParseName));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Make_Send_Packet is error!", szPacketParseName);
         CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
         return false;
     }
 
@@ -77,9 +77,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Make_Send_Packet_Length)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Make_Send_Packet_Length is error!\n", szPacketParseName));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, Function Make_Send_Packet_Length is error!", szPacketParseName);
         CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
         return false;
     }
 
@@ -87,9 +87,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Connect)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Connect is error!\n", szPacketParseName));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, Function Connect is error!", szPacketParseName);
         CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
         return false;
     }
 
@@ -97,9 +97,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if(nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->DisConnect)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function DisConnect is error!\n", szPacketParseName));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, Function DisConnect is error!", szPacketParseName);
         CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
         return false;
     }
 
@@ -107,9 +107,9 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
 
     if (nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Close)
     {
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo] strModuleName = %s, Function Close is error!\n", szPacketParseName));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, Function Close is error!", szPacketParseName);
         CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
-        OUR_DEBUG((LM_ERROR, "[CLoadPacketParse::LoadPacketInfo]PacketID=%d, ret=%d.\n", pPacketParseInfo->m_u4PacketParseID, nRet));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
         return false;
     }
 
@@ -125,7 +125,7 @@ shared_ptr<_Packet_Parse_Info> CLoadPacketParse::GetPacketParseInfo(uint32 u4Pac
     if(m_objPacketParseList.end() == f)
     {
         //这里打印输出错误
-        OUR_DEBUG((LM_INFO, "[CLoadPacketParse::GetPacketParseInfo]can't find u4PacketParseID(%d).\n", u4PacketParseID));
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::GetPacketParseInfo]can't find u4PacketParseID({0}).", u4PacketParseID);
         return nullptr;
     }
     else
@@ -136,7 +136,7 @@ shared_ptr<_Packet_Parse_Info> CLoadPacketParse::GetPacketParseInfo(uint32 u4Pac
 
 void CLoadPacketParse::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CLoadPacketParse::Close]Begin.\n"));
+    PSS_LOGGER_DEBUG("[CLoadPacketParse::Close]Begin.");
     //清理所有已存在的指针
     for_each(m_objPacketParseList.begin(), m_objPacketParseList.end(), [](const std::pair<uint32, shared_ptr<_Packet_Parse_Info>>& iter) {
         //关闭模块接口
@@ -145,5 +145,5 @@ void CLoadPacketParse::Close()
         });
 
     m_objPacketParseList.clear();
-    OUR_DEBUG((LM_INFO, "[CLoadPacketParse::Close]End.\n"));
+    PSS_LOGGER_DEBUG("[CLoadPacketParse::Close]End.");
 }

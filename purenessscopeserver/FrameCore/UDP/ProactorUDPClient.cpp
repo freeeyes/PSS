@@ -17,7 +17,7 @@ int CProactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE 
 {
     if(m_skRemote.open(AddrLocal) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPClient::OpenAddress]Open error(%d).\n", errno));
+        PSS_LOGGER_DEBUG("[CProactorUDPClient::OpenAddress]Open error({0}).", errno);
         return -1;
     }
 
@@ -41,7 +41,7 @@ int CProactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE 
 
     if(0 != nStatus)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::OpenAddress]ioctl SIO_UDP_CONNRESET error.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::OpenAddress]ioctl SIO_UDP_CONNRESET error.");
     }
 
 #endif
@@ -50,13 +50,13 @@ int CProactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE 
 
     if(m_Read.open(*this, m_skRemote.get_handle(), pCompletionKey, pProactor) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPClient::OpenAddress]m_Read error.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPClient::OpenAddress]m_Read error.");
         return -1;
     }
 
     if(m_Write.open(*this, m_skRemote.get_handle(), pCompletionKey, pProactor) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPClient::OpenAddress]m_Write error.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPClient::OpenAddress]m_Write error.");
         return -1;
     }
 
@@ -65,7 +65,7 @@ int CProactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrLocal, EM_UDP_TYPE 
 
     if(nullptr == pMBBuff)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPClient::OpenAddress]pMBBuff is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPClient::OpenAddress]pMBBuff is nullptr.");
         return -1;
     }
 
@@ -100,7 +100,7 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
         //处理数据
         if (false == CheckMessage(pMb, (uint32)nTran))
         {
-            OUR_DEBUG((LM_INFO, "[CProactorUDPClient::handle_read_dgram]CheckMessage error.\n"));
+            PSS_LOGGER_DEBUG("[CProactorUDPClient::handle_read_dgram]CheckMessage error.");
         }
 
         App_MessageBlockManager::instance()->Close(pMb);
@@ -114,7 +114,7 @@ void CProactorUDPClient::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result& 
 
     if(nullptr == pMBBuff)
     {
-        OUR_DEBUG((LM_INFO, "[CProactorUDPClient::handle_read_dgram]pMBBuff is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPClient::handle_read_dgram]pMBBuff is nullptr.");
     }
     else
     {
@@ -130,7 +130,7 @@ bool CProactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const c
 
     if(nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[CProactorUDPClient::SendMessage]set_address error[%d].\n", errno));
+        PSS_LOGGER_DEBUG("[CProactorUDPClient::SendMessage]set_address error[{0}].", errno);
         SAFE_DELETE_ARRAY(pMessage);
         return false;
     }
@@ -146,7 +146,7 @@ bool CProactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const c
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPClient::SendMessage]send error(%d).\n", errno));
+        PSS_LOGGER_DEBUG("[CProactorUDPClient::SendMessage]send error({0}).", errno);
         return false;
     }
 }

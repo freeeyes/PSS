@@ -7,7 +7,7 @@ bool Server_Manager_Common_LogSystem()
 
     if (nullptr == pFileLogger)
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Init]pFileLogger new is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CServerManager::Init]pFileLogger new is nullptr.");
         return false;
     }
 
@@ -16,12 +16,12 @@ bool Server_Manager_Common_LogSystem()
 
     if (0 != AppLogManager::instance()->RegisterLog(pFileLogger))
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Init]AppLogManager::instance()->RegisterLog error.\n"));
+        PSS_LOGGER_DEBUG("[CServerManager::Init]AppLogManager::instance()->RegisterLog error.");
         return false;
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Init]AppLogManager is OK.\n"));
+        PSS_LOGGER_DEBUG("[CServerManager::Init]AppLogManager is OK.");
     }
 
     return true;
@@ -81,8 +81,8 @@ bool Server_Manager_Common_Module()
 
         if (false == blState)
         {
-            OUR_DEBUG((LM_INFO, "[Server_Manager_Common_Module]LoadModule (%s)is error.\n",
-                       GetXmlConfigAttribute(xmlModuleInfos)->vec[i].szModuleName.c_str()));
+            PSS_LOGGER_DEBUG("[Server_Manager_Common_Module]LoadModule ({0})is error.",
+                       GetXmlConfigAttribute(xmlModuleInfos)->vec[i].szModuleName);
             return false;
         }
     }
@@ -123,7 +123,7 @@ bool Server_Manager_Common_Addr(uint8 u4IpType, const char* pIP, uint16 u2Port, 
 
     if (nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Server_Manager_Common_Addr](%d)set_address error[%s:%d].\n", pIP, u2Port, errno));
+        PSS_LOGGER_DEBUG("[Server_Manager_Common_Addr]({2})set_address error[{0}:{1}].", pIP, u2Port, errno);
         return false;
     }
 

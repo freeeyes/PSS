@@ -21,7 +21,7 @@ void CUnit_AceReactorManager::Test_DoMessage_AceReactorManager(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_DoMessage_AceReactorManager]AddNewReactor Reactor_Select is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_DoMessage_AceReactorManager]AddNewReactor Reactor_Select is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_DoMessage_AceReactorManager]AddNewReactor Reactor_Select is fail.", true == blRet);
         return;
     }
@@ -30,7 +30,7 @@ void CUnit_AceReactorManager::Test_DoMessage_AceReactorManager(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_DoMessage_AceReactorManager]AddNewReactor Reactor_TP is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_DoMessage_AceReactorManager]AddNewReactor Reactor_TP is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_DoMessage_AceReactorManager]AddNewReactor Reactor_TP is fail.", true == blRet);
         return;
     }
@@ -39,7 +39,7 @@ void CUnit_AceReactorManager::Test_DoMessage_AceReactorManager(void)
 
     if (1 != pAceReactor->GetThreadCount() || EM_REACTOR_MODULE::Reactor_Select != pAceReactor->GetReactorType())
     {
-        OUR_DEBUG((LM_INFO, "[Test_DoMessage_AceReactorManager]Reactor_Select GetThreadCount(%s) is fail.\n", pAceReactor->GetError()));
+        PSS_LOGGER_DEBUG("[Test_DoMessage_AceReactorManager]Reactor_Select GetThreadCount({0}) is fail.", pAceReactor->GetError());
         CPPUNIT_ASSERT_MESSAGE("[Test_DoMessage_AceReactorManager]Reactor_Select GetThreadCount is fail.", true == blRet);
         return;
     }
@@ -48,7 +48,7 @@ void CUnit_AceReactorManager::Test_DoMessage_AceReactorManager(void)
 
     if (1 != pAceReactor->GetThreadCount() || EM_REACTOR_MODULE::Reactor_TP != pAceReactor->GetReactorType())
     {
-        OUR_DEBUG((LM_INFO, "[Test_DoMessage_AceReactorManager]Reactor_TP GetThreadCount(%s) is fail.\n", pAceReactor->GetError()));
+        PSS_LOGGER_DEBUG("[Test_DoMessage_AceReactorManager]Reactor_TP GetThreadCount({0}) is fail.", pAceReactor->GetError());
         CPPUNIT_ASSERT_MESSAGE("[Test_DoMessage_AceReactorManager]Reactor_TP GetThreadCount is fail.", true == blRet);
         return;
     }

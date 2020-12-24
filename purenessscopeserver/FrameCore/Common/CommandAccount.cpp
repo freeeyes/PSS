@@ -60,13 +60,13 @@ void CCommandAccount::Save_Command_To_File(shared_ptr<_CommandData> pCommandData
 
 void CCommandAccount::Close()
 {
-    OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]Begin.\n"));
+    PSS_LOGGER_DEBUG("CCommandAccount::Close]Begin.");
 
     m_objCommandDataList.clear();
     m_objectPortAccount.clear();
 
     m_u1CommandAccount = 0;
-    OUR_DEBUG((LM_ERROR, "CCommandAccount::Close]End.\n"));
+    PSS_LOGGER_DEBUG("CCommandAccount::Close]End.");
 }
 
 bool CCommandAccount::Save_Flow(uint16 u2CommandID, uint16 u2Port, EM_CONNECT_IO_TYPE u1PacketType, uint32 u4PacketSize, uint8 u1CommandType, PSS_Time_Point const& tvTime)
@@ -190,7 +190,7 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONN
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]Save_Flow is error.\n"));
+        PSS_LOGGER_DEBUG("[CCommandAccount::SaveCommandData]Save_Flow is error.");
     }
 
     //如果统计开关打开，才开始记录统计信息
@@ -198,7 +198,7 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONN
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]Save_Command is error.\n"));
+        PSS_LOGGER_DEBUG("[CCommandAccount::SaveCommandData]Save_Command is error.");
     }
 
     //判定是否存在告警阀值计算
@@ -206,7 +206,7 @@ bool CCommandAccount::SaveCommandData(uint16 u2CommandID, uint16 u2Port, EM_CONN
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[CCommandAccount::SaveCommandData]Save_Command is error.\n"));
+        PSS_LOGGER_DEBUG("[CCommandAccount::SaveCommandData]Save_Command is error.");
     }
 
     return true;

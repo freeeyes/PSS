@@ -10,7 +10,7 @@ void CUnit_ServerMessageInfoPool::setUp(void)
 void CUnit_ServerMessageInfoPool::tearDown(void)
 {
     nCount--;
-    OUR_DEBUG((LM_INFO, "[CUnit_ServerMessageInfoPool::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ServerMessageInfoPool::tearDown]Finish.");
 }
 
 void CUnit_ServerMessageInfoPool::Test_ServerMessageInfoPool(void)
@@ -21,7 +21,7 @@ void CUnit_ServerMessageInfoPool::Test_ServerMessageInfoPool(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ServerMessageInfoPool]pServerMessageInfo is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[Test_ServerMessageInfoPool]pServerMessageInfo is nullptr.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ServerMessageInfoPool]pServerMessageInfo is nullptr.", true == blRet);
         return;
     }

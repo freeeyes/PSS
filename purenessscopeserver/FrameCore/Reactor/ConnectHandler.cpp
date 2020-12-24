@@ -6,11 +6,11 @@ void CConnectHandler::Close(uint32 u4ConnectID)
     m_pPacketParseInfo->DisConnect(u4ConnectID);
 
     
-	OUR_DEBUG((LM_ERROR, "[CProConnectHandler::Close](0x%08x)Close(ConnectID=%d), Recv=%d,Send=%d OK.\n",
-		this,
+    PSS_LOGGER_DEBUG("[CProConnectHandler::Close]({0})Close(ConnectID={1}), Recv={2},Send={3} OK.",
+		fmt::ptr(this),
 		GetConnectID(),
 		m_u4AllRecvSize,
-		m_u4AllSendSize));
+		m_u4AllSendSize);
 
     shutdown();
 
@@ -99,28 +99,28 @@ int CConnectHandler::open(void*)
     if (nullptr == m_pPacketParseInfo)
     {
         //如果解析器不存在，则直接断开连接
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open](%s)can't find PacketParseInfo.\n", m_addrRemote.get_host_addr()));
+        PSS_LOGGER_DEBUG("[CConnectHandler::open]({0})can't find PacketParseInfo.", m_addrRemote.get_host_addr());
         return -1;
     }
 
     //获得远程链接地址和端口
     if(this->peer().get_remote_addr(m_addrRemote) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().get_remote_addr error.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandler::open]this->peer().get_remote_addr error.");
         return -1;
     }
 
     if(App_ForbiddenIP::instance()->CheckIP(m_addrRemote.get_host_addr()) == false)
     {
         //在禁止列表中，不允许访问
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]IP Forbidden(%s).\n", m_addrRemote.get_host_addr()));
+        PSS_LOGGER_DEBUG("[CConnectHandler::open]IP Forbidden({0}).", m_addrRemote.get_host_addr());
         return -1;
     }
 
     //检查单位时间链接次数是否达到上限
     if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]IP connect frequently(%s).\n", m_addrRemote.get_host_addr()));
+        PSS_LOGGER_DEBUG("[CConnectHandler::open]IP connect frequently({0}).", m_addrRemote.get_host_addr());
         App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
 
         //发送告警邮件
@@ -140,7 +140,7 @@ int CConnectHandler::open(void*)
     //设置链接为非阻塞模式
     if (this->peer().enable(ACE_NONBLOCK) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
         return -1;
     }
 
@@ -164,7 +164,7 @@ int CConnectHandler::open(void*)
 
     if (-1 == nWakeupRet)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]ConnectID=%d, nWakeupRet=%d, errno=%d.\n", GetConnectID(), nWakeupRet, errno));
+        PSS_LOGGER_DEBUG("[CConnectHandler::open]ConnectID={0}, nWakeupRet={1}, errno={2}.", GetConnectID(), nWakeupRet, errno);
     }
 
     m_emIOType = EM_IO_TYPE::NET_INPUT;
@@ -179,7 +179,7 @@ int CConnectHandler::handle_input(ACE_HANDLE fd)
     if(fd == ACE_INVALID_HANDLE)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.");
         return -1;
     }
 
@@ -192,7 +192,7 @@ int CConnectHandler::handle_output(ACE_HANDLE fd /*= ACE_INVALID_HANDLE*/)
     if (fd == ACE_INVALID_HANDLE)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::handle_output]fd == ACE_INVALID_HANDLE.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandler::handle_output]fd == ACE_INVALID_HANDLE.");
         return -1;
     }
 
@@ -209,7 +209,7 @@ int CConnectHandler::Dispose_Recv_Data()
     //这里需要对m_u4CurrSize进行检查。
     if (u4CurrCount == 0)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData][%d] nCurrCount < 0 m_u4CurrSize = %d.\n", GetConnectID(), m_u4CurrSize));
+        PSS_LOGGER_DEBUG("[CConnectHandler::RecvData][{0}] nCurrCount < 0 m_u4CurrSize = {1}.", GetConnectID(), m_u4CurrSize);
 
 		//清理PacketParse
 		ClearPacketParse();
@@ -230,7 +230,7 @@ int CConnectHandler::Dispose_Recv_Data()
             return 0;
         }
 
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData] ConnectID=%d, recv data is error nDataLen = [%d] errno = [%d].\n", GetConnectID(), nDataLen, u4Error));
+        PSS_LOGGER_DEBUG("[CConnectHandler::RecvData] ConnectID={0}, recv data is error nDataLen = [{1}] errno = [{2}].", GetConnectID(), nDataLen, u4Error);
 
         return -1;
     }
@@ -291,7 +291,7 @@ int CConnectHandler::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 {
     if(h == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_close] h is nullptr mask=%d.\n", (int)mask));
+        PSS_LOGGER_DEBUG("[CConnectHandler::handle_close] h is nullptr mask={0}.", (int)mask);
     }
 
     //设置发送消息队列不能再发送任何消息
@@ -419,9 +419,9 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
     {
         if(nSendPacketLen <= 0)
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, nCurrSendSize error is %d.\n", 
+            PSS_LOGGER_DEBUG("[CConnectHandler::PutSendPacket] ConnectID = {0}, nCurrSendSize error is {1}.",
                 u4ConnectID,
-                nSendPacketLen));
+                nSendPacketLen);
             App_MessageBlockManager::instance()->Close(pmbSend);
             return false;
         }
@@ -431,7 +431,7 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
         if(nDataLen <= 0)
         {
             int nErrno = errno;
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID = %d, error = %d.\n", u4ConnectID, nErrno));
+            PSS_LOGGER_DEBUG("[CConnectHandler::PutSendPacket] ConnectID = {0}, error = {1}.", u4ConnectID, nErrno);
 
             string strLog = fmt::format("WriteError [{0}:{1}] nErrno = {2}  result.bytes_transferred() = {3},",
                 m_addrRemote.get_host_addr(), 
@@ -446,7 +446,7 @@ bool CConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMbDa
             auto tvNow = CTimeStamp::Get_Time_Stamp();
             Send_MakePacket_Queue_Error(m_MakePacket, GetConnectID(), pmbSend, tvNow);
 
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::PutSendPacket] ConnectID=%d send cancel.\n", GetConnectID()));
+            PSS_LOGGER_DEBUG("[CConnectHandler::PutSendPacket] ConnectID={0} send cancel.", GetConnectID());
 
             return false;
         }
@@ -645,7 +645,7 @@ void CConnectHandler::ConnectOpen()
 	//发送链接建立消息
 	Send_Hander_Event(PACKET_CONNECT);
 
-    OUR_DEBUG((LM_DEBUG, "[CConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
+    PSS_LOGGER_DEBUG("[CConnectHandler::open]Open({0}) Connection from [{1}:{2}]({3}).", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), fmt::ptr(this));
 
     m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 }
@@ -667,7 +667,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmbHead)
     if (false == blStateHead)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData]SetPacketHead is false.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandler::RecvData]SetPacketHead is false.");
 
         return -1;
     }
@@ -675,7 +675,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmbHead)
     {
         if (nullptr == objHeadInfo.m_pmbHead)
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData]ConnectID=%d, objHeadInfo.m_pmbHead is nullptr.\n", GetConnectID()));
+            PSS_LOGGER_DEBUG("[CConnectHandler::RecvData]ConnectID={0}, objHeadInfo.m_pmbHead is nullptr.", GetConnectID());
         }
 
         m_pPacketParse->SetPacket_IsHandleHead(false);
@@ -707,7 +707,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmbHead)
         if (u4PacketBodyLen >= m_u4MaxPacketSize)
         {
             m_u4CurrSize = 0;
-            OUR_DEBUG((LM_ERROR, "[CConnectHandler::RecvData]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
+            PSS_LOGGER_DEBUG("[CConnectHandler::RecvData]u4PacketHeadLen({0}) more than {1}.", u4PacketBodyLen, m_u4MaxPacketSize);
 
             return -1;
         }
@@ -730,7 +730,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmbBody, uint
     {
         //如果数据包体是错误的，则断开连接
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConnectHandle::RecvData]SetPacketBody is false.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandle::RecvData]SetPacketBody is false.");
 
         return -1;
     }
@@ -907,7 +907,7 @@ bool CConnectHandler::Send_Input_To_TCP(const CSendMessageInfo& objSendMessageIn
 	}
 	else
 	{
-		OUR_DEBUG((LM_INFO, "[CConnectHandler::handle_output]ConnectID=%d write is close.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CConnectHandler::handle_output]ConnectID={0} write is close.", GetConnectID());
 		return false;
 	}
 
@@ -1025,7 +1025,7 @@ void CConnectHandlerPool::Init(int nObjcetCount)
 
 void CConnectHandlerPool::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CConnectHandlerPool::Close]Begin.\n"));
+    PSS_LOGGER_DEBUG("[CConnectHandlerPool::Close]Begin.");
     //清理所有已存在的指针
 
     //删除hash表空间
@@ -1039,7 +1039,7 @@ void CConnectHandlerPool::Close()
 
     m_objHashHandleList.Close();
 
-    OUR_DEBUG((LM_INFO, "[CConnectHandlerPool::Close]End.\n"));
+    PSS_LOGGER_DEBUG("[CConnectHandlerPool::Close]End.");
 }
 
 int CConnectHandlerPool::GetUsedCount()
@@ -1084,7 +1084,7 @@ bool CConnectHandlerPool::Delete(CConnectHandler* pObject)
 
     if(false == blState)
     {
-        OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x).\n", strHandlerID.c_str(), pObject));
+        PSS_LOGGER_DEBUG("[CProConnectHandlerPool::Delete]szHandlerID = {0}({1}).", strHandlerID.c_str(), fmt::ptr(pObject));
     }
 
     return true;

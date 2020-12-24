@@ -10,7 +10,7 @@ void CUnit_ConsoleMessage::setUp(void)
 
 void CUnit_ConsoleMessage::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_ConsoleMessage::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ConsoleMessage::tearDown]Finish.");
 }
 
 bool CUnit_ConsoleMessage::Create_Command(const char* pCommand, uint16 u2ReturnCommandID)

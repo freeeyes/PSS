@@ -2,7 +2,7 @@
 
 void CReactorUDPHander::CloseFinaly()
 {
-    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::~CloseFinaly]Begin.\n"));
+    PSS_LOGGER_DEBUG("[CReactorUDPHander::~CloseFinaly]Begin.");
     if (nullptr != m_pBlockMessage)
     {
         m_pBlockMessage->release();
@@ -16,14 +16,14 @@ void CReactorUDPHander::CloseFinaly()
     ACE_Reactor_Mask close_mask = ACE_Event_Handler::ALL_EVENTS_MASK | ACE_Event_Handler::DONT_CALL;
     reactor()->remove_handler(this, close_mask);
     m_skRemote.close();
-    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::~CloseFinaly]End.\n"));
+    PSS_LOGGER_DEBUG("[CReactorUDPHander::~CloseFinaly]End.");
 }
 
 int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor* pReactor)
 {
     if (m_skRemote.open(AddrRemote) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::OpenAddress]Open error(%d).\n", errno));
+        PSS_LOGGER_DEBUG("[CReactorUDPHander::OpenAddress]Open error({0}).", errno);
         return -1;
     }
 
@@ -31,7 +31,7 @@ int CReactorUDPHander::OpenAddress(const ACE_INET_Addr& AddrRemote, ACE_Reactor*
 
 	if (-1 == this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK))
 	{
-		OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::OpenAddress] Addr is register_handler error(%d).\n", errno));
+        PSS_LOGGER_DEBUG("[CReactorUDPHander::OpenAddress] Addr is register_handler error({0}).", errno);
 		return -1;
 	}
 
@@ -54,7 +54,7 @@ int CReactorUDPHander::handle_input(ACE_HANDLE fd)
 {
     if(fd == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::handle_input]fd is ACE_INVALID_HANDLE.\n"));
+        PSS_LOGGER_DEBUG("[CReactorUDPHander::handle_input]fd is ACE_INVALID_HANDLE.");
         return -1;
     }
 
@@ -78,7 +78,7 @@ int CReactorUDPHander::handle_input(ACE_HANDLE fd)
         //处理接收包的数据
         if (false == CheckMessage(u4ConnectID, m_pBlockRecv->rd_ptr(), (uint32)nDataLen, addrRemote))
         {
-            OUR_DEBUG((LM_INFO, "[CReactorUDPHander::handle_input]CheckMessage fail.\n"));
+            PSS_LOGGER_DEBUG("[CReactorUDPHander::handle_input]CheckMessage fail.");
         }
 
         m_pBlockRecv->reset();
@@ -91,7 +91,7 @@ int CReactorUDPHander::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_ma
 {
     if(handle == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorUDPHander::handle_close]close_mask = %d.\n", (uint32)close_mask));
+        PSS_LOGGER_DEBUG("[CReactorUDPHander::handle_close]close_mask = {0}.", close_mask);
     }
 
     m_skRemote.close();
@@ -111,7 +111,7 @@ bool CReactorUDPHander::SendMessage(const CSendMessageInfo& objSendMessageInfo, 
 	if (objClientIPInfo.m_u2Port == 0)
 	{
 		//没有找到要发送的端口，不在发送
-		OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::SendMessage]no find ConnectID=%d.\n", objSendMessageInfo.u4ConnectID));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::SendMessage]no find ConnectID={0}.", objSendMessageInfo.u4ConnectID);
 		return false;
 	}
 
@@ -154,7 +154,7 @@ bool CReactorUDPHander::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMb
 	if (objClientIPInfo.m_u2Port == 0)
 	{
 		//没有找到要发送的端口，不在发送
-		OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::PutSendPacket]no find ConnectID=%d.\n", u4ConnectID));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::PutSendPacket]no find ConnectID={0}.", u4ConnectID);
 		return false;
 	}
 
@@ -163,7 +163,7 @@ bool CReactorUDPHander::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pMb
 
 	if (nErr != 0)
 	{
-		OUR_DEBUG((LM_INFO, "[PutSendPacket]set_address error[%d].\n", errno));
+        PSS_LOGGER_DEBUG("[PutSendPacket]set_address error[{0}].", errno);
 		return false;
 	}
 
@@ -192,7 +192,7 @@ void CReactorUDPHander::SetIsLog(bool blIsLog)
 
 bool CReactorUDPHander::Device_Send_Data(const char* pData, ssize_t nLen)
 {
-    OUR_DEBUG((LM_INFO, "[CReactorUDPHander::Device_Send_Data]0x%08x, size=%d", pData, nLen));
+    PSS_LOGGER_DEBUG("[CReactorUDPHander::Device_Send_Data]{0}, size={1}.", fmt::ptr(pData), nLen);
     return true;
 }
 

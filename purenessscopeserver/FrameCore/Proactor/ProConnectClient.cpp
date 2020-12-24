@@ -80,14 +80,14 @@ void CProConnectClient::Close()
             m_strDeviceName = "";
         }
 
-        OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]delete OK[0x%08x], m_ems2s=%d.\n", this, m_ems2s));
+        PSS_LOGGER_DEBUG("[CProConnectClient::Close]delete OK[{0}], m_ems2s={1}.", fmt::ptr(this), m_ems2s);
         delete this;
     }
 }
 
 void CProConnectClient::Close(uint32 u4ConnectID)
 {
-    OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]u4ConnectID=%d.\n", u4ConnectID));
+    PSS_LOGGER_DEBUG("[CProConnectClient::Close]u4ConnectID={0}.", u4ConnectID);
     Close();
 }
 
@@ -168,7 +168,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 
     if(this->m_Reader.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor()) == -1||this->m_Writer.open(*this, h,  0, App_ProactorManager::instance()->GetAce_Proactor()) == -1)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_reader or m_reader == 0.\n"));
+        PSS_LOGGER_DEBUG("[CProConnectClient::open] m_reader or m_reader == 0.");
         Close();
         return;
     }
@@ -180,7 +180,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
     m_u4CostTime        = 0;
     m_atvBegin          = CTimeStamp::Get_Time_Stamp();
 
-    OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_nServerID=%d, this=0x%08x.\n", m_nServerID, this));
+    PSS_LOGGER_DEBUG("[CProConnectClient::open] m_nServerID={0}, this={1}.", m_nServerID, fmt::ptr(this));
 
     if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
     {
@@ -212,7 +212,7 @@ void CProConnectClient::open(ACE_HANDLE h, ACE_Message_Block&)
 
     if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, nullptr))
     {
-        OUR_DEBUG((LM_DEBUG, "[CProConnectClient::open](%d)GetConnectServerRecvBuffer is error.\n", m_nServerID));
+        PSS_LOGGER_DEBUG("[CProConnectClient::open]({0})GetConnectServerRecvBuffer is error.", m_nServerID);
     }
 }
 
@@ -302,7 +302,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 //等待下一个数据
                 if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, nullptr))
                 {
-                    OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+                    PSS_LOGGER_DEBUG("[CProConnectClient::handle_read_stream]({0})RecvData is fail.", m_nServerID);
                 }
             }
         }
@@ -362,7 +362,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
                     if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, pmbSave))
                     {
-                        OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+                        PSS_LOGGER_DEBUG("[CProConnectClient::handle_read_stream]({0})RecvData is fail.", m_nServerID);
                     }
                 }
             }
@@ -370,7 +370,7 @@ void CProConnectClient::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
             {
                 if (false == RecvData(GetXmlConfigAttribute(xmlConnectServer)->Recvbuff, nullptr))
                 {
-                    OUR_DEBUG((LM_INFO, "[CProConnectClient::handle_read_stream](%d)RecvData is fail.\n", m_nServerID));
+                    PSS_LOGGER_DEBUG("[CProConnectClient::handle_read_stream]({0})RecvData is fail.", m_nServerID);
                 }
             }
 
@@ -386,7 +386,7 @@ void CProConnectClient::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
     if(!result.success() || result.bytes_transferred() == 0)
     {
         //处理数据发送出错
-        OUR_DEBUG((LM_DEBUG, "[CProConnectClient::handle_write_stream]Write error(%d).\n", ACE_OS::last_error()));
+        PSS_LOGGER_DEBUG("[CProConnectClient::handle_write_stream]Write error({0}).", ACE_OS::last_error());
         mblk.release();
 
         if(nullptr != m_pClientMessage)
@@ -427,7 +427,7 @@ bool CProConnectClient::GetTimeout(PSS_Time_Point const& tvNow)
     if(m_emRecvState == EM_Server_Recv_State::SERVER_RECV_BEGIN && time_interval_second > SERVER_RECV_TIMEOUT)
     {
         //接收数据处理已经超时，在这里打印出来
-        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, time_interval_second));
+        PSS_LOGGER_DEBUG("[CProConnectClient::GetTimeout]***({0})recv dispose is timeout({1})!***.", m_nServerID, time_interval_second);
         return false;
     }
     else
@@ -451,7 +451,7 @@ bool CProConnectClient::RecvData(uint32 u4PacketLen, ACE_Message_Block* pmbSave)
 
     if(this->m_Reader.read(*m_mbRecv, u4PacketLen) == -1)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::open] m_reader is error(%d).\n", (int)ACE_OS::last_error()));
+        PSS_LOGGER_DEBUG("[CProConnectClient::open] m_reader is error({0}).", ACE_OS::last_error());
         App_MessageBlockManager::instance()->Close(m_mbRecv);
 
         if(nullptr != m_pClientMessage)
@@ -483,7 +483,6 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
 {
     string strHexChar;     //单个十六进制的字符
     string strHexData;     //十六进制的字符串
-    //OUR_DEBUG((LM_DEBUG, "[CProConnectClient::SendData]Begin.\n"));
 
     //如果是DEBUG状态，记录当前接受包的二进制数据
     if(GetXmlConfigAttribute(xmlServerType)->Debug == DEBUG_ON)
@@ -536,7 +535,7 @@ bool CProConnectClient::SendData(ACE_Message_Block* pmblk)
 
     if (m_Writer.write(*pmblk, pmblk->length()) == -1)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConnectClient::SendData] Send Error(%d).\n", ACE_OS::last_error()));
+        PSS_LOGGER_DEBUG("[CProConnectClient::SendData] Send Error({0}).", ACE_OS::last_error());
         App_MessageBlockManager::instance()->Close(pmblk);
 
         if(nullptr != m_pClientMessage)

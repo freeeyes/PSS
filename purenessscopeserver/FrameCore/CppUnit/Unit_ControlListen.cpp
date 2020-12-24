@@ -9,7 +9,7 @@ void CUnit_ControlListen::setUp(void)
 
 void CUnit_ControlListen::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_ControlListen::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ControlListen::tearDown]Finish.");
 }
 
 void CUnit_ControlListen::Test_ControlListen(void)
@@ -18,7 +18,7 @@ void CUnit_ControlListen::Test_ControlListen(void)
 
     if (false == m_pControlListen->AddListen("127.0.0.1", 10007, TYPE_IPV4, 1))
     {
-        OUR_DEBUG((LM_INFO, "[Test_ControlListen]m_pControlListen->AddListen() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_ControlListen]m_pControlListen->AddListen() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ControlListen]m_pControlListen->AddListen() Error.", true == blRet);
         return;
     }
@@ -28,21 +28,21 @@ void CUnit_ControlListen::Test_ControlListen(void)
 
     if (0 >= m_pControlListen->GetListenCount())
     {
-        OUR_DEBUG((LM_INFO, "[Test_ControlListen]m_pControlListen->GetListenCount() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_ControlListen]m_pControlListen->GetListenCount() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ControlListen]m_pControlListen->GetListenCount() Error.", true == blRet);
         return;
     }
 
     if (1 != m_pControlListen->GetServerID())
     {
-        OUR_DEBUG((LM_INFO, "[Test_ControlListen]m_pControlListen->GetServerID() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_ControlListen]m_pControlListen->GetServerID() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ControlListen]m_pControlListen->GetServerID() Error.", true == blRet);
         return;
     }
 
     if (false == m_pControlListen->DelListen("127.0.0.1", 10007))
     {
-        OUR_DEBUG((LM_INFO, "[Test_ControlListen]m_pControlListen->AddListen() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_ControlListen]m_pControlListen->AddListen() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ControlListen]m_pControlListen->AddListen() Error.", true == blRet);
     }
 }

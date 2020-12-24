@@ -12,7 +12,7 @@ void CUnit_BuffPacket::setUp(void)
 
 void CUnit_BuffPacket::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_BuffPacket::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_BuffPacket::tearDown]Finish.");
 }
 
 void CUnit_BuffPacket::Read_Write_BuffPacket(void)
@@ -62,7 +62,7 @@ void CUnit_BuffPacket::Read_Write_BuffPacket(void)
 
     if (m_pBuffPacket->GetWriteLen() - m_pBuffPacket->GetReadLen() != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Read_Write_String_BuffPacket]GetPacketLen=%d.\n", m_pBuffPacket->GetPacketLen()));
+        PSS_LOGGER_DEBUG("[Read_Write_String_BuffPacket]GetPacketLen=%d.", m_pBuffPacket->GetPacketLen());
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]GetPacketLen is not zero.", true == blRet);
         return;
     }
@@ -115,7 +115,7 @@ void CUnit_BuffPacket::Read_Write_String_BuffPacket(void)
 
     if (m_pBuffPacket->GetWriteLen() - m_pBuffPacket->GetReadLen() != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Read_Write_String_BuffPacket]GetPacketLen=%d.\n", m_pBuffPacket->GetPacketLen()));
+        PSS_LOGGER_DEBUG("[Read_Write_String_BuffPacket]GetPacketLen=%d.", m_pBuffPacket->GetPacketLen());
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_String_BuffPacket]GetPacketLen is not zero.", true == blRet);
         return;
     }
@@ -151,7 +151,7 @@ void CUnit_BuffPacket::Read_Write_Binary_BuffPacket(void)
 
     if (m_pBuffPacket->GetPacketLen() - m_pBuffPacket->GetReadLen() != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Read_Write_String_BuffPacket]GetPacketLen=%d.\n", m_pBuffPacket->GetPacketLen()));
+        PSS_LOGGER_DEBUG("[Read_Write_String_BuffPacket]GetPacketLen=%d.", m_pBuffPacket->GetPacketLen());
         CPPUNIT_ASSERT_MESSAGE("[Read_Write_Binary_BuffPacket]GetPacketLen is not zero.", true == blRet);
         return;
     }
@@ -175,7 +175,7 @@ void CUnit_BuffPacket::Check_Size_BuffPacket(void)
 
     if (m_pBuffPacket->GetHeadLen() != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Check_Size_BuffPacket]m_pBuffPacket->GetHeadLen()=%d.\n", m_pBuffPacket->GetHeadLen()));
+        PSS_LOGGER_DEBUG("[Check_Size_BuffPacket]m_pBuffPacket->GetHeadLen()={0}.", m_pBuffPacket->GetHeadLen());
         CPPUNIT_ASSERT_MESSAGE("[Check_Size_BuffPacket]GetHeadLen() error.", true == blRet);
         return;
     }

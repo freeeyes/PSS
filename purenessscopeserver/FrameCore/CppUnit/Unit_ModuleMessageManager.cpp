@@ -9,7 +9,7 @@ void CUnit_ModuleMessageManager::setUp(void)
 
 void CUnit_ModuleMessageManager::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_ModuleMessageManager::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ModuleMessageManager::tearDown]Finish.");
 }
 
 void CUnit_ModuleMessageManager::Test_SendModuleMessage(void)

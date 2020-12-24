@@ -25,11 +25,11 @@ void CUnit_Redirection::Test_Redirection(void)
     sockclient1 = Create_client(12005, "127.0.0.1", 10002);
     sockclient2 = Create_client(12006, "127.0.0.1", 10002);
 
-    OUR_DEBUG((LM_INFO, "[CUnit_Redirection::Test_Redirection]sockclient1=%d, sockclient1=%d.\n", sockclient1, sockclient2));
+    PSS_LOGGER_DEBUG("[CUnit_Redirection::Test_Redirection]sockclient1={0}, sockclient1={1}.", sockclient1, sockclient2);
 
     if (0 == sockclient1 || 0 == sockclient2)
     {
-        OUR_DEBUG((LM_INFO, "[CUnit_Redirection::Test_Redirection]connect is error.\n"));
+        PSS_LOGGER_DEBUG("[CUnit_Redirection::Test_Redirection]connect is error.");
         CPPUNIT_ASSERT_MESSAGE("[CUnit_Redirection::Test_Redirection]connect is error.", true == blRet);
         return;
     }
@@ -42,7 +42,7 @@ void CUnit_Redirection::Test_Redirection(void)
 
     if (nRecvLen != (int)ACE_OS::strlen(szBuffSend))
     {
-        OUR_DEBUG((LM_INFO, "[CUnit_Redirection::Test_Redirection]connect is error.\n"));
+        PSS_LOGGER_DEBUG("[CUnit_Redirection::Test_Redirection]connect is error.");
         CPPUNIT_ASSERT_MESSAGE("[CUnit_Redirection::Test_Redirection]recv is error.", true == blRet);
     }
 

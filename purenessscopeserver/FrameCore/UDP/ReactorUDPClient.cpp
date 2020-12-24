@@ -4,7 +4,7 @@ int CReactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrRemote, EM_UDP_TYPE 
 {
     if(m_skRemote.open(AddrRemote) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorUDPClient::OpenAddress]Open error(%d).\n", errno));
+        PSS_LOGGER_DEBUG("[CReactorUDPClient::OpenAddress]Open error({0}).", errno);
         return -1;
     }
 
@@ -26,7 +26,7 @@ int CReactorUDPClient::OpenAddress(const ACE_INET_Addr& AddrRemote, EM_UDP_TYPE 
 
     if(-1 == this->reactor()->register_handler(this, ACE_Event_Handler::READ_MASK))
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorUDPClient::OpenAddress] Addr is register_handler error(%d).\n", errno));
+        PSS_LOGGER_DEBUG("[CReactorUDPClient::OpenAddress] Addr is register_handler error({0}).", errno);
         return -1;
     }
 
@@ -49,7 +49,7 @@ int CReactorUDPClient::handle_input(ACE_HANDLE fd)
 {
     if(fd == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorUDPClient::handle_input]fd is ACE_INVALID_HANDLE.\n"));
+        PSS_LOGGER_DEBUG("[CReactorUDPClient::handle_input]fd is ACE_INVALID_HANDLE.");
         return -1;
     }
 
@@ -59,7 +59,7 @@ int CReactorUDPClient::handle_input(ACE_HANDLE fd)
 
     if(nDataLen > 0 && false == CheckMessage(szBuff, (uint32)nDataLen))
     {
-        OUR_DEBUG((LM_INFO, "[CReactorUDPClient::handle_inpu]CheckMessage error.\n"));
+        PSS_LOGGER_DEBUG("[CReactorUDPClient::handle_inpu]CheckMessage error.");
     }
 
     return 0;
@@ -69,7 +69,7 @@ int CReactorUDPClient::handle_close(ACE_HANDLE handle, ACE_Reactor_Mask close_ma
 {
     if(handle == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorUDPClient::handle_close]close_mask = %d.\n", (uint32)close_mask));
+        PSS_LOGGER_DEBUG("[CReactorUDPClient::handle_close]close_mask = {0}.", close_mask);
     }
 
     Close();
@@ -83,7 +83,7 @@ bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const ch
 
     if(nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::SendMessage]set_address error[%d].\n", errno));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::SendMessage]set_address error[{0}].", errno);
         return false;
     }
 
@@ -98,7 +98,7 @@ bool CReactorUDPClient::SendMessage(const char* pMessage, uint32 u4Len, const ch
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::SendMessage]send error(%d).\n", errno));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::SendMessage]send error({0}).", errno);
         return false;
     }
 }

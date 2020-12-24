@@ -19,14 +19,14 @@ static int32 ServerMain()
     //启动主服务器监控
     if(!App_ProServerManager::instance()->Init())
     {
-        OUR_DEBUG((LM_INFO, "[main]App_ProServerManager::instance()->Init() error.\n"));
+        PSS_LOGGER_DEBUG("[main]App_ProServerManager::instance()->Init() error.");
         App_ProServerManager::instance()->Close();
         return 0;
     }
 
     if(!App_ProServerManager::instance()->Start())
     {
-        OUR_DEBUG((LM_INFO, "[main]App_ProServerManager::instance()->Start() error.\n"));
+        PSS_LOGGER_DEBUG("[main]App_ProServerManager::instance()->Start() error.");
         App_ProServerManager::instance()->Close();
         return 0;
     }
@@ -37,7 +37,7 @@ static int32 ServerMain()
         ACE_Thread_Manager::instance()->wait();
     }
 
-    OUR_DEBUG((LM_INFO, "[main]Server Run is End.\n"));
+    PSS_LOGGER_DEBUG("[main]Server Run is End.");
 
     return 0;
 }

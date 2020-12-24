@@ -9,7 +9,7 @@ void CUnit_FileLogger::setUp(void)
 
 void CUnit_FileLogger::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_FileLogger::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_FileLogger::tearDown]Finish.");
 }
 
 void CUnit_FileLogger::Test_FileLogger(void)
@@ -30,41 +30,41 @@ void CUnit_FileLogger::Test_FileLogger(void)
 
     if (8192 != m_pLogFile->GetBufferSize())
     {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetBufferSize() fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_FileLogger]m_pLogFile->GetBufferSize() fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetBufferSize() fail.", true == blRet);
         return;
     }
 
     if (ACE_OS::strcmp("./", m_pLogFile->GetFileRoot()) != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetFileRoot() fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_FileLogger]m_pLogFile->GetFileRoot() fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetFileRoot() fail.", true == blRet);
         return;
     }
     
     auto logTime = m_pLogFile->GetLogTime();
-    OUR_DEBUG((LM_INFO, "[Test_FileLogger]LogTime=%s.\n", logTime));
+    PSS_LOGGER_DEBUG("[Test_FileLogger]LogTime={0}.", logTime);
 
     if (MAX_BUFF_1024 * MAX_BUFF_1024 * 1024 != m_pLogFile->GetFileMaxSize())
     {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetFileMaxSize() fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_FileLogger]m_pLogFile->GetFileMaxSize() fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetFileMaxSize() fail.", true == blRet);
         return;
     }
 
     if (1 != m_pLogFile->GetCurrFileIndex())
     {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->GetCurrFileIndex() fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_FileLogger]m_pLogFile->GetCurrFileIndex() fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->GetCurrFileIndex() fail.", true == blRet);
         return;
     }
 
     auto fileSize = m_pLogFile->GetCurrFileSize();
-    OUR_DEBUG((LM_INFO, "[Test_FileLogger]fileSize=%d.\n", fileSize));
+    PSS_LOGGER_DEBUG("[Test_FileLogger]fileSize={0}.", fileSize);
 
     if (false == m_pLogFile->Run())
     {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->Run() fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_FileLogger]m_pLogFile->Run() fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->Run() fail.", true == blRet);
         return;
     }
@@ -76,7 +76,7 @@ void CUnit_FileLogger::Test_FileLogger(void)
 
     if (0 != m_pLogFile->doLog(objLogBlockInfo))
     {
-        OUR_DEBUG((LM_INFO, "[Test_FileLogger]m_pLogFile->doLog() fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_FileLogger]m_pLogFile->doLog() fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_FileLogger]m_pLogFile->doLog() fail.", true == blRet);
     }
 

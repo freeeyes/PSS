@@ -28,7 +28,7 @@ void CPerformanceCounter::counter()
 	else if(m_u4CurrCount == m_u4MaxCount)
 	{
 		auto tvCost = CTimeStamp::Get_Time_Difference(CTimeStamp::Get_Time_Stamp(), m_tvBegin);
-		OUR_DEBUG((LM_INFO, "[%s]m_u4MaxCount=%d, cost=%d.\n", m_strName.c_str(), m_u4MaxCount, tvCost));
+		PSS_LOGGER_DEBUG("[{0}]m_u4MaxCount={1}, cost={2}.", m_strName, m_u4MaxCount, tvCost);
 		m_u4CurrCount = 0;
 	}
 

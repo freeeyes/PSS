@@ -16,7 +16,7 @@ void CConnectClient::Close()
     if (m_nIOCount == 0)
     {
         shutdown();
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::Close]Close(%s:%d) OK.\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+        PSS_LOGGER_DEBUG("[CConnectClient::Close]Close({0}:{1}) OK.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
 
         //删除链接对象
         App_ClientReConnectManager::instance()->CloseByClient(m_nServerID);
@@ -61,7 +61,7 @@ void CConnectClient::Close()
 
 void CConnectClient::Close(uint32 u4ConnectID)
 {
-    OUR_DEBUG((LM_DEBUG, "[CProConnectClient::Close]u4ConnectID=%d.\n", u4ConnectID));
+    PSS_LOGGER_DEBUG("[CProConnectClient::Close]u4ConnectID={0}.", u4ConnectID);
     Close();
 }
 
@@ -96,7 +96,7 @@ void CConnectClient::ClientClose()
 
     if (nullptr == pMbData)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::ClientClose] Connectid=%d, pMbData is nullptr.\n", GetServerID()));
+        PSS_LOGGER_DEBUG("[CConnectClient::ClientClose] Connectid={0}, pMbData is nullptr.", GetServerID());
         return;
     }
 
@@ -113,7 +113,7 @@ int CConnectClient::open(void* p)
 {
     if (p != nullptr)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::open]p is not nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConnectClient::open]p is not nullptr.");
     }
 
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
@@ -130,7 +130,7 @@ int CConnectClient::open(void* p)
     //设置链接为非阻塞模式
     if (this->peer().enable(ACE_NONBLOCK) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandler::open]this->peer().enable  = ACE_NONBLOCK error.");
         m_strError = "[CConnectClient::open]this->peer().enable  = ACE_NONBLOCK error.";
         return -1;
     }
@@ -138,7 +138,7 @@ int CConnectClient::open(void* p)
     //获得远程链接地址和端口
     if (this->peer().get_remote_addr(m_addrRemote) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectHandler::open]this->peer().get_remote_addr error.\n"));
+        PSS_LOGGER_DEBUG("[CConnectHandler::open]this->peer().get_remote_addr error.");
         m_strError = "[CConnectClient::open]this->peer().get_remote_addr error.";
         return -1;
     }
@@ -155,13 +155,13 @@ int CConnectClient::open(void* p)
 
     if (m_pCurrMessage == nullptr)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::RecvClinetPacket] pmb new is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConnectClient::RecvClinetPacket] pmb new is nullptr.");
         return -1;
     }
 
     m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 
-    OUR_DEBUG((LM_INFO, "[CConnectClient::open] Connection from [%s:%d]\n", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number()));
+    PSS_LOGGER_DEBUG("[CConnectClient::open] Connection from [{0}:{1}].", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
 
     if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
     {
@@ -197,7 +197,7 @@ int CConnectClient::open(void* p)
 
     if (-1 == nWakeupRet)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::open]ConnectID=%d, nWakeupRet=%d, errno=%d.\n", GetServerID(), nWakeupRet, errno));
+        PSS_LOGGER_DEBUG("[CConnectClient::open]ConnectID={0}, nWakeupRet={1}, errno={2}.", GetServerID(), nWakeupRet, errno);
     }
 
     return nRet;
@@ -209,7 +209,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
 
     if (fd == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]fd == ACE_INVALID_HANDLE.\n"));
+        PSS_LOGGER_DEBUG("[CConnectClient::handle_input]fd == ACE_INVALID_HANDLE.");
         m_strError = "[CConnectHandler::handle_input]fd == ACE_INVALID_HANDLE.";
 
         if (nullptr != m_pClientMessage)
@@ -231,7 +231,7 @@ int CConnectClient::handle_input(ACE_HANDLE fd)
     if (m_pCurrMessage == nullptr)
     {
         m_u4CurrSize = 0;
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input]m_pCurrMessage == nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CConnectClient::handle_input]m_pCurrMessage == nullptr.");
         m_strError = "[CConnectClient::handle_input]m_pCurrMessage == nullptr.";
              
         if (nullptr != m_pClientMessage)
@@ -264,7 +264,7 @@ int CConnectClient::RecvData()
     {
         m_u4CurrSize = 0;
         auto u4Error = (uint32)errno;
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::handle_input] ConnectID = %d, recv data is error nDataLen = [%d] errno = [%d].\n", GetServerID(), nDataLen, u4Error));
+        PSS_LOGGER_DEBUG("[CConnectClient::handle_input] ConnectID = {0}, recv data is error nDataLen = [{1}] errno = [{2}].", GetServerID(), nDataLen, u4Error);
         m_strError = fmt::format("[CConnectClient::handle_input] ConnectID = {0}, recv data is error{1}.", GetServerID(), nDataLen);
 
         _ClientIPInfo objServerIPInfo;
@@ -399,7 +399,7 @@ int CConnectClient::handle_close(ACE_HANDLE h, ACE_Reactor_Mask mask)
 {
     if (h == ACE_INVALID_HANDLE)
     {
-        OUR_DEBUG((LM_DEBUG, "[CConnectClient::handle_close] h is nullptr mask=%d.\n", GetServerID(), (int)mask));
+        PSS_LOGGER_DEBUG("[CConnectClient::handle_close] h({0}) is nullptr mask={1}.", GetServerID(), (int)mask);
     }
 
     Close();
@@ -448,7 +448,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
 
     if (nullptr == pmblk)
     {
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, get_handle() == ACE_INVALID_HANDLE.\n", GetServerID()));
+        PSS_LOGGER_DEBUG("[CConnectClient::SendData] ConnectID = {0}, get_handle() == ACE_INVALID_HANDLE.", GetServerID());
         return false;
     }
 
@@ -463,7 +463,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
     {
         if (nSendLen <= 0)
         {
-            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, nCurrSendSize error is %d.\n", GetServerID(), nSendLen));
+            PSS_LOGGER_DEBUG("[CConnectClient::SendData] ConnectID = {0}, nCurrSendSize error is {1].", GetServerID(), nSendLen);
             App_MessageBlockManager::instance()->Close(pmblk);
             return false;
         }
@@ -478,7 +478,7 @@ bool CConnectClient::SendData(ACE_Message_Block* pmblk)
             objServerIPInfo.m_u2Port = m_addrRemote.get_port_number();
             m_pClientMessage->ConnectError(ACE_OS::last_error(), objServerIPInfo);
 
-            OUR_DEBUG((LM_ERROR, "[CConnectClient::SendData] ConnectID = %d, error = %d.\n", GetServerID(), errno));
+            PSS_LOGGER_DEBUG("[CConnectClient::SendData] ConnectID = {0}, error = {1}.", GetServerID(), errno);
             App_MessageBlockManager::instance()->Close(pmblk);
             return false;
         }
@@ -524,7 +524,7 @@ bool CConnectClient::GetTimeout(PSS_Time_Point const& tvNow) const
     if(m_emRecvState == EM_Server_Recv_State::SERVER_RECV_BEGIN && time_interval_second > SERVER_RECV_TIMEOUT)
     {
         //接收数据处理已经超时，在这里打印出来
-        OUR_DEBUG((LM_DEBUG,"[CConnectClient::GetTimeout]***(%d)recv dispose is timeout(%d)!***.\n", m_nServerID, tvIntval.sec()));
+        PSS_LOGGER_DEBUG("[CConnectClient::GetTimeout]***({0})recv dispose is timeout({1})!***.", m_nServerID, tvIntval.sec());
         return false;
     }
     else

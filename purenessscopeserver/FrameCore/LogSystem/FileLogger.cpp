@@ -34,7 +34,7 @@ void CLogFile::Init(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMax
 
             if (nullptr == fp)
             {
-                OUR_DEBUG((LM_INFO, "[CLogFile::Init]File(%s) fopen error.\n", strLogName.c_str()));
+                PSS_LOGGER_DEBUG("[CLogFile::Init]File({0}) fopen error.", strLogName);
                 return;
             }
 
@@ -63,7 +63,7 @@ void CLogFile::Init(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMax
             }
             else
             {
-                OUR_DEBUG((LM_INFO, "[CLogFile::Init]File(%s) access error(%d).\n", strLogName.c_str(), nError));
+                PSS_LOGGER_DEBUG("[CLogFile::Init]File({0}) access error({1}).", strLogName, nError);
                 return;
             }
         }
@@ -72,10 +72,10 @@ void CLogFile::Init(const char* pFileRoot, uint32 u4BufferSize, uint32 u4FileMax
 
 void CLogFile::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CLogFile::Close]m_StrlogName=%s.\n", m_strlogName.c_str()));
+    PSS_LOGGER_DEBUG("[CLogFile::Close]m_StrlogName={0}.", m_strlogName);
     m_u4BufferSize = 0;
     m_filestream.close();
-    OUR_DEBUG((LM_INFO, "[CLogFile::Close] End.\n"));
+    PSS_LOGGER_DEBUG("[CLogFile::Close] End.");
 }
 
 void CLogFile::SetFileRoot(const char* pFileRoot)
@@ -166,13 +166,13 @@ int CLogFile::doLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
     else
     {
         //输出到屏幕
-        OUR_DEBUG((LM_INFO, "%s.\n", strBuffer.c_str()));
+        PSS_LOGGER_DEBUG("{0}.", strBuffer);
     }
 
     //查看是否要发送邮件
     if (pLogBlockInfo->m_u2MailID > 0 && false == SendMail(pLogBlockInfo))
     {
-        OUR_DEBUG((LM_INFO, "[CLogFile::doLog](%s)Send mail fail.\n", m_strlogName.c_str()));
+        PSS_LOGGER_DEBUG("[CLogFile::doLog]({0})Send mail fail.", m_strlogName);
     }
 
     //检查是否超过了文件块，如果超过了，创建一个新日志文件。
@@ -198,7 +198,7 @@ bool CLogFile::SendMail(shared_ptr<_LogBlockInfo> pLogBlockInfo, const xmlMails:
 
     if (nullptr == pMailAlert)
     {
-        OUR_DEBUG((LM_ERROR, "[CLogFile::SendMail]MailID(%d) is no find.\n", pLogBlockInfo->m_u2MailID));
+        PSS_LOGGER_DEBUG("[CLogFile::SendMail]MailID({0}) is no find.", pLogBlockInfo->m_u2MailID);
         return false;
     }
 
@@ -261,7 +261,7 @@ void CLogFile::SetLoggerClass(int nType)
         m_strlogType = LOGTYPE_ERROR;
     }
 
-    OUR_DEBUG((LM_INFO, "[ServerLogger](%d)m_StrlogType=%s.\n", nType, m_strlogType.c_str()));
+    PSS_LOGGER_DEBUG("[ServerLogger]({0})m_StrlogType={1}.", nType, m_strlogType);
 }
 
 int CLogFile::GetLoggerClass() const
@@ -341,7 +341,7 @@ bool CLogFile::Run()
     //设置当前文件大小是0
     m_u4CurrFileSize = 0;
 
-    OUR_DEBUG((LM_INFO, "[ServerLogger]Create file ok[%s].\n", strLogName.c_str()));
+    PSS_LOGGER_DEBUG("[ServerLogger]Create file ok[{0}].", strLogName);
     return true;
 }
 
@@ -355,7 +355,7 @@ void CLogFile::CheckTime()
 
     if (strDate != m_strLogTime && false == Run())
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_strlogName.c_str()));
+        PSS_LOGGER_DEBUG("[ServerLogger]({0})Run fail.", m_strlogName);
     }
 }
 
@@ -369,7 +369,7 @@ void CLogFile::CheckLogFileBlock()
 
         if (false == Run())
         {
-            OUR_DEBUG((LM_INFO, "[ServerLogger](%s)Run fail.\n", m_strlogName.c_str()));
+            PSS_LOGGER_DEBUG("[ServerLogger]({0})Run fail.", m_strlogName);
         }
     }
 }
@@ -384,7 +384,7 @@ void CLogFile::CreatePath() const
 
     if (-1 == n4Return && EEXIST != nError)
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", strPath.c_str()));
+        PSS_LOGGER_DEBUG("[ServerLogger]({0})CreatePath fail.", strPath);
     }
 
     strPath = m_strFileRoot + "/Log/" + m_strlogType.c_str();
@@ -393,7 +393,7 @@ void CLogFile::CreatePath() const
 
     if (-1 == n4Return && EEXIST != nError)
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", strPath.c_str()));
+        PSS_LOGGER_DEBUG("[ServerLogger]({0})CreatePath fail.", strPath);
     }
 
     strPath = m_strFileRoot + "/Log/" + m_strlogType + "/" + m_strlogName;
@@ -402,7 +402,7 @@ void CLogFile::CreatePath() const
 
     if (-1 == n4Return && EEXIST != nError)
     {
-        OUR_DEBUG((LM_INFO, "[ServerLogger](%s)CreatePath fail.\n", strPath.c_str()));
+        PSS_LOGGER_DEBUG("[ServerLogger]({0})CreatePath fail.", strPath);
     }
 }
 
@@ -410,7 +410,7 @@ void CLogFile::CreatePath() const
 
 void CFileLogger::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CFileLogger::Close]Begin.\n"));
+    PSS_LOGGER_DEBUG("[CFileLogger::Close]Begin.");
 
     for_each(m_mapLogFileList.begin(), m_mapLogFileList.end(), [](const std::pair<uint16, shared_ptr<CLogFile>>& iter) {
         //关闭写入文件
@@ -420,7 +420,7 @@ void CFileLogger::Close()
     m_mapLogFileList.clear();
     m_nCount = 0;
 
-    OUR_DEBUG((LM_INFO, "[CFileLogger::Close]End.\n"));
+    PSS_LOGGER_DEBUG("[CFileLogger::Close]End.");
 }
 
 int CFileLogger::DoLog(uint16 nLogType, shared_ptr<_LogBlockInfo> pLogBlockInfo)
@@ -460,20 +460,20 @@ bool CFileLogger::Init()
 
     if(false == objXmlOpeation.Init(strFile.c_str()))
     {
-        OUR_DEBUG((LM_ERROR,"[CFileLogger::Init] Read Configfile[%s] failed\n", strFile.c_str()));
+        PSS_LOGGER_DEBUG("[CFileLogger::Init] Read Configfile[{0}] failed.", strFile);
         return false;
     }
 
     //得到服务器名称
     objXmlOpeation.Read_XML_Data_Single_String("ServerLogHead", "Text", strServerName);
-    OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strServerName=%s\n", strServerName.c_str()));
+    PSS_LOGGER_DEBUG("[CFileLogger::readConfig]strServerName={0}.", strServerName);
 
     //得到单个日志最大大小
     objXmlOpeation.Read_XML_Data_Single_Uint32("ServerLogHead", "LogFileMaxSize", u4FileMaxSize);
 
     //得到绝对路径
     objXmlOpeation.Read_XML_Data_Single_String("LogPath", "Path", m_strLogRoot);
-    OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]m_strRoot=%s\n", m_strLogRoot.c_str()));
+    PSS_LOGGER_DEBUG("[CFileLogger::readConfig]m_strRoot={0}.", m_strLogRoot);
 
     //得到日志池配置信息，日志块的大小
     objXmlOpeation.Read_XML_Data_Single_Uint32("LogPool", "BlockSize", m_u4BlockSize);
@@ -497,7 +497,7 @@ bool CFileLogger::Init()
         //得到日志id
         if(true == objXmlOpeation.Read_XML_Data_Multiple_Uint16("LogInfo", "logid", u2LogID, pNextTiXmlElementIdx))
         {
-            OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u2LogID=%d\n", u2LogID));
+            PSS_LOGGER_DEBUG("[CFileLogger::readConfig]u2LogID={0}.", u2LogID);
         }
         else
         {
@@ -506,19 +506,19 @@ bool CFileLogger::Init()
 
         //得到日志名称
         objXmlOpeation.Read_XML_Data_Multiple_String("LogInfo", "logname", strFileName, pNextTiXmlElement);
-        OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]strFileValue=%s\n", strFileName.c_str()));
+        PSS_LOGGER_DEBUG("[CFileLogger::readConfig]strFileValue={0}.", strFileName);
 
         //得到日志类型
         objXmlOpeation.Read_XML_Data_Multiple_Uint8("LogInfo", "logtype", u1FileClass, pNextTiXmlElementPos);
-        OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u1FileClass=%d\n", u1FileClass));
+        PSS_LOGGER_DEBUG("[CFileLogger::readConfig]u1FileClass={0}.", u1FileClass);
 
         //得到日志输出来源，0为输出到文件，1为输出到屏幕
         objXmlOpeation.Read_XML_Data_Multiple_Uint8("LogInfo", "Display", u1DisPlay, pNextTiXmlElementDisplay);
-        OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u1DisPlay=%d\n", u1DisPlay));
+        PSS_LOGGER_DEBUG("[CFileLogger::readConfig]u1DisPlay={0}.", u1DisPlay);
 
         //得到日志当前级别
         objXmlOpeation.Read_XML_Data_Multiple_Uint16("LogInfo", "Level", u2LogLevel, pNextTiXmlElementLevel);
-        OUR_DEBUG((LM_ERROR, "[CFileLogger::readConfig]u4LogLevel=%d\n", u2LogLevel));
+        PSS_LOGGER_DEBUG("[CFileLogger::readConfig]u4LogLevel={0}.", u2LogLevel);
 
         //加入缓冲
         _Log_File_Info obj_Log_File_Info;
@@ -547,7 +547,7 @@ bool CFileLogger::Init()
 
         if (false == pLogFile->Run())
         {
-            OUR_DEBUG((LM_INFO, "[CFileLogger::Init]Run error.\n"));
+            PSS_LOGGER_DEBUG("[CFileLogger::Init]Run error.");
         }
 
         m_mapLogFileList[objFileInfo.m_u2LogID] = pLogFile;

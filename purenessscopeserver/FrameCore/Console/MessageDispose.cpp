@@ -319,7 +319,7 @@ void DoMessage_ShowModule(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacke
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[DoMessage_ShowModule]Param is error.\n"));
+        PSS_LOGGER_DEBUG("[DoMessage_ShowModule]Param is error.");
     }
 }
 
@@ -1660,7 +1660,7 @@ void DoMessage_TestFileStart(const _CommandInfo& CommandInfo, shared_ptr<IBuffPa
 
     if (GetTestFileName(CommandInfo.m_strCommandExp, strFileName) == true)
     {
-        OUR_DEBUG((LM_INFO, "[Do_Message_TestFileStart]file=%s.\n", strFileName.c_str()));
+        PSS_LOGGER_DEBUG("[Do_Message_TestFileStart]file={0}.", strFileName);
         u2ReturnCommandID = CONSOLE_COMMAND_FILE_TEST_START;
 
         FileTestResultInfoSt objFileResult;
@@ -1740,11 +1740,11 @@ void DoMessage_TestFileStop(const _CommandInfo& CommandInfo, shared_ptr<IBuffPac
 
 void DoMessage_PortList(const _CommandInfo& CommandInfo, shared_ptr<IBuffPacket> pBuffPacket, uint16& u2ReturnCommandID)
 {
-    OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In.\n"));
+    PSS_LOGGER_DEBUG("[DoMessage_PortList]In.");
 
     if (CommandInfo.m_strCommandExp == "-a")
     {
-        OUR_DEBUG((LM_INFO, "[DoMessage_PortList]In 1.\n"));
+        PSS_LOGGER_DEBUG("[DoMessage_PortList]In 1.");
         u2ReturnCommandID = CONSOLE_COMMAND_PORT_FLOW;
 
         vector<CWorkThread_Packet_Info> vec_Port_Data_Account;

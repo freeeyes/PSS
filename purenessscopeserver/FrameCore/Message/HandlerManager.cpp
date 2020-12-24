@@ -19,7 +19,7 @@ bool CPSSHandlerManager::PostMessage(uint32 u4ConnectID, uint16 u2CommandID, sha
 	}
 	else
 	{
-		OUR_DEBUG((LM_INFO, "[CPSSHandlerManager::PostMessage]Cant't send connectid is 0.\n"));
+		PSS_LOGGER_DEBUG("[CPSSHandlerManager::PostMessage]Cant't send connectid is 0.");
 		return true;
 	}
 }

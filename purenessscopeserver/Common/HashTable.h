@@ -540,7 +540,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					PSS_LOGGER_DEBUG("[Pop]1 pKey = {0}.\n", pKey);
+					PSS_LOGGER_DEBUG("[Pop]1 pKey = {0}.", pKey);
 				}
 
 				//回收数据
@@ -659,7 +659,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					PSS_LOGGER_DEBUG("[Pop]2 index={0}, Del_Hash_Data({1}), Currused={2}, pT={3}.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), fmt::ptr(pT));
+					PSS_LOGGER_DEBUG("[Pop]2 index={0}, Del_Hash_Data({1}), Currused={2}, pT={3}.", m_nCurrLinkIndex, nRet, Get_Used_Count(), fmt::ptr(pT));
 				}
 
 				return pT;
@@ -688,7 +688,7 @@ public:
 			//没有找到共享内存
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				PSS_LOGGER_DEBUG("[Push] m_lpTable is nullptr, pKey={0}, pT={1}.\n", pKey, fmt::ptr(pT));
+				PSS_LOGGER_DEBUG("[Push] m_lpTable is nullptr, pKey={0}, pT={1}.", pKey, fmt::ptr(pT));
 			}
 
 			return false;
@@ -1133,7 +1133,7 @@ public:
 
 					if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 					{
-						PSS_LOGGER_DEBUG("[Test]Add 2 pKey={0}, pData->m_pKey={1}.\n", pKey, pData->m_pKey);
+						PSS_LOGGER_DEBUG("[Test]Add 2 pKey={0}, pData->m_pKey={1}.", pKey, pData->m_pKey);
 					}
 
 					if (nullptr != pLastLink)

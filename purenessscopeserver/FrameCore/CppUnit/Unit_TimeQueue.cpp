@@ -9,7 +9,7 @@ void CUnit_TimerManager::setUp(void)
 
 void CUnit_TimerManager::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_TimerManager::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_TimerManager::tearDown]Finish.");
 }
 
 void CUnit_TimerManager::Test_TimerManager(void)
@@ -25,7 +25,7 @@ void CUnit_TimerManager::Test_TimerManager(void)
 
     cout << "[Test_Timer]End" << endl;
 
-    OUR_DEBUG((LM_INFO, "[CUnit_TimerManager]objActiveTimer is close.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_TimerManager]objActiveTimer is close.");
 }
 
 #endif

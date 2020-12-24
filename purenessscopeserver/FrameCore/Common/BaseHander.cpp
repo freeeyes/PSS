@@ -16,7 +16,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
 {
     if (nullptr == pBuffPacket)
     {
-        OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]pBuffPacket is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[Udp_Common_Send_Message]pBuffPacket is nullptr.");
         return false;
     }
 
@@ -25,7 +25,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
 
     if (nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]set_address error[%d].\n", errno));
+        PSS_LOGGER_DEBUG("[Udp_Common_Send_Message]set_address error[{0}].", errno);
         return false;
     }
 
@@ -45,7 +45,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
             pMbData, 
             obj_Send_Message_Param.m_u2CommandID))
         {
-            OUR_DEBUG((LM_INFO, "[Udp_Common_Send_Message]Make_Send_Packet is false.\n"));
+            PSS_LOGGER_DEBUG("[Udp_Common_Send_Message]Make_Send_Packet is false.");
             return false;
         }
 
@@ -141,7 +141,7 @@ bool Udp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, shar
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[Udp_Common_Recv_Stream]m_pPacketParse GetPacketStream is error.\n"));
+        PSS_LOGGER_DEBUG("[Udp_Common_Recv_Stream]m_pPacketParse GetPacketStream is error.");
         return false;
     }
 
@@ -162,7 +162,7 @@ bool Udp_Common_Send_WorkThread(CMakePacket& MakePacket, uint32 u4ConnectID, sha
     //UDP因为不是面向链接的
     if (false == MakePacket.PutMessageBlock(objMakePacket, tvCheck))
     {
-        OUR_DEBUG((LM_ERROR, "[Udp_Common_Send_WorkThread]PutMessageBlock is error.\n"));
+        PSS_LOGGER_DEBUG("[Udp_Common_Send_WorkThread]PutMessageBlock is error.");
         return false;
     }
 
@@ -194,7 +194,7 @@ uint8 Tcp_Common_Recv_Stream(uint32 u4ConnectID, ACE_Message_Block* pMbData, sha
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[Udp_Common_Recv_Stream]m_pPacketParse GetPacketStream is error.\n"));
+        PSS_LOGGER_DEBUG("[Udp_Common_Recv_Stream]m_pPacketParse GetPacketStream is error.");
     }
 
     return n1Ret;
@@ -255,7 +255,7 @@ void Send_MakePacket_Queue(CMakePacket& MakePacketDispose, const _MakePacket& ob
     //放入消息队列
     if (false == MakePacketDispose.PutMessageBlock(objMakePacket, objMakePacket.m_tvRecv))
     {
-        OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", objMakePacket.m_u4ConnectID));
+        PSS_LOGGER_DEBUG("[Send_MakePacket_Queue] ConnectID = {0}, PACKET_CONNECT is error.", objMakePacket.m_u4ConnectID);
     }
 
     if (blCommit)
@@ -269,7 +269,7 @@ void Send_MakePacket_Queue_Error(CMakePacket& MakePacketDispose, uint32 u4Connec
     //放入消息队列
     if (false == MakePacketDispose.PutSendErrorMessage(u4ConnectID, pMessageBlock, tvNow))
     {
-        OUR_DEBUG((LM_ERROR, "[Send_MakePacket_Queue] ConnectID = %d, PACKET_CONNECT is error.\n", u4ConnectID));
+        PSS_LOGGER_DEBUG("[Send_MakePacket_Queue] ConnectID = {0}, PACKET_CONNECT is error.", u4ConnectID);
     }
 
     MakePacketDispose.CommitMessageList();
@@ -375,7 +375,7 @@ bool Tcp_Common_Send_Input_To_Cache(CMakePacket& MakePacket,
 
     if (u4SendPacketSize + (uint32)pBlockMessage->length() >= obj_Input_To_Cache_Param.m_u4SendMaxBuffSize)
     {
-        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Send_Input_To_Cache] Connectid=[%d] m_pBlockMessage is not enougth.\n", obj_Input_To_Cache_Param.m_u4ConnectID));
+        PSS_LOGGER_DEBUG("[Tcp_Common_Send_Input_To_Cache] Connectid=[{0}] m_pBlockMessage is not enougth.", obj_Input_To_Cache_Param.m_u4ConnectID);
         //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
         ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(pBuffPacket->GetPacketLen());
         memcpy_safe(pBuffPacket->GetData(), pBuffPacket->GetPacketLen(), pSendMessage->wr_ptr(), pBuffPacket->GetPacketLen());
@@ -418,7 +418,7 @@ bool Tcp_Common_Make_Send_Packet(CMakePacket& MakePacket,
 {
     if (pBlockMessage == nullptr)
     {
-        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) pBlockMessage is nullptr.\n", obj_Send_Packet_Param.m_u4ConnectID));
+        PSS_LOGGER_DEBUG("[Tcp_Common_Make_Send_Packet]({0}) pBlockMessage is nullptr.", obj_Send_Packet_Param.m_u4ConnectID);
         return false;
     }
 
@@ -428,7 +428,7 @@ bool Tcp_Common_Make_Send_Packet(CMakePacket& MakePacket,
 
         if (u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
+            PSS_LOGGER_DEBUG("[Tcp_Common_Make_Send_Packet]({0}) u4SendPacketSize is more than({1})({2}).", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize);
 
             Recovery_Common_BuffPacket(obj_Send_Packet_Param.m_blDelete, pBuffPacket);
 
@@ -448,7 +448,7 @@ bool Tcp_Common_Make_Send_Packet(CMakePacket& MakePacket,
 
         if (obj_Send_Packet_Param.m_u4SendMaxBuffSize > 0 && u4PacketSize >= obj_Send_Packet_Param.m_u4SendMaxBuffSize)
         {
-            OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) u4SendPacketSize is more than(%d)(%d).\n", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize));
+            PSS_LOGGER_DEBUG("[Tcp_Common_Make_Send_Packet]({0}) u4SendPacketSize is more than({1})({2}).", obj_Send_Packet_Param.m_u4ConnectID, u4PacketSize, obj_Send_Packet_Param.m_u4SendMaxBuffSize);
             //如果连接不存在了，在这里返回失败，回调给业务逻辑去处理
             ACE_Message_Block* pSendMessage = App_MessageBlockManager::instance()->Create(u4PacketSize);
             memcpy_safe(pBuffPacket->GetData(), u4PacketSize, pSendMessage->wr_ptr(), u4PacketSize);
@@ -474,9 +474,9 @@ bool Tcp_Common_Make_Send_Packet(CMakePacket& MakePacket,
     }
     else
     {
-        OUR_DEBUG((LM_DEBUG, "[Tcp_Common_Make_Send_Packet](%d) commandID=%d, pBlockMessage is 0.\n", 
+        PSS_LOGGER_DEBUG("[Tcp_Common_Make_Send_Packet]({0}) commandID={1}, pBlockMessage is 0.",
             obj_Send_Packet_Param.m_u4ConnectID, 
-            obj_Send_Packet_Param.m_u2CommandID));
+            obj_Send_Packet_Param.m_u2CommandID);
 
         return false;
     }

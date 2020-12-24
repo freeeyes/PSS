@@ -22,7 +22,7 @@ bool CServerManager::Init()
     //初始化禁止IP列表
     App_ForbiddenIP::instance()->Init(FORBIDDENIP_FILE);
 
-    OUR_DEBUG((LM_INFO, "[CServerManager::Init]nReactorCount=%d.\n", nReactorCount));
+    PSS_LOGGER_DEBUG("[CServerManager::Init]nReactorCount={0}.", nReactorCount);
 
     //为多进程做准备，针对epoll和epollet初始化不能在这里去做,因为在多进程里epoll_create必须在子进程里去声明
     if (NETWORKMODE::NETWORKMODE_RE_EPOLL != GetXmlConfigAttribute(xmlNetWorkMode)->Mode
@@ -88,7 +88,7 @@ bool CServerManager::Init()
 
     if (!App_ConnectAcceptorManager::instance()->InitConnectAcceptor(nServerPortCount, u4ClientReactorCount))
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Init]%s.\n", App_ConnectAcceptorManager::instance()->GetError()));
+        PSS_LOGGER_DEBUG("[CServerManager::Init]{0}.", App_ConnectAcceptorManager::instance()->GetError());
         return false;
     }
 
@@ -122,7 +122,7 @@ bool CServerManager::Start()
     {
         if (false == Run())
         {
-            OUR_DEBUG((LM_INFO, "child Run failure.\n"));
+            PSS_LOGGER_DEBUG("child Run failure.");
             return false;
         }
     }
@@ -137,38 +137,38 @@ bool CServerManager::Init_Reactor(uint8 u1ReactorCount, NETWORKMODE u1NetMode) c
     //初始化反应器
     for (uint8 i = 0; i < u1ReactorCount; i++)
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]... i=[%d].\n", i));
+        PSS_LOGGER_DEBUG("[CServerManager::Init_Reactor]... i=[{0}].", i);
 
         if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_SELECT)
         {
             blState = App_ReactorManager::instance()->AddNewReactor(i, EM_REACTOR_MODULE::Reactor_Select, 1);
-            OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_Select.\n"));
+            PSS_LOGGER_DEBUG("[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_Select.");
         }
         else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_TPSELECT)
         {
             blState = App_ReactorManager::instance()->AddNewReactor(i, EM_REACTOR_MODULE::Reactor_TP, 1);
-            OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_TP.\n"));
+            PSS_LOGGER_DEBUG("[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_TP.");
         }
         else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_EPOLL)
         {
             blState = App_ReactorManager::instance()->AddNewReactor(i, EM_REACTOR_MODULE::Reactor_DEV_POLL, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
-            OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL.\n"));
+            PSS_LOGGER_DEBUG("[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL.");
         }
         else if (u1NetMode == NETWORKMODE::NETWORKMODE_RE_EPOLL_ET)
         {
             blState = App_ReactorManager::instance()->AddNewReactor(i, EM_REACTOR_MODULE::Reactor_DEV_POLL_ET, 1, GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
-            OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL_ET.\n"));
+            PSS_LOGGER_DEBUG("[CServerManager::Init_Reactor]AddNewReactor REACTOR_CLIENTDEFINE = Reactor_DEV_POLL_ET.");
         }
         else
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewProactor NETWORKMODE Error.\n"));
+            PSS_LOGGER_DEBUG("[CServerManager::Init_Reactor]AddNewProactor NETWORKMODE Error.");
             return false;
         }
 
         if (!blState)
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]AddNewReactor [%d] Error.\n", i));
-            OUR_DEBUG((LM_INFO, "[CServerManager::Init_Reactor]Error=%s.\n", App_ReactorManager::instance()->GetError()));
+            PSS_LOGGER_DEBUG("[CServerManager::Init_Reactor]AddNewReactor [{0}] Error.", i);
+            PSS_LOGGER_DEBUG("[CServerManager::Init_Reactor]Error={0}.", App_ReactorManager::instance()->GetError());
             return false;
         }
     }
@@ -190,7 +190,7 @@ bool CServerManager::Run()
 
         if (false == Init_Reactor((uint8)(3 + GetXmlConfigAttribute(xmlMessage)->Msg_Thread), GetXmlConfigAttribute(xmlNetWorkMode)->Mode))
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Run]Init_Reactor Error.\n"));
+            PSS_LOGGER_DEBUG("[CServerManager::Run]Init_Reactor Error.");
             return false;
         }
     }
@@ -235,14 +235,14 @@ bool CServerManager::Run()
     //启动服务器间检查线程
     if (false == App_ClientReConnectManager::instance()->StartConnectTask(GetXmlConfigAttribute(xmlConnectServer)->TimeCheck))
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Run]StartConnectTask error.\n"));
+        PSS_LOGGER_DEBUG("[CServerManager::Run]StartConnectTask error.");
         return false;
     }
 
     //启动所有反应器(不是客户端接收的反应器，在这里不能启动)
     if (!App_ReactorManager::instance()->StartOtherReactor())
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ReactorManager::instance()->StartOtherReactor is error.\n"));
+        PSS_LOGGER_DEBUG("[CServerManager::Run]App_ReactorManager::instance()->StartOtherReactor is error.");
         return false;
     }
 
@@ -252,7 +252,7 @@ bool CServerManager::Run()
     //加载所有的插件初始化动作
     if (false == App_ModuleLoader::instance()->InitModule())
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ModuleLoader::instance()->InitModule() is error.\n"));
+        PSS_LOGGER_DEBUG("[CServerManager::Run]App_ModuleLoader::instance()->InitModule() is error.");
         return false;
     }
 
@@ -299,16 +299,16 @@ bool CServerManager::Run()
     //最后开闸，启动客户端反应器，让客户端数据进来
     if (!App_ReactorManager::instance()->StartClientReactor())
     {
-        OUR_DEBUG((LM_INFO, "[CServerManager::Run]App_ReactorManager::instance()->StartClientReactor is error.\n"));
+        PSS_LOGGER_DEBUG("[CServerManager::Run]App_ReactorManager::instance()->StartClientReactor is error.");
         return false;
     }
 
 #ifdef _CPPUNIT_TEST
     //运行CppUnit自动化测试
-    OUR_DEBUG((LM_INFO, "[CppUnit]********************************\n"));
+    PSS_LOGGER_DEBUG("[CppUnit]********************************");
     CCppUnitMain objCppUnitMain;
     objCppUnitMain.Run();
-    OUR_DEBUG((LM_INFO, "[CppUnit]********************************\n"));
+    PSS_LOGGER_DEBUG("[CppUnit]********************************");
 #endif
 
     ACE_Thread_Manager::instance()->wait();
@@ -337,7 +337,7 @@ bool CServerManager::Start_Tcp_Listen() const
 
         if (nullptr == pConnectAcceptor)
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]pConnectAcceptor[%d] is nullptr.\n", i));
+            PSS_LOGGER_DEBUG("[CServerManager::Start]pConnectAcceptor[{0}] is nullptr.", i);
             return false;
         }
 
@@ -346,12 +346,12 @@ bool CServerManager::Start_Tcp_Listen() const
 
         if (-1 == nRet)
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] pConnectAcceptor->open[%d] is error.\n", i));
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] error(%d).\n", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
+            PSS_LOGGER_DEBUG("[CServerManager::Start] pConnectAcceptor->open[{0}] is error.", i);
+            PSS_LOGGER_DEBUG("[CServerManager::Start] Listen from [{0}:{1}] error({1}).", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno);
             return false;
         }
 
-        OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+        PSS_LOGGER_DEBUG("[CServerManager::Start] Listen from [{0}:{1}] OK.", listenAddr.get_host_addr(), listenAddr.get_port_number());
     }
 
     return true;
@@ -381,13 +381,13 @@ bool CServerManager::Start_Udp_Listen()
 
         if (-1 == nRet)
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] UDP Listen from [%s:%d] error(%d).\n", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno));
+            PSS_LOGGER_DEBUG("[CServerManager::Start] UDP Listen from [{0}:{1}] error({2}).", listenAddr.get_host_addr(), listenAddr.get_port_number(), errno);
             return false;
         }
 
         m_vecUDPList.emplace_back(pReactorUDPHandler);
 
-        OUR_DEBUG((LM_INFO, "[CServerManager::Start] UDP Listen from [%s:%d] OK.\n", listenAddr.get_host_addr(), listenAddr.get_port_number()));
+        PSS_LOGGER_DEBUG("[CServerManager::Start] UDP Listen from [{0}:{1}] OK.", listenAddr.get_host_addr(), listenAddr.get_port_number());
     }
 
     return true;
@@ -427,7 +427,7 @@ bool CServerManager::Start_Console_Tcp_Listen()
 
         if (nErr != 0)
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start]listenConsoleAddr set_address error[%d].\n", errno));
+            PSS_LOGGER_DEBUG("[CServerManager::Start]listenConsoleAddr set_address error[{0}].", errno);
             return false;
         }
 
@@ -435,8 +435,8 @@ bool CServerManager::Start_Console_Tcp_Listen()
 
         if (-1 == nRet)
         {
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] pConnectAcceptor->open is error.\n"));
-            OUR_DEBUG((LM_INFO, "[CServerManager::Start] Listen from [%s:%d] error(%d).\n", listenConsoleAddr.get_host_addr(), listenConsoleAddr.get_port_number(), errno));
+            PSS_LOGGER_DEBUG("[CServerManager::Start] pConnectAcceptor->open is error.");
+            PSS_LOGGER_DEBUG("[CServerManager::Start] Listen from [{0}:{1}] error({2}).", listenConsoleAddr.get_host_addr(), listenConsoleAddr.get_port_number(), errno);
             return false;
         }
     }
@@ -475,7 +475,7 @@ void CServerManager::Multiple_Process_Start()
 
     if (fd_lock < 0)
     {
-        OUR_DEBUG((LM_ERROR, "open the flock and exit, errno = %d.\n", errno));
+        PSS_LOGGER_DEBUG("open the flock and exit, errno = {0}.", errno);
         exit(1);
     }
 
@@ -484,14 +484,14 @@ void CServerManager::Multiple_Process_Start()
 
     if (nRet == -1 || nRet == 2)
     {
-        OUR_DEBUG((LM_ERROR, "file is already exist!\n"));
+        PSS_LOGGER_DEBUG("file is already exist!");
         exit(1);
     }
 
     //如果文件锁没锁，则锁住当前文件锁
     if (AcquireWriteLock(fd_lock, 0, sizeof(int)) != 0)
     {
-        OUR_DEBUG((LM_ERROR, "lock the file failure and exit, idx = 0.\n"));
+        PSS_LOGGER_DEBUG("lock the file failure and exit, idx = 0.");
         exit(1);
     }
 
@@ -504,7 +504,7 @@ void CServerManager::Multiple_Process_Start()
 
         if (0 == stSize)
         {
-            OUR_DEBUG((LM_ERROR, "write idx = %d, error.\n", nIndex));
+            PSS_LOGGER_DEBUG("write idx = {0}, error.", nIndex);
             exit(1);
         }
     }
@@ -549,7 +549,7 @@ void CServerManager::Run_Child_Process_Start(int nNumChlid, const int& fd_lock)
 			//启动子进程
 			if (false == Run())
 			{
-				OUR_DEBUG((LM_ERROR, "child %d Run failure.\n", nChlidIndex));
+                PSS_LOGGER_DEBUG("child {0} Run failure.", nChlidIndex);
 				exit(1);
 			}
 
@@ -561,45 +561,45 @@ void CServerManager::Run_Child_Process_Start(int nNumChlid, const int& fd_lock)
 
 bool CServerManager::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close begin....\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close begin....");
     App_ConnectAcceptorManager::instance()->Close();
     m_ConnectConsoleAcceptor.close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close Acceptor OK\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close Acceptor OK");
     App_ClientReConnectManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ClientReConnectManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_ClientReConnectManager OK.");
     App_ReTTyClientManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReTTyClientManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_ReTTyClientManager OK.");
     App_MessageManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_MessageManager OK.");
     App_MessageServiceGroup::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[App_MessageServiceGroup::Close]Close App_MessageServiceGroup OK.\n"));
+    PSS_LOGGER_DEBUG("[App_MessageServiceGroup::Close]Close App_MessageServiceGroup OK.");
     App_ModuleLoader::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_MessageManager OK.");
     App_ConnectHandlerPool::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConnectHandlerPool OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_ConnectHandlerPool OK.");
     AppLogManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]AppLogManager OK\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]AppLogManager OK.");
     App_ForwardManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ForwardManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_ForwardManager OK.");
     App_IPAccount::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_IPAccount OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_IPAccount OK.");
     App_MessageBlockManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_MessageBlockManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_MessageBlockManager OK.");
     App_FileTestManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_FileTestManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_FileTestManager OK.");
     for (auto UdpServer : m_vecUDPList)
     {
         UdpServer->CloseFinaly();
     }
     m_vecUDPList.clear();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close UDP Listen OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close UDP Listen OK.");
     App_ReactorManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ReactorManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_ReactorManager OK.");
     App_ConsoleManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_ConsoleManager OK.\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_ConsoleManager OK.");
     App_TimerManager::instance()->Close();
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close App_TimerManager OK.\n"));
-    OUR_DEBUG((LM_INFO, "[CServerManager::Close]Close end....\n"));
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close App_TimerManager OK.");
+    PSS_LOGGER_DEBUG("[CServerManager::Close]Close end....");
 
     return true;
 }

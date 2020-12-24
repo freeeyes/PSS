@@ -47,8 +47,6 @@ void CProConsoleHandle::Close(int nIOCount)
 
     m_ThreadWriteLock.release();
 
-    //OUR_DEBUG((LM_DEBUG, "[CProConsoleHandle::Close]ConnectID=%d, m_nIOCount = %d.\n", GetConnectID(), m_nIOCount));
-
     if(m_nIOCount == 0)
     {
         m_ThreadWriteLock.acquire();
@@ -63,7 +61,7 @@ void CProConsoleHandle::Close(int nIOCount)
         }
 
         m_ThreadWriteLock.release();
-        OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::Close] Close(%d) delete OK.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CProConsoleHandle::Close] Close({0}) delete OK.", GetConnectID());
 
         delete this;
     }
@@ -71,7 +69,7 @@ void CProConsoleHandle::Close(int nIOCount)
 
 bool CProConsoleHandle::ServerClose()
 {
-    OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::ServerClose] Close(%d) delete OK.\n", GetConnectID()));
+    PSS_LOGGER_DEBUG("[CProConsoleHandle::ServerClose] Close({0}) delete OK.", GetConnectID());
 
     m_Reader.cancel();
     m_Writer.cancel();
@@ -123,7 +121,7 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
     if(this->m_Reader.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor()) == -1 ||
        this->m_Writer.open(*this, h, 0, App_ProactorManager::instance()->GetAce_Proactor()) == -1)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::open] m_reader or m_reader == 0.\n"));
+        PSS_LOGGER_DEBUG("[CProConsoleHandle::open] m_reader or m_reader == 0.");
         Close();
         return;
     }
@@ -137,20 +135,20 @@ void CProConsoleHandle::open(ACE_HANDLE h, ACE_Message_Block&)
 
     m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 
-    OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::open] Open(%d).\n", GetConnectID()));
+    PSS_LOGGER_DEBUG("[CProConsoleHandle::open] Open({0}).", GetConnectID());
 
     m_pPacketParse = std::make_shared<CConsolePacketParse>();
 
     if(nullptr == m_pPacketParse)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::open] Open(%d) m_pPacketParse new error.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CProConsoleHandle::open] Open({0}) m_pPacketParse new error.", GetConnectID());
         Close();
         return;
     }
 
     if (false == RecvClinetPacket(CONSOLE_PACKET_MAX_SIZE))
     {
-        OUR_DEBUG((LM_INFO, "[CProConsoleHandle::open]RecvClinetPacket error.\n"));
+        PSS_LOGGER_DEBUG("[CProConsoleHandle::open]RecvClinetPacket error.");
     }
 
     return;
@@ -177,11 +175,10 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
         if(&mb != m_pPacketParse->GetMessageHead() && &mb != m_pPacketParse->GetMessageBody())
         {
-            //OUR_DEBUG((LM_DEBUG,"[CProConsoleHandle::handle_read_stream] Message_block release.\n"));
             App_MessageBlockManager::instance()->Close(&mb);
         }
 
-        OUR_DEBUG((LM_DEBUG,"[CConnectHandler::handle_read_stream]Connectid=[%d] error(%d)...\n", GetConnectID(), errno));
+        PSS_LOGGER_DEBUG("[CConnectHandler::handle_read_stream]Connectid=[{0}] error({1})...", GetConnectID(), errno);
 
         Close(2);
 
@@ -216,7 +213,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
                 App_MessageBlockManager::instance()->Close(&mb);
             }
 
-            OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::handle_input]Read Shoter error(%d).", errno));
+            PSS_LOGGER_DEBUG("[CProConsoleHandle::handle_input]Read Shoter error({0}).", errno);
 
             Close(2);
             return;
@@ -238,7 +235,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
 
             if (false == CheckMessage())
             {
-                OUR_DEBUG((LM_INFO, "[CProConsoleHandle::handle_input]CheckMessage error.\n"));
+                PSS_LOGGER_DEBUG("[CProConsoleHandle::handle_input]CheckMessage error.");
 
                 if (m_pPacketParse->GetMessageHead() != nullptr)
                 {
@@ -275,7 +272,7 @@ void CProConsoleHandle::handle_read_stream(const ACE_Asynch_Read_Stream::Result&
         //接受下一个数据包
         if (false == RecvClinetPacket(CONSOLE_PACKET_MAX_SIZE))
         {
-            OUR_DEBUG((LM_INFO, "[CProConsoleHandle::handle_read_stream]RecvClinetPacket error.\n"));
+            PSS_LOGGER_DEBUG("[CProConsoleHandle::handle_read_stream]RecvClinetPacket error.");
         }
     }
 
@@ -287,7 +284,7 @@ void CProConsoleHandle::handle_write_stream(const ACE_Asynch_Write_Stream::Resul
     if(!result.success() || result.bytes_transferred()==0)
     {
         //链接断开
-        OUR_DEBUG ((LM_DEBUG,"[CConnectHandler::handle_write_stream] Connectid=[%d] write(%d)...\n",GetConnectID(), errno));
+        PSS_LOGGER_DEBUG("[CConnectHandler::handle_write_stream] Connectid=[{0}] write({1})...",GetConnectID(), errno);
         m_atvOutput = CTimeStamp::Get_Time_Stamp();
         App_MessageBlockManager::instance()->Close(&result.message_block());
         Close();
@@ -332,7 +329,7 @@ bool CProConsoleHandle::SendMessage(shared_ptr<IBuffPacket> pBuffPacket, uint8 u
 
     if (false == PutSendPacket(pMbData))
     {
-        OUR_DEBUG((LM_INFO, "[CProConsoleHandle::SendMessage]PutSendPacket error.\n"));
+        PSS_LOGGER_DEBUG("[CProConsoleHandle::SendMessage]PutSendPacket error.");
     }
 
     return true;
@@ -349,7 +346,7 @@ bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
     {
         if(0 != m_Writer.write(*pMbData, pMbData->length()))
         {
-            OUR_DEBUG ((LM_ERROR, "[CConnectHandler::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", GetConnectID(),  pMbData->length(), errno));
+            PSS_LOGGER_DEBUG("[CConnectHandler::PutSendPacket] Connectid={0} mb={1} m_writer.write error({2})!", GetConnectID(),  pMbData->length(), errno);
             App_MessageBlockManager::instance()->Close(pMbData);
             Close();
             return false;
@@ -363,7 +360,7 @@ bool CProConsoleHandle::PutSendPacket(ACE_Message_Block* pMbData)
     }
     else
     {
-        OUR_DEBUG ((LM_ERROR,"[CConnectHandler::PutSendPacket] Connectid=%d mb is nullptr!\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CConnectHandler::PutSendPacket] Connectid=%d mb is nullptr!", GetConnectID());
         Close();
         return false;
     }
@@ -379,7 +376,7 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
 
     if(pmb == nullptr)
     {
-        OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket] pmb new is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CProConsoleHandle::RecvClinetPacket] pmb new is nullptr.");
 
         if(m_pPacketParse->GetMessageHead() != nullptr)
         {
@@ -398,7 +395,7 @@ bool CProConsoleHandle::RecvClinetPacket(uint32 u4PackeLen)
     if(m_Reader.read(*pmb, u4PackeLen) == -1)
     {
         //如果读失败，则关闭连接。
-        OUR_DEBUG((LM_ERROR, "[CProConsoleHandle::RecvClinetPacket] m_reader.read is error(%d)(%d).\n", GetConnectID(), errno));
+        PSS_LOGGER_DEBUG("[CProConsoleHandle::RecvClinetPacket] m_reader.read is error({0})({1}).", GetConnectID(), errno);
 
         App_MessageBlockManager::instance()->Close(pmb);
 
@@ -429,7 +426,7 @@ bool CProConsoleHandle::CheckMessage()
 
     if (true == blRet && false == SendMessage(pBuffPacket, u1Output))
     {
-        OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]SendMessage error.\n"));
+        PSS_LOGGER_DEBUG("[CProConsoleHandle::CheckMessage]SendMessage error.");
     }
 
     return true;

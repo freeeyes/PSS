@@ -10,7 +10,7 @@ void CUnit_MessageService::setUp(void)
 
 void CUnit_MessageService::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_MessageService::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_MessageService::tearDown]Finish.");
 }
 
 void CUnit_MessageService::Test_MessageService(void)
@@ -21,7 +21,7 @@ void CUnit_MessageService::Test_MessageService(void)
 
     if (1 != u4ThreadID)
     {
-        OUR_DEBUG((LM_INFO, "[Test_MessageService]GetThreadID is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_MessageService]GetThreadID is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_MessageService]GetThreadID is fail.", true == blRet);
         return;
     }
@@ -30,21 +30,21 @@ void CUnit_MessageService::Test_MessageService(void)
 
     if (MESSAGE_SERVICE_THREAD_STATE::THREAD_RUN != m_pMessageService->GetThreadState())
     {
-        OUR_DEBUG((LM_INFO, "[Test_MessageService]GetThreadState is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_MessageService]GetThreadState is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_MessageService]GetThreadState is fail.", true == blRet);
         return;
     }
 
     if (0 != m_pMessageService->GetUsedMessageCount())
     {
-        OUR_DEBUG((LM_INFO, "[Test_MessageService]GetUsedMessageCount is fail(%d).\n", m_pMessageService->GetUsedMessageCount()));
+        PSS_LOGGER_DEBUG("[Test_MessageService]GetUsedMessageCount is fail({0}).", m_pMessageService->GetUsedMessageCount());
         CPPUNIT_ASSERT_MESSAGE("[Test_MessageService]GetUsedMessageCount is fail.", true == blRet);
         return;
     }
 
     if (THREADSTATE::THREAD_INIT != m_pMessageService->GetStepState())
     {
-        OUR_DEBUG((LM_INFO, "[Test_MessageService]GetStepState is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_MessageService]GetStepState is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_MessageService]GetStepState is fail.", true == blRet);
         return;
     }

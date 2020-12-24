@@ -9,7 +9,7 @@ void CUnit_FrameCommand::setUp(void)
 
 void CUnit_FrameCommand::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_FrameCommand::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_FrameCommand::tearDown]Finish.");
 }
 
 void CUnit_FrameCommand::Test_Frame_Command(void)

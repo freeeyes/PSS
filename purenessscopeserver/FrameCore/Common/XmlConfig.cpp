@@ -118,14 +118,14 @@ bool XMainConfig::InitFile(const char* pFileName, XmlConfig start, XmlConfig end
 
         if (false == bKet)
         {
-            OUR_DEBUG((LM_INFO, "[XMainConfig::InitFile](%s) Init is false.\n",
-                       _array.at(i)->ClassName().c_str()));
+            PSS_LOGGER_DEBUG("[XMainConfig::InitFile]({0}) Init is false.\n",
+                       _array.at(i)->ClassName());
         }
     }
     else
     {
         bKet = false;
-        OUR_DEBUG((LM_INFO, "[XMainConfig::Init]File Read Error = %s.\n", pFileName));
+        PSS_LOGGER_DEBUG("[XMainConfig::Init]File Read Error = {0}.", pFileName);
     }
 
     return bKet;
@@ -196,7 +196,7 @@ bool xmlNetWorkMode::SetIOMode(const std::string& pData)
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[XMainConfig::SetIOMode]NetworkMode is Invalid!!, please read main.xml desc.\n"));
+        PSS_LOGGER_DEBUG("[XMainConfig::SetIOMode]NetworkMode is Invalid!!, please read main.xml desc.");
         bKet = false;
     }
 

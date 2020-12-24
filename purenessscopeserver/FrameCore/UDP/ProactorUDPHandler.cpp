@@ -37,7 +37,7 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
 {
     if(m_skRemote.open(AddrLocal) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::OpenAddress]Open error(%d).\n", errno));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::OpenAddress]Open error({0}).", errno);
         return -1;
     }
 
@@ -75,20 +75,20 @@ int CProactorUDPHandler::OpenAddress(const ACE_INET_Addr& AddrLocal, ACE_Proacto
 
     if(0 != nStatus)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::OpenAddress]ioctl SIO_UDP_CONNRESET error.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::OpenAddress]ioctl SIO_UDP_CONNRESET error.");
     }
 
 #endif
 
     if(m_Read.open(*this, m_skRemote.get_handle(), m_szCompletionkey, pProactor) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::OpenAddress]m_Read error.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::OpenAddress]m_Read error.");
         return -1;
     }
 
     if(m_Write.open(*this, m_skRemote.get_handle(), m_szCompletionkey, pProactor) == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CProactorUDPHandler::OpenAddress]m_Write error.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::OpenAddress]m_Write error.");
         return -1;
     }
 
@@ -135,12 +135,12 @@ void CProactorUDPHandler::handle_read_dgram(const ACE_Asynch_Read_Dgram::Result&
         //处理数据
         if (false == CheckMessage(u4ConnectID, pMb, (uint32)nTran, addrRemote))
         {
-            OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::handle_read_dgram]CheckMessage error.\n"));
+            PSS_LOGGER_DEBUG("[CProactorUDPHandler::handle_read_dgram]CheckMessage error.");
         }
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::handle_read_dgram]result.bytes_transferred() is 0.\n"));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::handle_read_dgram]result.bytes_transferred() is 0.");
     }
 
     //重置，接收下一个数据包
@@ -155,7 +155,7 @@ bool CProactorUDPHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo
     if (objClientIPInfo.m_u2Port == 0)
     {
         //没有找到要发送的端口，不在发送
-        OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::SendMessage]no find ConnectID=%d.\n", objSendMessageInfo.u4ConnectID));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::SendMessage]no find ConnectID={0}.", objSendMessageInfo.u4ConnectID);
         return false;
     }
 
@@ -191,7 +191,7 @@ bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* p
 	if (objClientIPInfo.m_u2Port == 0)
 	{
 		//没有找到要发送的端口，不在发送
-		OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::PutSendPacket]no find ConnectID=%d.\n", u4ConnectID));
+        PSS_LOGGER_DEBUG("[CProactorUDPHandler::PutSendPacket]no find ConnectID={0}.", u4ConnectID);
 		return false;
 	}
 
@@ -200,7 +200,7 @@ bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* p
 
 	if (nErr != 0)
 	{
-		OUR_DEBUG((LM_INFO, "[PutSendPacket]set_address error[%d].\n", errno));
+        PSS_LOGGER_DEBUG("[PutSendPacket]set_address error[{0}].", errno);
 		return false;
 	}
 
@@ -230,7 +230,7 @@ void CProactorUDPHandler::SetIsLog(bool blIsLog)
 
 bool CProactorUDPHandler::Device_Send_Data(const char* pData, ssize_t nLen)
 {
-    OUR_DEBUG((LM_INFO, "[CProactorUDPHandler::Device_Send_Data]0x%08x, size=%d", pData, nLen));
+    PSS_LOGGER_DEBUG("[CProactorUDPHandler::Device_Send_Data]{0}, size={1}.", fmt::ptr(pData), nLen);
     return true;
 }
 

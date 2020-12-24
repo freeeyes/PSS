@@ -128,7 +128,7 @@ bool CDeviceHandlerPool::Delete(CWorkThread_Handler_info* pHandler)
 
 	if (false == blState)
 	{
-		OUR_DEBUG((LM_INFO, "[CDeviceHandlerPool::Delete]HashID=%d(0x%08x).\n", pHandler->GetHashID(), pHandler));
+        PSS_LOGGER_DEBUG("[CDeviceHandlerPool::Delete]HashID={0}({1}).", pHandler->GetHashID(), fmt::ptr(pHandler));
 	}
 
 	return true;

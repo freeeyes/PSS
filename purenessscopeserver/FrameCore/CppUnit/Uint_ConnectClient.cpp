@@ -9,7 +9,7 @@ void CUnit_ConnectClient::setUp(void)
 
 void CUnit_ConnectClient::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_ConnectClient::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ConnectClient::tearDown]Finish.");
 }
 
 void CUnit_ConnectClient::Test_handle_input(void)
@@ -21,7 +21,7 @@ void CUnit_ConnectClient::Test_handle_input(void)
 
     if (-1 != nRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_handle_input]handle_input is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_handle_input]handle_input is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_handle_input]handle_input is fail.", true == blRet);
         return;
     }
@@ -30,7 +30,7 @@ void CUnit_ConnectClient::Test_handle_input(void)
 
     if (-1 != nRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_handle_input]handle_input m_pCurrMessage is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_handle_input]handle_input m_pCurrMessage is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_handle_input]handle_input m_pCurrMessage is fail.", true == blRet);
     }
 }

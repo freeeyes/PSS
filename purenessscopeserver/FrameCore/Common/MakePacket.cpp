@@ -34,7 +34,7 @@ bool CMakePacket::PutMessageBlock(_MakePacket const& objMakePacket, const PSS_Ti
             objMakePacket.m_pPacketParse->Clear();
         }
 
-        OUR_DEBUG((LM_ERROR,"[CMakePacket::PutMessageBlock] pMessage is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CMakePacket::PutMessageBlock] pMessage is nullptr.");
         return false;
     }
 
@@ -132,7 +132,7 @@ void CMakePacket::SetMessage(_MakePacket const& objMakePacket, shared_ptr<CWorkT
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CMakePacket::SetMessage] ConnectID = %d, pMessage->GetMessageBase() is nullptr.\n", objMakePacket.m_u4ConnectID));
+        PSS_LOGGER_DEBUG("[CMakePacket::SetMessage] ConnectID = {0}, pMessage->GetMessageBase() is nullptr.", objMakePacket.m_u4ConnectID);
     }
 }
 
@@ -152,7 +152,7 @@ bool CMakePacket::PutSendErrorMessage(uint32 u4ConnectID, ACE_Message_Block* pBo
 
     if(nullptr == pMessage)
     {
-        OUR_DEBUG((LM_ERROR, "[CMakePacket::PutSendErrorMessage] pMessage is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CMakePacket::PutSendErrorMessage] pMessage is nullptr.");
         App_MessageBlockManager::instance()->Close(pBodyMessage);
         return false;
     }

@@ -9,7 +9,7 @@ void CUnit_ThreadInfo::setUp(void)
 
 void CUnit_ThreadInfo::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_ThreadInfo::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_ThreadInfo::tearDown]Finish.");
 }
 
 void CUnit_ThreadInfo::Test_ThreadInfo(void)
@@ -19,7 +19,7 @@ void CUnit_ThreadInfo::Test_ThreadInfo(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ThreadInfo]m_pThreadInfo->Close() is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_ThreadInfo]m_pThreadInfo->Close() is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ThreadInfo]m_pThreadInfo->Close() is fail.", true == blRet);
         return;
     }

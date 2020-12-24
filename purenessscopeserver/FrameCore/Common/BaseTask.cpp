@@ -12,7 +12,7 @@ int Task_Common_CloseMsgQueue(ACE_Task<ACE_MT_SYNCH>* pTask, ACE_Condition<ACE_T
     // If queue is full, flush it before block in while
     if (pTask->msg_queue()->is_full() && pTask->msg_queue()->flush() == -1)
     {
-        OUR_DEBUG((LM_ERROR, "[CLogManager::CloseMsgQueue]put error flushing queue\n"));
+        PSS_LOGGER_DEBUG("[CLogManager::CloseMsgQueue]put error flushing queue.");
     }
 
     mutex.acquire();
@@ -21,7 +21,7 @@ int Task_Common_CloseMsgQueue(ACE_Task<ACE_MT_SYNCH>* pTask, ACE_Condition<ACE_T
     {
         if (pTask->msg_queue()->state() != ACE_Message_Queue_Base::PULSED)
         {
-            OUR_DEBUG((LM_ERROR, ACE_TEXT("[CLogManager::CloseMsgQueue]put Queue not activated.\n")));
+            PSS_LOGGER_DEBUG("[CLogManager::CloseMsgQueue]put Queue not activated.");
             break;
         }
     }

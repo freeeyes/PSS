@@ -9,7 +9,7 @@ void CUnit_MakePacket::setUp(void)
 
 void CUnit_MakePacket::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_MakePacket::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_MakePacket::tearDown]Finish.");
 }
 
 void CUnit_MakePacket::Test_MakePacket(void)
@@ -22,7 +22,7 @@ void CUnit_MakePacket::Test_MakePacket(void)
 
     if (false == m_pMakePacket->PutSendErrorMessage(u4ConnectID, pmb, tvNow))
     {
-        OUR_DEBUG((LM_INFO, "[Test_ControlListen]m_pMakePacket->PutSendErrorMessage() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_ControlListen]m_pMakePacket->PutSendErrorMessage() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ControlListen]m_pMakePacket->PutSendErrorMessage() Error.", true == blRet);
     }
 

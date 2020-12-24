@@ -2,11 +2,11 @@
 
 bool CForbiddenIP::Init(const char* szConfigPath)
 {
-    OUR_DEBUG((LM_INFO, "[CForbiddenIP::Init]Filename = %s.\n", szConfigPath));
+    PSS_LOGGER_DEBUG("[CForbiddenIP::Init]Filename = {0}.\n", szConfigPath);
 
     if(!m_ForbiddenData.Init(szConfigPath))
     {
-        OUR_DEBUG((LM_INFO, "[CForbiddenIP::Init]Read Filename = %s error.\n", szConfigPath));
+        PSS_LOGGER_DEBUG("[CForbiddenIP::Init]Read Filename = {0} error.", szConfigPath);
         return false;
     }
 
@@ -87,7 +87,7 @@ bool CForbiddenIP::AddForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectTyp
 
     if (false == SaveConfig())
     {
-        OUR_DEBUG((LM_INFO, "[CForbiddenIP::AddForeverIP]SaveConfig is error.\n"));
+        PSS_LOGGER_DEBUG("[CForbiddenIP::AddForeverIP]SaveConfig is error.");
     }
 
     return true;
@@ -115,7 +115,7 @@ bool CForbiddenIP::DelForeverIP(const char* pIP, EM_CONNECT_IO_TYPE u1ConnectTyp
 
             if (false == SaveConfig())
             {
-                OUR_DEBUG((LM_INFO, "[CForbiddenIP::DelForeverIP]SaveConfig is error.\n"));
+                PSS_LOGGER_DEBUG("[CForbiddenIP::DelForeverIP]SaveConfig is error.");
             }
 
             return true;
@@ -147,7 +147,7 @@ bool CForbiddenIP::SaveConfig() const
 
     if(nullptr == pFile)
     {
-        OUR_DEBUG((LM_ERROR, "[CForbiddenIP::SaveConfig]Open file fail.\n"));
+        PSS_LOGGER_DEBUG("[CForbiddenIP::SaveConfig]Open file fail.");
         return false;
     }
 
@@ -157,7 +157,7 @@ bool CForbiddenIP::SaveConfig() const
 
     if(stSize != strTemp.length())
     {
-        OUR_DEBUG((LM_ERROR, "[CForbiddenIP::SaveConfig]Write file fail.\n"));
+        PSS_LOGGER_DEBUG("[CForbiddenIP::SaveConfig]Write file fail.");
         ACE_OS::fclose(pFile);
         return false;
     }
@@ -184,7 +184,7 @@ bool CForbiddenIP::SaveConfig() const
 
         if(stSize != strTemp.length())
         {
-            OUR_DEBUG((LM_ERROR, "[CForbiddenIP::SaveConfig]Write file fail.\n"));
+            PSS_LOGGER_DEBUG("[CForbiddenIP::SaveConfig]Write file fail.");
             ACE_OS::fclose(pFile);
             return false;
         }
@@ -196,7 +196,7 @@ bool CForbiddenIP::SaveConfig() const
 
     if(stSize != strTemp.length())
     {
-        OUR_DEBUG((LM_ERROR, "[CForbiddenIP::SaveConfig]Write file fail.\n"));
+        PSS_LOGGER_DEBUG("[CForbiddenIP::SaveConfig]Write file fail.");
         ACE_OS::fclose(pFile);
         return false;
     }

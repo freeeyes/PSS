@@ -11,7 +11,7 @@ void CUnit_IPAccount::setUp(void)
 
 void CUnit_IPAccount::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_IPAccount::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_IPAccount::tearDown]Finish.");
 }
 
 void CUnit_IPAccount::Test_IPAccount_Add(void)

@@ -10,7 +10,7 @@ void CUnit_WorkThreadAI::setUp(void)
 
 void CUnit_WorkThreadAI::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_WorkThreadAI::tearDown]Finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_WorkThreadAI::tearDown]Finish.");
 }
 
 void CUnit_WorkThreadAI::Test_WorkThreadAI(void)
@@ -23,7 +23,7 @@ void CUnit_WorkThreadAI::Test_WorkThreadAI(void)
     //故意插入一条超时的指令
     if (false == m_pWorkThreadAI->SaveTimeout(u2Command, 10))
     {
-        OUR_DEBUG((LM_INFO, "[Test_WorkThreadAI]m_pWorkThreadAI->SaveTimeout() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_WorkThreadAI]m_pWorkThreadAI->SaveTimeout() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_WorkThreadAI]m_pWorkThreadAI->SaveTimeout() Error.", true == blRet);
         return;
     }
@@ -32,14 +32,14 @@ void CUnit_WorkThreadAI::Test_WorkThreadAI(void)
 
     if (true != m_pWorkThreadAI->CheckCurrTimeout(u2Command, u8Now))
     {
-        OUR_DEBUG((LM_INFO, "[Test_WorkThreadAI]m_pWorkThreadAI->CheckCurrTimeout() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_WorkThreadAI]m_pWorkThreadAI->CheckCurrTimeout() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_WorkThreadAI]m_pWorkThreadAI->CheckCurrTimeout() Error.", true == blRet);
         return;
     }
 
     if (5 != m_pWorkThreadAI->GetReturnDataLength())
     {
-        OUR_DEBUG((LM_INFO, "[Test_WorkThreadAI]m_pWorkThreadAI->GetReturnDataLength() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_WorkThreadAI]m_pWorkThreadAI->GetReturnDataLength() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_WorkThreadAI]m_pWorkThreadAI->GetReturnDataLength() Error.", true == blRet);
         return;
     }
@@ -51,7 +51,7 @@ void CUnit_WorkThreadAI::Test_WorkThreadAI(void)
 
     if (1 != objTimeout.size())
     {
-        OUR_DEBUG((LM_INFO, "[Test_WorkThreadAI]m_pWorkThreadAI->GetAllTimeout() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_WorkThreadAI]m_pWorkThreadAI->GetAllTimeout() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_WorkThreadAI]m_pWorkThreadAI->GetAllTimeout() Error.", true == blRet);
         return;
     }
@@ -61,7 +61,7 @@ void CUnit_WorkThreadAI::Test_WorkThreadAI(void)
 
     if (1 != objForbiden.size())
     {
-        OUR_DEBUG((LM_INFO, "[Test_WorkThreadAI]m_pWorkThreadAI->GetAllForbiden() Error.\n"));
+        PSS_LOGGER_DEBUG("[Test_WorkThreadAI]m_pWorkThreadAI->GetAllForbiden() Error.");
         CPPUNIT_ASSERT_MESSAGE("[Test_WorkThreadAI]m_pWorkThreadAI->GetAllForbiden() Error.", true == blRet);
     }
 }

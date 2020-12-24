@@ -95,7 +95,7 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
 
         default:
             {
-                OUR_DEBUG((LM_INFO, "[CAceReactor::Init]Unknow nReactorType(%d).\n", nProactorType));
+            PSS_LOGGER_DEBUG("[CAceReactor::Init]Unknow nReactorType({0}).", nProactorType);
                 return false;
             }
         }
@@ -112,18 +112,18 @@ bool CAceProactor::Init(int nProactorType, int nThreadCount)
 
 int CAceProactor::open(void* args)
 {
-    OUR_DEBUG((LM_ERROR, "CAceProactor::Open Begin nProactorID= [%d].\n", m_u4ProactorID));
+    PSS_LOGGER_DEBUG("CAceProactor::Open Begin nProactorID= [{0}].", m_u4ProactorID);
 
     if(activate(THREAD_PARAM, MAX_MSG_THREADCOUNT)  == -1)
     {
         m_blRun = false;
-        OUR_DEBUG((LM_ERROR, "[CAceProactor::Open]activate error ProactorType = [%d] nThreadCount = [%d] Start!\n", m_nProactorType, m_nThreadCount));
+        PSS_LOGGER_DEBUG("[CAceProactor::Open]activate error ProactorType = [{0}] nThreadCount = [{1}] Start!", m_nProactorType, m_nThreadCount);
         return -1;
     }
     else
     {
         m_blRun = true;
-        OUR_DEBUG((LM_ERROR, "CAceProactor::Open Begin nProactorID= [%d] OK\n", m_u4ProactorID));
+        PSS_LOGGER_DEBUG("CAceProactor::Open Begin nProactorID= [{0}] OK.", m_u4ProactorID);
         return 0;
     }
 }
@@ -132,21 +132,21 @@ int CAceProactor::svc()
 {
     if(nullptr == m_pProactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceProactor::Svc]m_pProactor is nullptr.\n", m_nProactorType, m_nThreadCount));
+        PSS_LOGGER_DEBUG("[CAceProactor::Svc]m_pProactor({0})({1}) is nullptr.", m_nProactorType, m_nThreadCount);
         return -1;
     }
     else
     {
         m_blRun = true;
         m_pProactor->proactor_run_event_loop();
-        OUR_DEBUG((LM_ERROR, "[CAceProactor::Svc] (%P|%t) Begin nProactorID= [%d] end .... \n", m_u4ProactorID));
+        PSS_LOGGER_DEBUG("[CAceProactor::Svc] Begin nProactorID= [{0}] end ....", m_u4ProactorID);
         return 0;
     }
 }
 
 bool CAceProactor::Start()
 {
-    OUR_DEBUG((LM_INFO, "[CAceProactor::Start] ProactorID = [%d] ProactorType = [%d] nThreadCount = [%d] Start!\n", GetProactorID(), m_nProactorType, m_nThreadCount));
+    PSS_LOGGER_DEBUG("[CAceProactor::Start] ProactorID = [{0}] ProactorType = [{1}] nThreadCount = [{2}] Start!", GetProactorID(), m_nProactorType, m_nThreadCount);
 
     if(0 == open())
     {
@@ -162,7 +162,7 @@ bool CAceProactor::Stop()
 {
     if(nullptr == m_pProactor)
     {
-        OUR_DEBUG((LM_ERROR, "[CAceProactor::Stop]m_pProactor is nullptr.\n", m_nProactorType, m_nThreadCount));
+        PSS_LOGGER_DEBUG("[CAceProactor::Stop]m_pProactor is nullptr.");
         return false;
     }
 
@@ -276,7 +276,7 @@ bool CAceProactorManager::AddNewProactor(int nProactorID, int nProactorType, int
     }
 
     m_pAceProactorList[nProactorID] = pAceProactor;
-    OUR_DEBUG((LM_INFO, "[CAceProactorManager::AddNewProactor]New [%d] ProactorType = [%d] nThreadCount = [%d]. pAceProactor=[%@]\n", nProactorID, nProactorType, nThreadCount,pAceProactor));
+    PSS_LOGGER_DEBUG("[CAceProactorManager::AddNewProactor]New [{0}] ProactorType = [{1}] nThreadCount = [{2}]. pAceProactor=[{3}]", nProactorID, nProactorType, nThreadCount, fmt::ptr(pAceProactor));
     return true;
 }
 
@@ -307,11 +307,11 @@ bool CAceProactorManager::StopProactor()
 
         if(nullptr != pAceProactor)
         {
-            OUR_DEBUG((LM_ERROR, "[CAceProactorManager::StopProactor]ProactorID=%d.\n", pAceProactor->GetProactorID()));
+            PSS_LOGGER_DEBUG("[CAceProactorManager::StopProactor]ProactorID={0}.", pAceProactor->GetProactorID());
 
             if (false == pAceProactor->Stop())
             {
-                OUR_DEBUG((LM_ERROR, "[CAceProactorManager::StopProactor]ProactorID=%d stop error.\n", pAceProactor->GetProactorID()));
+                PSS_LOGGER_DEBUG("[CAceProactorManager::StopProactor]ProactorID={0} stop error.", pAceProactor->GetProactorID());
             }
         }
     }

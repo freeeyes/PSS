@@ -54,7 +54,7 @@ private:
             if (m_pMemoryList == nullptr)
             {
                 //³ÌÐò´íÎóÍË³öÃ¶¾Ù
-                OUR_DEBUG((LM_INFO, "[CreateMemory::CreateMemory]Create List(%d) error.\n", u4Count));
+                PSS_LOGGER_DEBUG("[CreateMemory::CreateMemory]Create List({0}) error.", u4Count);
             }
         }
 

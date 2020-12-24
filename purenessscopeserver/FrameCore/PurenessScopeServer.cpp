@@ -79,7 +79,7 @@ int CheckCoreLimit(int nMaxCoreFile)
 
 		if (setrlimit(RLIMIT_CORE, &rCorelimit) != 0)
 		{
-			PSS_LOGGER_DEBUG("[CheckCoreLimit]failed to setrlimit core size(error={0}).\n", strerror(errno));
+			PSS_LOGGER_DEBUG("[CheckCoreLimit]failed to setrlimit core size(error={0}).", strerror(errno));
 			return -1;
 		}
 	}
@@ -222,13 +222,6 @@ int Chlid_Run(std::thread& th_monitor)
 	//回收隐式加载PacketParse
 	App_PacketParseLoader::instance()->Close();
 
-	//如果日志流不等于空，则回收
-	if (nullptr != pLogoStream)
-	{
-		pLogoStream->close();
-		SAFE_DELETE(pLogoStream);
-	}
-
 	th_monitor.join();
 
 	return 0;
@@ -238,7 +231,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 {
 	if (argc > 0)
 	{
-		PSS_LOGGER_DEBUG("[main]argc = {0}.\n", argc);
+		PSS_LOGGER_DEBUG("[main]argc = {0}.", argc);
 
 		for (int i = 0; i < argc; i++)
 		{

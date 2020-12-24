@@ -6,7 +6,7 @@ FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestNa
 
     if(m_bFileTesting)
     {
-        OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]m_bFileTesting:%d.\n",m_bFileTesting));
+        PSS_LOGGER_DEBUG("[CProConnectAcceptManager::FileTestStart]m_bFileTesting:{0}.",m_bFileTesting);
         objFileTestResult.n4Result = FILE_TEST_RESULT::RESULT_ERR_TESTING;
         return objFileTestResult;
     }
@@ -14,7 +14,7 @@ FileTestResultInfoSt CFileTestManager::FileTestStart(const char* szXmlFileTestNa
     {
         if(!LoadXmlCfg(szXmlFileTestName, objFileTestResult))
         {
-            OUR_DEBUG((LM_DEBUG, "[CProConnectAcceptManager::FileTestStart]Loading config file error filename:%s.\n", szXmlFileTestName));
+            PSS_LOGGER_DEBUG("[CProConnectAcceptManager::FileTestStart]Loading config file error filename:{0}.", szXmlFileTestName);
         }
     }
 
@@ -34,7 +34,7 @@ void CFileTestManager::HandlerServerResponse(uint32 u4ConnectID)
 
     if (m_objResponseRecordList.end() == f)
     {
-        OUR_DEBUG((LM_INFO, "[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTimeNo find connectID=%d.\n", u4ConnectID));
+        PSS_LOGGER_DEBUG("[CFileTestManager::HandlerServerResponse]Response time too long m_u4ExpectTimeNo find connectID={0}.\n", u4ConnectID);
         return;
     }
 
@@ -61,11 +61,11 @@ void CFileTestManager::Close()
 
 bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultInfoSt& objFileTestResult)
 {
-    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]Filename = %s.\n", szXmlFileTestName));
+    PSS_LOGGER_DEBUG("[CProConnectAcceptManager::LoadXmlCfg]Filename = {0}.", szXmlFileTestName);
 
     if(false == m_MainConfig.Init(szXmlFileTestName))
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]File Read Error = %s.\n", szXmlFileTestName));
+        PSS_LOGGER_DEBUG("[CMainConfig::LoadXmlCfg]File Read Error = %{0}.", szXmlFileTestName);
         objFileTestResult.n4Result = FILE_TEST_RESULT::RESULT_ERR_CFGFILE;
         return false;
     }
@@ -77,22 +77,22 @@ bool CFileTestManager::LoadXmlCfg(const char* szXmlFileTestName, FileTestResultI
     //获得定时执行时间间隔
     m_u4TimeInterval = 10;
     m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "TimeInterval", m_u4TimeInterval);
-    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4TimeInterval = %d.\n", m_u4TimeInterval));
+    PSS_LOGGER_DEBUG("[CProConnectAcceptManager::LoadXmlCfg]m_u4TimeInterval = {0}.", m_u4TimeInterval);
     objFileTestResult.n4TimeInterval = (int32)m_u4TimeInterval;
 
     //获得连接总数
     m_u4ConnectCount = 10;
     m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ConnectCount", m_u4ConnectCount);
-    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4ConnectCount = %d.\n", m_u4ConnectCount));
+    PSS_LOGGER_DEBUG("[CProConnectAcceptManager::LoadXmlCfg]m_u4ConnectCount = {0}.", m_u4ConnectCount);
     objFileTestResult.n4ConnectNum = (int32)m_u4ConnectCount;
 
     m_u4ResponseCount = 1;
     m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ResponseCount", m_u4ResponseCount);
-    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4ResponseCount = %d.\n", m_u4ResponseCount));
+    PSS_LOGGER_DEBUG("[CProConnectAcceptManager::LoadXmlCfg]m_u4ResponseCount = {0}.", m_u4ResponseCount);
 
     m_u4ExpectTime = 1000;
     m_MainConfig.Read_XML_Data_Single_Uint32("FileTestConfig", "ExpectTime", m_u4ExpectTime);
-    OUR_DEBUG((LM_INFO, "[CProConnectAcceptManager::LoadXmlCfg]m_u4ExpectTime = %d.\n", m_u4ExpectTime));
+    PSS_LOGGER_DEBUG("[CProConnectAcceptManager::LoadXmlCfg]m_u4ExpectTime = {0}.", m_u4ExpectTime);
 
     //默认解析器类型
     m_u4ParseID = 1;
@@ -157,7 +157,7 @@ FILE_TEST_RESULT CFileTestManager::ReadTestFile(const char* pFileName, int nType
 
     if (fConnector.connect(ioFile, fAddr) == -1)
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::ReadTestFile]Open filename:%s Error.\n", pFileName));
+        PSS_LOGGER_DEBUG("[CMainConfig::ReadTestFile]Open filename:{0} Error.", pFileName);
         return FILE_TEST_RESULT::RESULT_ERR_PROFILE;
     }
 
@@ -165,14 +165,14 @@ FILE_TEST_RESULT CFileTestManager::ReadTestFile(const char* pFileName, int nType
 
     if (ioFile.get_info(fInfo) == -1)
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::ReadTestFile]Get file info filename:%s Error.\n", pFileName));
+        PSS_LOGGER_DEBUG("[CMainConfig::ReadTestFile]Get file info filename:{0} Error.", pFileName);
         ioFile.close();
         return FILE_TEST_RESULT::RESULT_ERR_PROFILE;
     }
 
     if (MAX_BUFF_10240 - 1 < fInfo.size_)
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Protocol file too larger filename:%s.\n", pFileName));
+        PSS_LOGGER_DEBUG("[CMainConfig::LoadXmlCfg]Protocol file too larger filename:{0}.", pFileName);
         ioFile.close();
         return FILE_TEST_RESULT::RESULT_ERR_PROFILE;
     }
@@ -183,7 +183,7 @@ FILE_TEST_RESULT CFileTestManager::ReadTestFile(const char* pFileName, int nType
 
         if (u4Size != fInfo.size_)
         {
-            OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]Read protocol file error filename:%s Error.\n", pFileName));
+            PSS_LOGGER_DEBUG("[CMainConfig::LoadXmlCfg]Read protocol file error filename:{0} Error.", pFileName);
             ioFile.close();
             return FILE_TEST_RESULT::RESULT_ERR_PROFILE;
         }
@@ -195,8 +195,8 @@ FILE_TEST_RESULT CFileTestManager::ReadTestFile(const char* pFileName, int nType
                 memcpy_safe(szFileContent, static_cast<uint32>(u4Size), objFileTestDataInfo.m_szData, static_cast<uint32>(u4Size));
                 objFileTestDataInfo.m_szData[u4Size] = '\0';
                 objFileTestDataInfo.m_u4DataLength = static_cast<uint32>(u4Size);
-                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]u4Size:%d\n", u4Size));
-                OUR_DEBUG((LM_INFO, "[CMainConfig::LoadXmlCfg]m_szData:%s\n", objFileTestDataInfo.m_szData));
+                PSS_LOGGER_DEBUG("[CMainConfig::LoadXmlCfg]u4Size:{0}.", u4Size);
+                PSS_LOGGER_DEBUG("[CMainConfig::LoadXmlCfg]m_szData:{0}.", objFileTestDataInfo.m_szData);
             }
             else
             {
@@ -238,7 +238,7 @@ bool CFileTestManager::AddResponseRecordList(uint32 u4ConnectID, const ACE_Time_
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CMainConfig::AddResponseRecordList]AddResponseRecordList error\n"));
+        PSS_LOGGER_DEBUG("[CMainConfig::AddResponseRecordList]AddResponseRecordList error.");
         return false;
     }
 }

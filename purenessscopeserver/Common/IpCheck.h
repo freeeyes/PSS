@@ -62,13 +62,11 @@ static EM_CHECK_IP_TYPE Check_IP_V6(vector<string> vecIpSection)
 
         if (nDataLength != (int)vecIpSection[i].length())
         {
-            printf("[Check_IP_V6]error Section[%s].\n", vecIpSection[i].c_str());
             return IP_UNKNOW;
         }
 
         if (nSection < 0x0000 || nSection > 0xffff)
         {
-            printf("[Check_IP_V6]error Section IP_UNKNOW[%s].\n", vecIpSection[i].c_str());
             return IP_UNKNOW;
         }
     }
@@ -93,13 +91,11 @@ static EM_CHECK_IP_TYPE Check_IP_V4(vector<string> vecIpSection)
 
         if (nDataLength != (int)vecIpSection[i].length())
         {
-            printf("[Check_IP_V4]error Section[%s].\n", vecIpSection[i].c_str());
             return IP_UNKNOW;
         }
 
         if (nSection < 0 || nSection > 255)
         {
-            printf("[Check_IP_V4]error Section IP_UNKNOW[%s].\n", vecIpSection[i].c_str());
             return IP_UNKNOW;
         }
     }
@@ -143,10 +139,8 @@ inline EM_CHECK_IP_TYPE Check_IP(string strIP)
     }
     else
     {
-        //printf("[Check_IP]IPv6 vecIpSection(%d).\n", vecIpSection.size());
         for (int i = 0; i < (int)vecIpSection.size(); i++)
         {
-            //printf("[Check_IP]IPv6(%s).\n", vecIpSection[i].c_str());
             if (vecIpSection[i].length() == 0)
             {
                 continue;
@@ -203,9 +197,9 @@ inline bool Check_IPType(const std::string& ip, uint8& ipType)
 
     if (IP_UNKNOW == emIpType)
     {
-        OUR_DEBUG((LM_INFO, "[XmlConfig::SetIPType](%s) IP is %s.\n",
-                   ip.c_str(),
-                   Get_Type_Name(emIpType).c_str()));
+        PSS_LOGGER_DEBUG("[XmlConfig::SetIPType]({0}) IP is {1}.",
+                   ip,
+                   Get_Type_Name(emIpType));
         bKet = false;
     }
     else if (IP_V6 == emIpType)

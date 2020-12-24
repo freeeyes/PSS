@@ -21,7 +21,7 @@ int CLogManager::open()
 
 int CLogManager::svc(void)
 {
-    OUR_DEBUG((LM_INFO,"[CLogManager::svc] svc run.\n"));
+    PSS_LOGGER_DEBUG("[CLogManager::svc] svc run.");
 
     while(m_blRun)
     {
@@ -35,7 +35,7 @@ int CLogManager::svc(void)
     //回收日志对象
     m_pServerLogger->Close();
 
-    OUR_DEBUG((LM_ERROR, "[CLogManager::svc]Close OK.\n"));
+    PSS_LOGGER_DEBUG("[CLogManager::svc]Close OK.");
     return 0;
 }
 
@@ -101,7 +101,7 @@ int CLogManager::PutLog(shared_ptr<_LogBlockInfo> pLogBlockInfo)
 
     if (m_objThreadQueue.Size() >= m_nQueueMax)
     {
-        OUR_DEBUG((LM_INFO,"[CLogManager::PutLog] CLogManager queue is full!\n"));
+        PSS_LOGGER_DEBUG("[CLogManager::PutLog] CLogManager queue is full!");
         return -1;
     }
 
@@ -136,7 +136,7 @@ bool CLogManager::Dispose_Queue(shared_ptr<_LogBlockInfo> msg) const
 
     if (0 != ProcessLog(msg))
     {
-        OUR_DEBUG((LM_ERROR, "[CLogManager::svc] ProcessLog is false.\n"));
+        PSS_LOGGER_DEBUG("[CLogManager::svc] ProcessLog is false.");
     }
 
     return true;

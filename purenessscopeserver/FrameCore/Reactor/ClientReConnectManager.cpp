@@ -15,7 +15,7 @@ bool CReactorClientInfo::Init(int nServerID, const char* pIP, uint16 u2Port, uin
 
     if (-1 == nRet)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Init]adrClient(%s:%d) error.\n", pIP, u2Port));
+        PSS_LOGGER_DEBUG("[CReactorClientInfo::Init]adrClient({0}:{1}) error.", pIP, u2Port);
         return false;
     }
 
@@ -31,13 +31,13 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 {
     if (nullptr != m_pConnectClient)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run]Connect is exist.\n"));
+        PSS_LOGGER_DEBUG("[CReactorClientInfo::Run]Connect is exist.");
         return false;
     }
 
     if (nullptr == m_pReactorConnect)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run]m_pAsynchConnect is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CReactorClientInfo::Run]m_pAsynchConnect is nullptr.");
         return false;
     }
 
@@ -45,7 +45,7 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
 
     if (nullptr == m_pConnectClient)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run]pConnectClient new is nullptr(%d).\n", emState));
+        PSS_LOGGER_DEBUG("[CReactorClientInfo::Run]pConnectClient new is nullptr({0}).", emState);
         return false;
     }
 
@@ -78,7 +78,7 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
             if (m_pReactorConnect->connect(m_pConnectClient, m_AddrServer, ACE_Synch_Options::defaults, m_AddrLocal) == -1)
             {
                 m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_FAIL;
-                OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run](%s:%d) connection fails(ServerID=%d) error(%d).\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID, ACE_OS::last_error()));
+                PSS_LOGGER_DEBUG("[CReactorClientInfo::Run]({0}:{1}) connection fails(ServerID={2}) error({3}).", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID, ACE_OS::last_error());
                 //这里设置为True，为了让自动重试起作用
                 return true;
             }
@@ -89,13 +89,13 @@ bool CReactorClientInfo::Run(bool blIsReady, EM_Server_Connect_State emState)
             if (m_pReactorConnect->connect(m_pConnectClient, m_AddrServer) == -1)
             {
                 m_emConnectState = EM_Server_Connect_State::SERVER_CONNECT_FAIL;
-                OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run](%s:%d) connection fails(ServerID=%d) error(%d).\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID, ACE_OS::last_error()));
+                PSS_LOGGER_DEBUG("[CReactorClientInfo::Run]({0}:{1}) connection fails(ServerID={2}) error({3}).", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID, ACE_OS::last_error());
                 //这里设置为True，为了让自动重试起作用
                 return true;
             }
             else
             {
-                OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::Run](%s:%d) connection ok(ServerID=%d) OK.\n", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID));
+                PSS_LOGGER_DEBUG("[CReactorClientInfo::Run]({0}:{1}) connection ok(ServerID={2}) OK.", m_AddrServer.get_host_addr(), m_AddrServer.get_port_number(), m_nServerID);
             }
         }
 
@@ -127,7 +127,7 @@ bool CReactorClientInfo::SendData(ACE_Message_Block* pmblk)
                 && EM_Server_Connect_State::SERVER_CONNECT_RECONNECT != m_emConnectState
                 && false == Run(true, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
             {
-                OUR_DEBUG((LM_INFO, "[CReactorClientInfo::SendData]Run error.\n"));
+                PSS_LOGGER_DEBUG("[CReactorClientInfo::SendData]Run error.");
             }
 
             return false;
@@ -226,7 +226,7 @@ void CReactorClientInfo::SetLocalAddr( const char* pIP, uint16 u2Port, uint8 u1I
 
     if (-1 == nRet)
     {
-        OUR_DEBUG((LM_ERROR, "[CReactorClientInfo::SetLocalAddr]AddrLocal(%s:%d) error.\n", pIP, u2Port));
+        PSS_LOGGER_DEBUG("[CReactorClientInfo::SetLocalAddr]AddrLocal({0}:{1}) error.", pIP, u2Port);
         return;
     }
 
@@ -237,7 +237,7 @@ bool CClientReConnectManager::Init(ACE_Reactor* pReactor)
 {
     if (-1 == m_ReactorConnect.open(pReactor))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Init]open error(%d).", ACE_OS::last_error()));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Init]open error({0}).", ACE_OS::last_error());
         return false;
     }
 
@@ -316,11 +316,11 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
 
     if (false == pClientInfo->Init(nServerID, pIP, u2Port, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor, u4PacketParseID))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]pClientInfo Init Error.");
 
         if (false == Close(nServerID))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectTcpInit]Close error.\n"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectTcpInit]Close error.");
         }
 
         return false;
@@ -332,18 +332,18 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
     //开始链接
     if (false == pClientInfo->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_FIRST))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]Run Error.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]Run Error.");
         pClientInfo = nullptr;
 
         if (false == Close(nServerID))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::Connect]Close Error"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]Close Error.");
         }
 
         return false;
     }
 
-    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]nServerID =({0}) connect is OK.", nServerID);
     return true;
 }
 
@@ -380,11 +380,11 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
 
     if (false == pClientInfo->Init(nServerID, pIP, u2Port, u1IPType, &m_ReactorConnect, pClientMessage, m_pReactor, u4PacketParseID))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]pClientInfo Init Error.");
 
         if (false == Close(nServerID))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectTcpInit]Close error.\n"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectTcpInit]Close error.");
         }
 
         return false;
@@ -399,17 +399,17 @@ bool CClientReConnectManager::Connect(int nServerID, const char* pIP, uint16 u2P
     //开始链接
     if (false == pClientInfo->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_FIRST))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]Run Error.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]Run Error.");
 
         if (false == Close(nServerID))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::Connect]Close Error.\n"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]Close Error.");
         }
 
         return false;
     }
 
-    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]nServerID =(%d) connect is OK.\n", nServerID));
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]nServerID =({0}) connect is OK.", nServerID);
     return true;
 }
 
@@ -427,11 +427,11 @@ bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint1
 
     if (false == pClientInfo->Init(nServerID, pIP, u2Port, u1IPType, &m_ReactorConnect, nullptr, m_pReactor, u4PacketParseID))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]pClientInfo Init Error.");
 
         if (false == Close(nServerID))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectTcpInit]Close error.\n"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectTcpInit]Close error.");
         }
 
         return false;
@@ -443,17 +443,17 @@ bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint1
     //开始链接
     if (false == pClientInfo->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_FIRST))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectFrame]Run Error.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectFrame]Run Error.");
 
         if (false == Close(nServerID))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectFrame]Close Error"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectFrame]Close Error.");
         }
 
         return false;
     }
 
-    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectFrame]nServerID =(%d) connect is OK.\n", nServerID));
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectFrame]nServerID =({0}) connect is OK.", nServerID);
     return true;
 }
 
@@ -471,11 +471,11 @@ bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint1
 
     if (false == pClientInfo->Init(nServerID, pIP, u2Port, u1IPType, &m_ReactorConnect, nullptr, m_pReactor, u4PacketParseID))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect]pClientInfo Init Error.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]pClientInfo Init Error.");
 
         if (false == Close(nServerID))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectTcpInit]Close error.\n"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectTcpInit]Close error.");
         }
 
         return false;
@@ -493,17 +493,17 @@ bool CClientReConnectManager::ConnectFrame(int nServerID, const char* pIP, uint1
     //开始链接
     if (false == pClientInfo->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_FIRST))
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectFrame]Run Error.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectFrame]Run Error.");
 
         if (false == Close(nServerID))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectFrame]Close Error.\n"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectFrame]Close Error.");
         }
 
         return false;
     }
 
-    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectFrame]nServerID =(%d) connect is OK.\n", nServerID));
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectFrame]nServerID =({0}) connect is OK.", nServerID);
     return true;
 }
 
@@ -542,14 +542,14 @@ bool CClientReConnectManager::ConnectUDP(int nServerID, const char* pIP, uint16 
 
     if (nErr != 0)
     {
-        OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectUDP](%d)UDP set_address error[%d].\n", nServerID, errno));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectUDP]({0})UDP set_address error[{1}].", nServerID, errno);
         return false;
     }
 
     //开始连接
     if (0 != pReactorUDPClient->OpenAddress(AddrLocal, emType, App_ReactorManager::instance()->GetAce_Reactor(REACTOR_UDPDEFINE), pClientUDPMessage))
     {
-        OUR_DEBUG((LM_INFO, "[CClientReConnectManager::ConnectUDP](%d)UDP OpenAddress error.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectUDP]({0})UDP OpenAddress error.", nServerID);
         return false;
     }
 
@@ -563,7 +563,7 @@ bool CClientReConnectManager::SetHandler(int nServerID, CConnectClient* pConnect
 {
     if (nullptr == pConnectClient)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::SetHandler]pProConnectClient is nullptr.\n"));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::SetHandler]pProConnectClient is nullptr.");
         return false;
     }
 
@@ -573,7 +573,7 @@ bool CClientReConnectManager::SetHandler(int nServerID, CConnectClient* pConnect
     if (m_objClientTCPList.end() == f)
     {
         //如果这个链接已经存在，则不再添加到已经存在的客户端Hash数组管理中
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::SetHandler]nServerID =(%d) is not exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::SetHandler]nServerID =({0}) is not exist.", nServerID);
         return false;
     }
 
@@ -593,7 +593,7 @@ bool CClientReConnectManager::Close(int nServerID)
 
     if (m_objClientTCPList.end() == f)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) pClientInfo is nullptr.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]nServerID =({0}) pClientInfo is nullptr.", nServerID);
         return false;
     }
 
@@ -620,7 +620,7 @@ bool CClientReConnectManager::CloseUDP(int nServerID)
 
     if (m_objClientUDPList.end() == f)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::CloseUDP]nServerID =(%d) pClientInfo is nullptr.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::CloseUDP]nServerID =({0}) pClientInfo is nullptr.", nServerID);
         return false;
     }
 
@@ -640,7 +640,7 @@ bool CClientReConnectManager::ConnectErrorClose(int nServerID)
 
     if (m_objClientTCPList.end() == f)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::ConnectErrorClose]nServerID =(%d) pClientInfo is nullptr.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::ConnectErrorClose]nServerID =({0}) pClientInfo is nullptr.", nServerID);
         return false;
     }
 
@@ -673,7 +673,7 @@ bool CClientReConnectManager::SendData(int nServerID, char*& pData, int nSize, b
     if (m_objClientTCPList.end() == f)
     {
         //如果这个链接不存在，则不创建新的链接
-        OUR_DEBUG((LM_ERROR, "[CProConnectManager::SendData]nServerID =(%d) is not exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CProConnectManager::SendData]nServerID =({0}) is not exist.", nServerID);
 
         if (true == blIsDelete)
         {
@@ -689,7 +689,7 @@ bool CClientReConnectManager::SendData(int nServerID, char*& pData, int nSize, b
 
     if (nullptr == pmblk)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::SendData]nServerID =(%d) pmblk is nullptr.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::SendData]nServerID =({0}) pmblk is nullptr.", nServerID);
 
         if (true == blIsDelete)
         {
@@ -720,7 +720,7 @@ bool CClientReConnectManager::SendDataUDP(int nServerID, const char* pIP, uint16
     if (m_objClientUDPList.end() == f)
     {
         //如果这个链接已经存在，则不创建新的链接
-        OUR_DEBUG((LM_ERROR, "[CProConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CProConnectManager::Close]nServerID =({0}) is not exist.", nServerID);
 
         if (true == blIsDelete)
         {
@@ -764,7 +764,7 @@ void CClientReConnectManager::CancelConnectTask()
 void CClientReConnectManager::Close()
 {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadWritrLock);
-    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]Begin.\n"));
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]Begin.");
     //如果有定时器，则删除定时器
     CancelConnectTask();
 
@@ -787,7 +787,7 @@ void CClientReConnectManager::Close()
     ACE_Time_Value tvSleep(0, 10000);
     ACE_OS::sleep(tvSleep);
 
-    OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]End.\n"));
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]End.");
 }
 
 shared_ptr<CReactorClientInfo> CClientReConnectManager::ConnectTcpInit(int nServerID)
@@ -797,14 +797,14 @@ shared_ptr<CReactorClientInfo> CClientReConnectManager::ConnectTcpInit(int nServ
 
     if (m_objClientTCPList.end() != f)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect](%d)pClientInfo is exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]({0})pClientInfo is exist.", nServerID);
         return nullptr;
     }
 
     //如果池已经满了，则不能在申请新连接
     if ((uint32)m_objClientTCPList.size() == m_u4MaxPoolCount)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::Connect]nServerID =(%d) m_objClientTCPList is full.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientProConnectManager::Connect]nServerID =({0}) m_objClientTCPList is full.", nServerID);
         return nullptr;
     }
 
@@ -821,14 +821,14 @@ shared_ptr<CReactorUDPClient> CClientReConnectManager::ConnectUdpInit(int nServe
 
     if (m_objClientUDPList.end() != f)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Connect](%d)pClientInfo is exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Connect]({0})pClientInfo is exist.", nServerID);
         return nullptr;
     }
 
     //如果池已经满了，则不能在申请新连接
     if ((uint32)m_objClientUDPList.size() == m_u4MaxPoolCount)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientProConnectManager::ConnectUdpInit]nServerID =(%d) <%d>m_objClientUDPList is full.\n", nServerID, m_u4MaxPoolCount));
+        PSS_LOGGER_DEBUG("[CClientProConnectManager::ConnectUdpInit]nServerID =({0}) <{1}>m_objClientUDPList is full.", nServerID, m_u4MaxPoolCount);
         return nullptr;
     }
 
@@ -862,7 +862,7 @@ int CClientReConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 
 void CClientReConnectManager::start_new_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::start_new_task]new timer is set.\n"));
+    PSS_LOGGER_DEBUG("[CMessageServiceGroup::start_new_task]new timer is set.");
     auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2ThreadTimeCheck), [this, timerMgr]() {
         timer_task(timerMgr);
         });
@@ -921,7 +921,7 @@ EM_Server_Connect_State CClientReConnectManager::GetConnectState( int nServerID 
     if (m_objClientTCPList.end() == f)
     {
         //如果这个链接已经存在，则不创建新的链接
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::GetConnectState]nServerID =(%d) is not exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::GetConnectState]nServerID =({0}) is not exist.", nServerID);
         return EM_Server_Connect_State::SERVER_CONNECT_FAIL;
     }
 
@@ -949,7 +949,7 @@ bool CClientReConnectManager::ReConnect(int nServerID)
     auto f = m_objClientTCPList.find(nServerID);
     if (m_objClientTCPList.end() == f)
     {
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) pClientInfo is nullptr.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]nServerID =({0}) pClientInfo is nullptr.", nServerID);
         return false;
     }
 
@@ -958,7 +958,7 @@ bool CClientReConnectManager::ReConnect(int nServerID)
         //如果连接不存在，则重新建立连接
         if (false == f->second->Run(m_blReactorFinish, EM_Server_Connect_State::SERVER_CONNECT_RECONNECT))
         {
-            OUR_DEBUG((LM_INFO, "[CClientReConnectManager::Close]Run error.\n"));
+            PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]Run error.");
         }
 
         return true;
@@ -979,7 +979,7 @@ ACE_INET_Addr CClientReConnectManager::GetServerAddr(int nServerID)
     if (m_objClientTCPList.end() == f)
     {
         //如果这个链接不存在，则不创建新的链接
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]nServerID =({0}) is not exist.", nServerID);
         return remote_addr;
     }
     else
@@ -998,7 +998,7 @@ bool CClientReConnectManager::SetServerConnectState(int nServerID, EM_Server_Con
     if (m_objClientTCPList.end() == f)
     {
         //如果这个链接不存在，则不创建新的链接
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]nServerID =({0}) is not exist.", nServerID);
         return false;
     }
     else
@@ -1017,7 +1017,7 @@ bool CClientReConnectManager::GetServerIPInfo( int nServerID, _ClientIPInfo& obj
     if (m_objClientTCPList.end() == f)
     {
         //如果这个链接不存在，则不创建新的链接
-        OUR_DEBUG((LM_ERROR, "[CClientReConnectManager::Close]nServerID =(%d) is not exist.\n", nServerID));
+        PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]nServerID =({0}) is not exist.", nServerID);
         return false;
     }
     else

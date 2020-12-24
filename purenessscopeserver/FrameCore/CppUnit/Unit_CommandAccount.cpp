@@ -40,7 +40,7 @@ void CUnit_CommandAccount::Test_CommandAccount_Alert(void)
 
     if (1 != CommandAlertDataList.size())
     {
-        OUR_DEBUG((LM_INFO, "[Test_CommandAccount_Alert]Test_CommandAccount_Alert is %d error.\n", CommandAlertDataList.size()));
+        PSS_LOGGER_DEBUG("[Test_CommandAccount_Alert]Test_CommandAccount_Alert is {0} error.", CommandAlertDataList.size());
         CPPUNIT_ASSERT_MESSAGE("[Test_CommandAccount_Alert]GetCommandData is error.", true == blRet);
         return;
     }
@@ -85,7 +85,7 @@ void CUnit_CommandAccount::Test_CommandAccount_PortList(void)
 
     if (1 != vec_Port_Data_Account.size())
     {
-        OUR_DEBUG((LM_INFO, "[Test_CommandAccount_PortList]vec_Port_Data_Account is %d.\n", vec_Port_Data_Account.size()));
+        PSS_LOGGER_DEBUG("[Test_CommandAccount_PortList]vec_Port_Data_Account is {0}.", vec_Port_Data_Account.size());
         CPPUNIT_ASSERT_MESSAGE("[Test_CommandAccount_PortList]vec_Port_Data_Account is error.", true == blRet);
         return;
     }

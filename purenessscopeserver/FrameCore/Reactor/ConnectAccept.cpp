@@ -23,9 +23,9 @@ int ConnectAcceptor::make_svc_handler(CConnectHandler*& sh)
     //如果正在处理的链接超过了服务器设定的数值，则不允许链接继续链接服务器
     if (App_ConnectHandlerPool::instance()->GetUsedCount() > (int)GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount)
     {
-        OUR_DEBUG((LM_ERROR, "[ConnectAcceptor::make_svc_handler]Connect is more MaxHandlerCount(%d > %d).\n",
+        PSS_LOGGER_DEBUG("[ConnectAcceptor::make_svc_handler]Connect is more MaxHandlerCount({0} > {1}).",
                    App_ConnectHandlerPool::instance()->GetUsedCount(),
-                   GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount));
+                   GetXmlConfigAttribute(xmlClientInfo)->MaxHandlerCount);
         //不允许链接
         return -1;
     }
@@ -184,7 +184,7 @@ bool CConnectAcceptorManager::InitConnectAcceptor(int nCount, uint32 u4ClientRea
 
 void CConnectAcceptorManager::Close()
 {
-    OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::Close]Begin.\n"));
+    PSS_LOGGER_DEBUG("[CConnectAcceptorManager::Close]Begin.");
 
     for (auto pConnectAcceptor : m_vecConnectAcceptor)
     {
@@ -193,7 +193,7 @@ void CConnectAcceptorManager::Close()
 
     m_vecConnectAcceptor.clear();
     m_nAcceptorCount = 0;
-    OUR_DEBUG((LM_INFO, "[CConnectAcceptorManager::Close]End.\n"));
+    PSS_LOGGER_DEBUG("[CConnectAcceptorManager::Close]End.");
 }
 
 bool CConnectAcceptorManager::Close(const char* pIP, uint16 u2Port)

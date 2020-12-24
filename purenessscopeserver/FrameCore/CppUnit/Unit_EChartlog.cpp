@@ -9,7 +9,7 @@ void CUnit_EChartlog::setUp(void)
 
 void CUnit_EChartlog::tearDown(void)
 {
-    OUR_DEBUG((LM_INFO, "[CUnit_EChartlog::tearDown]is Close."));
+    PSS_LOGGER_DEBUG("[CUnit_EChartlog::tearDown]is Close.");
 }
 
 void CUnit_EChartlog::Test_EChartlog(void)
@@ -25,7 +25,7 @@ void CUnit_EChartlog::Test_EChartlog(void)
         return;
     }
 
-    OUR_DEBUG((LM_INFO, "[CUnit_EChartlog]objActiveTimer is finish.\n"));
+    PSS_LOGGER_DEBUG("[CUnit_EChartlog]objActiveTimer is finish.");
 }
 
 #endif

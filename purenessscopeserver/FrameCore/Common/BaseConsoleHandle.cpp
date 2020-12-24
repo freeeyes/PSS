@@ -47,7 +47,7 @@ bool Console_Common_CheckMessage_Data(uint32& u4AllRecvSize, uint32& u4AllRecvCo
     }
     else if (EM_CONSOLE_MESSAGE::CONSOLE_MESSAGE_FAIL == emReturn)
     {
-        OUR_DEBUG((LM_INFO, "[CProConsoleHandle::CheckMessage]Dispose CONSOLE_MESSAGE_FAIL.\n"));
+        PSS_LOGGER_DEBUG( "[CProConsoleHandle::CheckMessage]Dispose CONSOLE_MESSAGE_FAIL.");
         return false;
     }
     else

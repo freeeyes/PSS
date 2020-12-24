@@ -83,11 +83,11 @@ void CProConnectHandler::Close(uint32 u4ConnectID)
 
     ACE_OS::shutdown(this->handle(), SD_BOTH);
 
-    OUR_DEBUG((LM_ERROR, "[CProConnectHandler::Close](0x%08x)Close(ConnectID=%d), Recv=%d,Send=%d OK.\n", 
-        this, 
+    PSS_LOGGER_DEBUG("[CProConnectHandler::Close]({0})Close(ConnectID={1}), Recv={2},Send={3} OK.",
+        fmt::ptr(this), 
         GetConnectID(),
         m_u4AllRecvSize,
-        m_u4AllSendSize));
+        m_u4AllSendSize);
 
     //清理转发接口
     if ("" != m_strDeviceName)
@@ -149,7 +149,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     if (nullptr == m_pPacketParseInfo)
     {
         //如果解析器不存在，则直接断开连接
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandler::open](%s)can't find PacketParseInfo.\n", m_addrRemote.get_host_addr()));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::open]({0})can't find PacketParseInfo.", m_addrRemote.get_host_addr());
         Close(GetConnectID());
         return;
     }
@@ -157,7 +157,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     if(App_ForbiddenIP::instance()->CheckIP(m_addrRemote.get_host_addr()) == false)
     {
         //在禁止列表中，不允许访问
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandler::open]IP Forbidden(%s).\n", m_addrRemote.get_host_addr()));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::open]IP Forbidden({0}).", m_addrRemote.get_host_addr());
         Close(GetConnectID());
         return;
     }
@@ -165,7 +165,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     //检查单位时间链接次数是否达到上限
     if(false == App_IPAccount::instance()->AddIP((string)m_addrRemote.get_host_addr()))
     {
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandler::open]IP(%s) connect frequently.\n", m_addrRemote.get_host_addr()));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::open]IP({0}) connect frequently.", m_addrRemote.get_host_addr());
         App_ForbiddenIP::instance()->AddTempIP(m_addrRemote.get_host_addr(), GetXmlConfigAttribute(xmlIP)->Timeout);
 
         AppLogManager::instance()->WriteToMail_r(LOG_SYSTEM_CONNECT,
@@ -192,7 +192,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     if(this->m_Reader.open(*this, h, 0, proactor()) == -1 ||
        this->m_Writer.open(*this, h, 0, proactor()) == -1)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::open] m_reader or m_reader == 0.\n"));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::open] m_reader or m_reader == 0.");
         Close(GetConnectID());
         return;
     }
@@ -205,7 +205,7 @@ void CProConnectHandler::open(ACE_HANDLE h, ACE_Message_Block&)
     //发送链接建立消息
     Send_Hander_Event(PACKET_CONNECT);
 
-    OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::open]Open(%d) Connection from [%s:%d](0x%08x).\n", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), this));
+    PSS_LOGGER_DEBUG("[CProConnectHandler::open]Open({ 0 }) Connection from[{1}:{2}]({3}).", GetConnectID(), m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), fmt::ptr(this));
 
     //查看是否存在转发服务
     m_strDeviceName = App_ForwardManager::instance()->ConnectRegedit(m_addrRemote.get_host_addr(),
@@ -271,7 +271,7 @@ void CProConnectHandler::handle_write_stream(const ACE_Asynch_Write_Stream::Resu
     {
         //发送失败
         int nErrno = errno;
-        OUR_DEBUG ((LM_DEBUG,"[CProConnectHandler::handle_write_stream] Connectid=[%d] begin(%d)...\n",GetConnectID(), nErrno));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::handle_write_stream] Connectid=[{0}] begin({1})...", GetConnectID(), nErrno);
 
         string strLog = fmt::format("WriteError [{0}:{1}] nErrno = {2}  result.bytes_transferred() = {3}, ",
             m_addrRemote.get_host_addr(), 
@@ -281,7 +281,7 @@ void CProConnectHandler::handle_write_stream(const ACE_Asynch_Write_Stream::Resu
 
         AppLogManager::instance()->WriteLog_r(LOG_SYSTEM_CONNECT, strLog);
 
-        OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::handle_write_stream] Connectid=[%d] finish ok...\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::handle_write_stream] Connectid=[{0}] finish ok...", GetConnectID());
         m_atvOutput = CTimeStamp::Get_Time_Stamp();
 
         //错误消息回调
@@ -319,7 +319,7 @@ bool CProConnectHandler::SendMessage(const CSendMessageInfo& objSendMessageInfo,
 {
     if(nullptr == objSendMessageInfo.pBuffPacket)
     {
-        OUR_DEBUG((LM_DEBUG,"[CProConnectHandler::SendMessage] Connectid=[%d] pBuffPacket is nullptr.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::SendMessage] Connectid=[{0}] pBuffPacket is nullptr.", GetConnectID());
         return false;
     }
 
@@ -364,10 +364,10 @@ bool CProConnectHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* pM
     //异步发送方法
     if(0 != m_Writer.write(*pmbSend, pmbSend->length()))
     {
-        OUR_DEBUG ((LM_ERROR, "[CProConnectHandler::PutSendPacket] Connectid=%d mb=%d m_writer.write error(%d)!\n", 
+        PSS_LOGGER_DEBUG("[CProConnectHandler::PutSendPacket] Connectid={0} mb={1} m_writer.write error({2})!",
             u4ConnectID,
             pMbData->length(), 
-            errno));
+            errno);
 
         //如果发送失败，在这里返回失败，回调给业务逻辑去处理
         Send_MakePacket_Queue_Error(m_MakePacket, u4ConnectID, pmbSend, m_atvOutput);
@@ -533,7 +533,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
     if (false == blStateHead)
     {
         //如果包头是非法的，则返回错误，断开连接。
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandler::handle_read_stream]PacketHead is illegal.\n"));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::handle_read_stream]PacketHead is illegal.");
 
         //清理PacketParse
         ClearPacketParse();
@@ -547,7 +547,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
     {
         if (nullptr == objHeadInfo.m_pmbHead)
         {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandler::RecvData]ConnectID=%d, objHeadInfo.m_pmbHead is nullptr.\n", GetConnectID()));
+            PSS_LOGGER_DEBUG("[CProConnectHandler::RecvData]ConnectID={0}, objHeadInfo.m_pmbHead is nullptr.", GetConnectID());
         }
 
         m_pPacketParse->SetPacket_IsHandleHead(false);
@@ -576,7 +576,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmb)
         //如果超过了最大包长度，为非法数据
         if (u4PacketBodyLen >= m_u4MaxPacketSize)
         {
-            OUR_DEBUG((LM_ERROR, "[CProConnectHandler::handle_read_stream]u4PacketHeadLen(%d) more than %d.\n", u4PacketBodyLen, m_u4MaxPacketSize));
+            PSS_LOGGER_DEBUG("[CProConnectHandler::handle_read_stream]u4PacketHeadLen({0}) more than {1}.", u4PacketBodyLen, m_u4MaxPacketSize);
 
             //清理PacketParse
             ClearPacketParse();
@@ -604,7 +604,7 @@ int CProConnectHandler::Dispose_Paceket_Parse_Body(ACE_Message_Block* pmb, uint3
     if (false == blStateBody)
     {
         //如果数据包体非法，断开连接
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandler::handle_read_stream]SetPacketBody is illegal.\n"));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::handle_read_stream]SetPacketBody is illegal.");
 
         //清理PacketParse
         ClearPacketParse();
@@ -766,7 +766,7 @@ bool CProConnectHandler::RecvClinetPacket()
     if(m_Reader.read(*m_pBlockRecv, u4RecvLength) == -1)
     {
         //如果读失败，则关闭连接。
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandler::RecvClinetPacket] m_reader.read is error(%d)(%d).\n", GetConnectID(), errno));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::RecvClinetPacket] m_reader.read is error({0})({1}).", GetConnectID(), errno);
 
         ClearPacketParse();
 
@@ -829,7 +829,7 @@ bool CProConnectHandler::CheckMessage()
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CProConnectHandler::CheckMessage] ConnectID = %d, m_pPacketParse is nullptr.\n", GetConnectID()));
+        PSS_LOGGER_DEBUG("[CProConnectHandler::CheckMessage] ConnectID = {0}, m_pPacketParse is nullptr.", GetConnectID());
     }
 
     return true;
@@ -1054,7 +1054,7 @@ bool CProConnectHandlerPool::Delete(CProConnectHandler* pObject)
 
 	if (false == blState)
 	{
-		OUR_DEBUG((LM_INFO, "[CProConnectHandlerPool::Delete]szHandlerID=%s(0x%08x).\n", szHandlerID, pObject));
+        PSS_LOGGER_DEBUG("[CProConnectHandlerPool::Delete]szHandlerID={0}({1}).", szHandlerID, fmt::ptr(pObject));
 	}
 
 	return true;

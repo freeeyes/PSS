@@ -30,7 +30,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
 
     if (111 != objClientConnectInfo.m_u4ConnectID)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]GetClientInfo is fail(%d).\n", objClientConnectInfo.m_u4ConnectID));
+        PSS_LOGGER_DEBUG("[Test_ConnectHandler_Stream]GetClientInfo is fail({0}).", objClientConnectInfo.m_u4ConnectID);
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]GetClientInfo is fail.", true == blRet);
         return;
     }
@@ -55,14 +55,14 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
 
     if (false != m_pConnectHandler->GetIsLog())
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]GetIsLog is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_ConnectHandler_Stream]GetIsLog is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]GetIsLog is fail.", true == blRet);
         return;
     }
 
     if (ACE_OS::strcmp(m_pConnectHandler->GetConnectName(), "127.0.0.1") != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]GetConnectName is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_ConnectHandler_Stream]GetConnectName is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]GetConnectName is fail.", true == blRet);
         return;
     }
@@ -72,7 +72,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
 
     if (111 != m_pConnectHandler->GetHashID())
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]GetHashID is fail(%d).\n", m_pConnectHandler->GetHashID()));
+        PSS_LOGGER_DEBUG("[Test_ConnectHandler_Stream]GetHashID is fail({0}).", m_pConnectHandler->GetHashID());
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]GetHashID is fail.", true == blRet);
         return;
     }
@@ -95,7 +95,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Stream(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Stream]Test_Paceket_Parse_Stream is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_ConnectHandler_Stream]Test_Paceket_Parse_Stream is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Stream]Test_Paceket_Parse_Stream is fail.", true == blRet);
     }
 }
@@ -121,7 +121,7 @@ void CUnit_ConnectHandler::Test_ConnectHandler_Close_Queue(void)
 
     if (false == blRet)
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_Close_Queue]CloseConnect is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_ConnectHandler_Close_Queue]CloseConnect is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_Close_Queue]CloseConnect is fail.", true == blRet);
     }
     m_nTestCount++;
@@ -146,14 +146,14 @@ void CUnit_ConnectHandler::Test_ConnectHandler_PostMessage(void)
 
     if (objClientIPInfo.m_strClientIP != "")
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_PostMessage]GetLocalIPInfo is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_ConnectHandler_PostMessage]GetLocalIPInfo is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_PostMessage]GetLocalIPInfo is fail.", true == blRet);
         return;
     }
 
     if (EM_Client_Connect_status::CLIENT_CONNECT_NO_EXIST != App_HandlerManager::instance()->GetConnectState(1))
     {
-        OUR_DEBUG((LM_INFO, "[Test_ConnectHandler_PostMessage]GetConnectState is fail.\n"));
+        PSS_LOGGER_DEBUG("[Test_ConnectHandler_PostMessage]GetConnectState is fail.");
         CPPUNIT_ASSERT_MESSAGE("[Test_ConnectHandler_PostMessage]GetConnectState is fail.", true == blRet);
     }
 

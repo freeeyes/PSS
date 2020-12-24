@@ -26,28 +26,28 @@ bool CProTTyHandler::ConnectTTy()
     //连接设备描述符
     if (m_Connector.connect(m_Ttyio, ACE_DEV_Addr(m_szName), 0, ACE_Addr::sap_any, 0, O_RDWR | FILE_FLAG_OVERLAPPED) == -1)
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyHandler::Init]m_Connector.connect(%s) fail.\n", m_szName));
+        PSS_LOGGER_DEBUG("[CProTTyHandler::Init]m_Connector.connect({0}) fail.", m_szName);
         return false;
     }
 
     //关联设备本身
     if (m_Ttyio.control(ACE_TTY_IO::SETPARAMS, &m_ObjParams) == -1)
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyHandler::Init]m_Ttyio SETPARAMS(%s) fail.\n", m_szName));
+        PSS_LOGGER_DEBUG("[CProTTyHandler::Init]m_Ttyio SETPARAMS({0}) fail.", m_szName);
         return false;
     }
 
     //将句柄绑定给反应器(读对象)
     if (-1 == m_ObjReadRequire.open(*this, m_Ttyio.get_handle(), 0, this->proactor()))
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyHandler::Init]m_Ttyio open(%s) read fail.\n", m_szName));
+        PSS_LOGGER_DEBUG("[CProTTyHandler::Init]m_Ttyio open({0}) read fail.", m_szName);
         return false;
     }
 
     //将句柄绑定给反应器（写对象）
     if (-1 == m_ObjWriteRequire.open(*this, m_Ttyio.get_handle(), 0, this->proactor()))
     {
-        OUR_DEBUG((LM_INFO, "[CProTTyHandler::Init]m_Ttyio open(%s) write fail.\n", m_szName));
+        PSS_LOGGER_DEBUG("[CProTTyHandler::Init]m_Ttyio open({0}) write fail.", m_szName);
         return false;
     }
 
@@ -130,7 +130,7 @@ bool CProTTyHandler::Init(uint32 u4ConnectID, const char* pName, ACE_TTY_IO::Ser
     if (nullptr == m_pPacketParse)
     {
         //找不到解析器
-        OUR_DEBUG((LM_INFO, "[CProTTyHandler::Init]u4PacketParseInfoID is not exist.\n"));
+        PSS_LOGGER_DEBUG("[CProTTyHandler::Init]u4PacketParseInfoID is not exist.");
         return false;
     }
 
@@ -193,7 +193,7 @@ void CProTTyHandler::handle_read_file(const ACE_Asynch_Read_File::Result& result
     if (!result.success())
     {
         //接收设备数据异常
-        OUR_DEBUG((LM_ERROR, "[CProTTyHandler::handle_read_file]Error:%d.\n", (int)result.error()));
+        PSS_LOGGER_DEBUG("[CProTTyHandler::handle_read_file]Error:{0}.", result.error());
 
         if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_PLUGIN == m_emDispose && nullptr != m_pTTyMessage)
         {
@@ -286,11 +286,11 @@ void CProTTyHandler::handle_write_file(const ACE_Asynch_Write_File::Result& resu
 {
     if (!result.success())
     {
-        OUR_DEBUG((LM_ERROR, "[CProTTyHandler::handle_write_file]Error:%s.\n", result.error()));
+        PSS_LOGGER_DEBUG("[CProTTyHandler::handle_write_file]Error:{0}.", result.error());
         return;
     }
 
-    OUR_DEBUG((LM_ERROR, "[CProTTyHandler::handle_write_file]Send OK:(%d).\n", result.message_block().length()));
+    PSS_LOGGER_DEBUG("[CProTTyHandler::handle_write_file]Send OK:({0}).", result.message_block().length());
     result.message_block().release();
 }
 
