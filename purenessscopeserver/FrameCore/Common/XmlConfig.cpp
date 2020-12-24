@@ -209,12 +209,10 @@ void xmlNetWorkMode::SetLocalByteOrder()
     if (O32_HOST_ORDER == O32_LITTLE_ENDIAN)
     {
         LocalByteOrder = ENUM_CHAR_ORDER::SYSTEM_LITTLE_ORDER;
-        OUR_DEBUG((LM_INFO, "[XMainConfig::SetLocalByteOrder]SYSYTEM SYSTEM_LITTLE_ORDER.\n"));
     }
     else
     {
         LocalByteOrder = ENUM_CHAR_ORDER::SYSTEM_BIG_ORDER;
-        OUR_DEBUG((LM_INFO, "[XMainConfig::SetLocalByteOrder]SYSYTEM SYSTEM_BIG_ORDER.\n"));
     }
 }
 
@@ -437,11 +435,11 @@ bool xmlAceDebug::Init(CXmlOpeation* pXmlOperation)
 {
     bool bKet = true;
 
-    if (pXmlOperation->Read_XML_Data_Single_Uint8("AceDebug", "TrunOn", TrunOn)
-        && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "DebugPath", DebugPath)
-        && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "DebugName", DebugName)
-        && pXmlOperation->Read_XML_Data_Single_Uint32("AceDebug", "LogFileMaxSize", LogFileMaxSize)
-        && pXmlOperation->Read_XML_Data_Single_String("AceDebug", "Level", Level))
+    if (pXmlOperation->Read_XML_Data_Single_Uint8("ConsoleDebug", "TrunOn", TrunOn)
+        && pXmlOperation->Read_XML_Data_Single_String("ConsoleDebug", "ConsoleName", ConsoleName)
+        && pXmlOperation->Read_XML_Data_Single_Uint16("ConsoleDebug", "FileCount", FileCount)
+        && pXmlOperation->Read_XML_Data_Single_Uint32("ConsoleDebug", "LogFileMaxSize", LogFileMaxSize)
+        && pXmlOperation->Read_XML_Data_Single_String("ConsoleDebug", "Level", Level))
     {
         //À©Õ¹µ½×Ö½Ú
         LogFileMaxSize = LogFileMaxSize * 1024;

@@ -31,14 +31,10 @@
 #include <sys/resource.h>
 #endif
 
-//这里使用第三方的格式化代码
-#define FMT_HEADER_ONLY
-#include "fmt/format.h"
+#include "consoleoutput.hpp"
 
 #include <memory>
 #include <vector>
-
-#include "singleton.h"
 
 using namespace std;
 
@@ -565,18 +561,18 @@ inline void Print_Binary(const char* pData, int nLen)
 {
     if(NULL != pData)
     {
-        OUR_DEBUG((LM_INFO, "[Print_Binary]"));
+        PSS_LOGGER_DEBUG("[Print_Binary]Begin");
 
         for(int32 i = 0; i < nLen; i++)
         {
-            OUR_DEBUG((LM_INFO, " %02x", (unsigned char)pData[i]));
+            PSS_LOGGER_DEBUG("{ 0:#x }", (unsigned char)pData[i]);
         }
 
-        OUR_DEBUG((LM_INFO, "\n"));
+        PSS_LOGGER_DEBUG("[Print_Binary]End");
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[Print_Binary]pData is NULL.\n"));
+        PSS_LOGGER_DEBUG("[Print_Binary]pData is NULL.");
     }
 }
 
@@ -693,7 +689,7 @@ typedef struct FILETESTDATAINFO
 
         if (false == memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240))
         {
-            OUR_DEBUG((LM_INFO, "[FILETESTDATAINFO::FILETESTDATAINFO]memcpy_safe error.\n"));
+            PSS_LOGGER_DEBUG("[FILETESTDATAINFO::FILETESTDATAINFO]memcpy_safe error.\n");
         }
 
         this->m_u4DataLength = ar.m_u4DataLength;
@@ -714,7 +710,7 @@ typedef struct FILETESTDATAINFO
     {
         if (false == memcpy_safe(const_cast<char*>(ar.m_szData), MAX_BUFF_10240, const_cast<char*>(this->m_szData), MAX_BUFF_10240))
         {
-            OUR_DEBUG((LM_INFO, "[FILETESTDATAINFO::FILETESTDATAINFO]operator= error.\n"));
+            PSS_LOGGER_DEBUG("[FILETESTDATAINFO::FILETESTDATAINFO]operator= error.");
         }
 
         this->m_u4DataLength = ar.m_u4DataLength;
@@ -770,7 +766,7 @@ typedef  struct _VCHARS_STR
 
                 if (false == memcpy_safe(pData, u1Length, text, u1Length))
                 {
-                    OUR_DEBUG((LM_INFO, "[_VCHARS_STR::SetData]memcpy_safe error.\n"));
+                    PSS_LOGGER_DEBUG("[_VCHARS_STR::SetData]memcpy_safe error.");
                     SAFE_DELETE(text);
                     return;
                 }
@@ -785,7 +781,7 @@ typedef  struct _VCHARS_STR
 
                 if (false == memcpy_safe(pData, u1Length, text, u1Length))
                 {
-                    OUR_DEBUG((LM_INFO, "[_VCHARS_STR::SetData]binary memcpy_safe error.\n"));
+                    PSS_LOGGER_DEBUG("[_VCHARS_STR::SetData]binary memcpy_safe error.");
                     SAFE_DELETE(text);
                     return;
                 }
@@ -846,7 +842,7 @@ typedef  struct _VCHARM_STR
 
                 if (false == memcpy_safe((char*)pData, u2Length, text, u2Length))
                 {
-                    OUR_DEBUG((LM_INFO, "[_VCHARM_STR::SetData]memcpy_safe error.\n"));
+                    PSS_LOGGER_DEBUG("[_VCHARM_STR::SetData]memcpy_safe error.");
                     SAFE_DELETE(text);
                     return;
                 }
@@ -861,7 +857,7 @@ typedef  struct _VCHARM_STR
 
                 if (false == memcpy_safe((char*)pData, u2Length, text, u2Length))
                 {
-                    OUR_DEBUG((LM_INFO, "[_VCHARM_STR::SetData]binary memcpy_safe error.\n"));
+                    PSS_LOGGER_DEBUG("[_VCHARM_STR::SetData]binary memcpy_safe error.");
                     SAFE_DELETE(text);
                     return;
                 }
@@ -928,7 +924,7 @@ typedef  struct _VCHARB_STR
 
                 if (false == memcpy_safe((char*)pData, u4Length, text, u4Length))
                 {
-                    OUR_DEBUG((LM_INFO, "[_VCHARB_STR::SetData]memcpy_safe error.\n"));
+                    PSS_LOGGER_DEBUG("[_VCHARB_STR::SetData]memcpy_safe error.");
                     SAFE_DELETE(text);
                     return;
                 }
@@ -943,7 +939,7 @@ typedef  struct _VCHARB_STR
 
                 if (false == memcpy_safe((char*)pData, u4Length, text, u4Length))
                 {
-                    OUR_DEBUG((LM_INFO, "[_VCHARB_STR::SetData]binary memcpy_safe error.\n"));
+                    PSS_LOGGER_DEBUG("[_VCHARB_STR::SetData]binary memcpy_safe error.");
                     SAFE_DELETE(text);
                     return;
                 }
@@ -1539,56 +1535,24 @@ class ACE_Hash_Map :
     ACE_Hash<EXT_ID>, ACE_Equal_To<EXT_ID>, ACE_Null_Mutex>
 {};
 
-
-inline void Set_Output_To_File(int nTrunOn, ofstream*& pLogoStream, const char* pLogPath, const char* pLogName, int nMaxLogSize)
+//初始化输出系统
+inline void Init_Console_Output(int nTurnOn, int nFileCount, int nLogFileMaxSize, string strConsoleName, string strLevel)
 {
-    //如果不需要输出到日志
-    if (nTrunOn == 0)
+    Console_Output_Info obj_Console_Output_Info;
+    if (nTurnOn == 0)
     {
-        return;
-    }
-
-    char szDebugFileName[MAX_BUFF_200] = { '\0' };
-    sprintf_safe(szDebugFileName, MAX_BUFF_200, "%s/%s.log", pLogPath, pLogName);
-
-    if (pLogoStream == NULL)
-    {
-        //这个是新建的文件
-        pLogoStream = new ofstream(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
-        ACE_LOG_MSG->msg_ostream(pLogoStream);
+        obj_Console_Output_Info.m_blTunOn = true;
     }
     else
     {
-        //获得当前的对象是否已经超过了max的数值
-        if ((size_t)nMaxLogSize <= (size_t)pLogoStream->tellp())
-        {
-            ACE_LOG_MSG->acquire();
-            //需要重启一个日志文件
-            ofstream* pOldLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
-            if (NULL != pOldLogoStream)
-            {
-				ACE_Date_Time  dt;
-				//转移日志文件
-				char szHistoryLogFile[MAX_BUFF_200] = { '\0' };
-				sprintf_safe(szHistoryLogFile, MAX_BUFF_200, "%s/%s_%04d%02d%02d_%02d%02d%02d.log", pLogPath, pLogName,
-					dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second());
-				rename(szDebugFileName, szHistoryLogFile);
-
-				pOldLogoStream->close();
-#if PSS_PLATFORM == PLATFORM_WIN
-                _unlink(szDebugFileName);
-#else
-				unlink(szDebugFileName);
-#endif
-
-				pOldLogoStream->open(szDebugFileName, std::ofstream::out | std::ofstream::trunc);
-            }
-
-            ACE_LOG_MSG->release();
-        }
+        obj_Console_Output_Info.m_blTunOn = false;
     }
+    obj_Console_Output_Info.m_nFileCount = nFileCount;
+    obj_Console_Output_Info.m_nLogFileMaxSize = nLogFileMaxSize;
+    obj_Console_Output_Info.m_strConsoleName = strConsoleName;
+    obj_Console_Output_Info.m_strLevel = strLevel;
 
-    ACE_LOG_MSG->set_flags(ACE_Log_Msg::STDERR | ACE_Log_Msg::OSTREAM);
+    app_ConsoleOutput::instance()->Init(obj_Console_Output_Info);
 }
 
 //格式化，讲一段二进制输出为十六进制
@@ -1630,19 +1594,19 @@ inline int Checkfilelimit(int nMaxOpenFile)
 
     if (getrlimit(RLIMIT_NOFILE, &rfilelimit) != 0)
     {
-        OUR_DEBUG((LM_INFO, "[Checkfilelimit]failed to getrlimit number of files.\n"));
+        PSS_LOGGER_DEBUG("[Checkfilelimit]failed to getrlimit number of files.");
         return -1;
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[Checkfilelimit]rfilelimit.rlim_cur=%d,nMaxOpenFile=%d.\n", rfilelimit.rlim_cur, nMaxOpenFile));
+        PSS_LOGGER_DEBUG("[Checkfilelimit]rfilelimit.rlim_cur=%d,nMaxOpenFile=%d.\n", rfilelimit.rlim_cur, nMaxOpenFile);
 
         //提示同时文件打开数不足，需要设置。
         if ((int)rfilelimit.rlim_cur < nMaxOpenFile)
         {
-            OUR_DEBUG((LM_INFO, "[Checkfilelimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
-            OUR_DEBUG((LM_INFO, "[Checkfilelimit]** PSS WILL AUTO UP FILE OPEN LIMIT **.\n"));
-            OUR_DEBUG((LM_INFO, "[Checkfilelimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
+            PSS_LOGGER_DEBUG("[Checkfilelimit]** WARNING!WARNING!WARNING!WARNING! **.");
+            PSS_LOGGER_DEBUG("[Checkfilelimit]** PSS WILL AUTO UP FILE OPEN LIMIT **.");
+            PSS_LOGGER_DEBUG("[Checkfilelimit]** WARNING!WARNING!WARNING!WARNING! **.");
             //这段自动提升的功能暂时注释，运维人员必须知道这个问题并自己设置，这是上选。
             //尝试临时提高并行文件数
             rfilelimit.rlim_cur = (rlim_t)nMaxOpenFile;
@@ -1650,21 +1614,21 @@ inline int Checkfilelimit(int nMaxOpenFile)
 
             if (setrlimit(RLIMIT_NOFILE, &rfilelimit) != 0)
             {
-                OUR_DEBUG((LM_INFO, "[Checkfilelimit]failed to setrlimit number of files(error=%s).\n", strerror(errno)));
+                PSS_LOGGER_DEBUG("[Checkfilelimit]failed to setrlimit number of files(error={0}).", strerror(errno));
                 return -1;
             }
 
             //如果修改成功，再次检查一下
             if (getrlimit(RLIMIT_NOFILE, &rfilelimit) != 0)
             {
-                OUR_DEBUG((LM_INFO, "[Checkfilelimit]failed to getrlimit number of files.\n"));
+                PSS_LOGGER_DEBUG("[Checkfilelimit]failed to getrlimit number of files.");
                 return -1;
             }
 
             //再次检查修改后的文件句柄数
             if ((int)rfilelimit.rlim_cur < nMaxOpenFile)
             {
-                OUR_DEBUG((LM_INFO, "[Checkfilelimit]rlim.rlim_cur=%d, nMaxOpenFile=%d, openfile is not enougth， please check [ulimit -a].\n", (int)rfilelimit.rlim_cur, nMaxOpenFile));
+                PSS_LOGGER_DEBUG( "[Checkfilelimit]rlim.rlim_cur={0}, nMaxOpenFile={1}, openfile is not enougth， please check [ulimit -a].\n", (int)rfilelimit.rlim_cur, nMaxOpenFile);
                 return -1;
             }
 

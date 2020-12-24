@@ -31,8 +31,11 @@ public:
     bool Read_XML_Data_Multiple_Uint8(const char* pTag, const char* pName, uint8& u1Value, TiXmlElement*& pTi);
     bool Read_XML_Data_Multiple_Int(const char* pTag, const char* pName, int& u4Value, TiXmlElement*& pTi);
 
+    const string GetError();
+
 private:
     std::shared_ptr<TiXmlDocument> m_pTiXmlDocument;
     TiXmlElement*                  m_pRootElement    = nullptr;
+    string                         m_strError;
 };
 #endif

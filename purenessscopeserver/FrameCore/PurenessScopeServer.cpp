@@ -65,21 +65,21 @@ int CheckCoreLimit(int nMaxCoreFile)
 
 	if (getrlimit(RLIMIT_CORE, &rCorelimit) != 0)
 	{
-		OUR_DEBUG((LM_INFO, "[CheckCoreLimit]failed to getrlimit number of files.\n"));
+		PSS_LOGGER_DEBUG("[CheckCoreLimit]failed to getrlimit number of files.");
 		return -1;
 	}
 
 	if (nMaxCoreFile != 0)
 	{
-		OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
-		OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** PSS WILL AUTO UP CORE SIZE LIMIT **.\n"));
-		OUR_DEBUG((LM_INFO, "[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.\n"));
+		PSS_LOGGER_DEBUG("[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.");
+		PSS_LOGGER_DEBUG("[CheckCoreLimit]** PSS WILL AUTO UP CORE SIZE LIMIT **.");
+		PSS_LOGGER_DEBUG("[CheckCoreLimit]** WARNING!WARNING!WARNING!WARNING! **.");
 		rCorelimit.rlim_cur = RLIM_INFINITY;
 		rCorelimit.rlim_max = RLIM_INFINITY;
 
 		if (setrlimit(RLIMIT_CORE, &rCorelimit) != 0)
 		{
-			OUR_DEBUG((LM_INFO, "[CheckCoreLimit]failed to setrlimit core size(error=%s).\n", strerror(errno)));
+			PSS_LOGGER_DEBUG("[CheckCoreLimit]failed to setrlimit core size(error={0}).\n", strerror(errno));
 			return -1;
 		}
 	}
@@ -93,7 +93,7 @@ int CheckCoreLimit(int nMaxCoreFile)
 
 			if (setrlimit(RLIMIT_CORE, &rCorelimit) != 0)
 			{
-				OUR_DEBUG((LM_INFO, "[Checkfilelimit]failed to setrlimit number of files.\n"));
+				PSS_LOGGER_DEBUG("[Checkfilelimit]failed to setrlimit number of files.");
 				return -1;
 			}
 		}
@@ -114,7 +114,7 @@ bool SetAppPath()
 
 	if (stPathSize <= 0)
 	{
-		OUR_DEBUG((LM_INFO, "[SetAppPath]no find work Path.\n", szPath));
+		PSS_LOGGER_DEBUG("[SetAppPath]no find work Path {0}.", szPath);
 		return false;
 	}
 
@@ -129,11 +129,11 @@ bool SetAppPath()
 
 	if (-1 == nRet)
 	{
-		OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) fail.\n", szPath));
+		PSS_LOGGER_DEBUG("[SetAppPath]Set work Path ({0}) fail.", szPath);
 	}
 	else
 	{
-		OUR_DEBUG((LM_INFO, "[SetAppPath]Set work Path (%s) OK.\n", szPath));
+		PSS_LOGGER_DEBUG("[SetAppPath]Set work Path ({0}) OK.", szPath);
 	}
 
 	return true;
@@ -142,18 +142,17 @@ bool SetAppPath()
 //子进程程序
 int Chlid_Run(std::thread& th_monitor)
 {
-	//判断是否需要将当前代码输出到文件里
-	ofstream* pLogoStream = nullptr;
-	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn, 
-		pLogoStream, 
-		GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
-		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
-		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
+    //初始化输出
+    Init_Console_Output(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
+        GetXmlConfigAttribute(xmlAceDebug)->FileCount,
+        GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize,
+        GetXmlConfigAttribute(xmlAceDebug)->ConsoleName,
+        GetXmlConfigAttribute(xmlAceDebug)->Level);
 
 	//判断是否是需要以服务的状态启动
 	if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
 	{
-		OUR_DEBUG((LM_INFO, "[main]Procress is run background.\n"));
+		PSS_LOGGER_DEBUG("[main]Procress is run background.");
 		Gdaemon();
 	}
 
@@ -188,7 +187,7 @@ int Chlid_Run(std::thread& th_monitor)
 				std::this_thread::sleep_for(std::chrono::microseconds(500));
 			}
 
-			OUR_DEBUG((LM_INFO, "[thread_Monitor]exit.\n"));
+			PSS_LOGGER_DEBUG("[thread_Monitor]exit.");
 		});
 
 	//等待线程锁生效
@@ -198,27 +197,27 @@ int Chlid_Run(std::thread& th_monitor)
 	//第二步，启动主服务器监控
 	if (!App_ServerManager::instance()->Init())
 	{
-		OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Init() error.\n"));
+		PSS_LOGGER_DEBUG("[main]App_ServerManager::instance()->Init() error.");
 		App_ServerManager::instance()->Close();
 		App_PacketParseLoader::instance()->Close();
 		return 0;
 	}
 
-	OUR_DEBUG((LM_INFO, "[CServerManager::Start]Begin.\n"));
+	PSS_LOGGER_DEBUG("[CServerManager::Start]Begin.");
 
 	if (!App_ServerManager::instance()->Start())
 	{
-		OUR_DEBUG((LM_INFO, "[main]App_ServerManager::instance()->Start() error.\n"));
+		PSS_LOGGER_DEBUG("[main]App_ServerManager::instance()->Start() error.");
 		App_ServerManager::instance()->Close();
 		App_PacketParseLoader::instance()->Close();
 		return 0;
 	}
 
-	OUR_DEBUG((LM_INFO, "[main]Server Run is End.\n"));
+	PSS_LOGGER_DEBUG("[main]Server Run is End.");
 
 	std::lock_guard<std::mutex> lk(g_mutex);
 
-	OUR_DEBUG((LM_INFO, "[main]Server Exit.\n"));
+	PSS_LOGGER_DEBUG("[main]Server Exit.");
 
 	//回收隐式加载PacketParse
 	App_PacketParseLoader::instance()->Close();
@@ -239,31 +238,31 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 {
 	if (argc > 0)
 	{
-		OUR_DEBUG((LM_INFO, "[main]argc = %d.\n", argc));
+		PSS_LOGGER_DEBUG("[main]argc = {0}.\n", argc);
 
 		for (int i = 0; i < argc; i++)
 		{
-			OUR_DEBUG((LM_INFO, "[main]argc(%d) = %s.\n", argc, argv[i]));
+			PSS_LOGGER_DEBUG("[main]argc({0}) = {1}.", argc, argv[i]);
 		}
 	}
 
 	//首先设置当前工作路径
 	if (false == SetAppPath())
 	{
-		OUR_DEBUG((LM_INFO, "[main]SetAppPath error.\n"));
+		PSS_LOGGER_DEBUG("[main]SetAppPath error.");
 	}
 
 	//读取配置文件
 	if (!App_XmlConfig::instance()->InitIsOk())
 	{
-		OUR_DEBUG((LM_INFO, "[main]App_XmlConfig::instance()->InitIsOk() is false.\n"));
+		PSS_LOGGER_DEBUG("[main]App_XmlConfig::instance()->InitIsOk() is false.");
 		return 0;
 	}
 
 	std::thread th_monitor;
 	if (0 != Chlid_Run(th_monitor))
 	{
-		OUR_DEBUG((LM_INFO, "[main]Chlid_Run error.\n"));
+		PSS_LOGGER_DEBUG("[main]Chlid_Run error.");
 	}
 
 	return 0;
@@ -318,7 +317,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		*pszEnd = 0;
 	}
 
-	OUR_DEBUG((LM_INFO, "[main]PSS is Starting.\n"));
+	PSS_LOGGER_DEBUG("[main]PSS is Starting.");
 
 	SetCurrentDirectory(szFileName);
 
@@ -334,17 +333,18 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	//第一步，读取配置文件
 	if (!App_XmlConfig::instance()->InitIsOk())
 	{
-		OUR_DEBUG((LM_INFO, "[main]!App_XmlConfig->InitIsOk() is false.\n"));
+		PSS_LOGGER_DEBUG("[main]!App_XmlConfig->InitIsOk() is false.");
 		return 0;
 	}
 
-	//判断是否需要将当前代码输出到文件里
-	ofstream* pLogoStream = nullptr;
-	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
-		pLogoStream,
-		GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
-		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
-		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
+	//初始化输出
+	Init_Console_Output(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
+		GetXmlConfigAttribute(xmlAceDebug)->FileCount,
+		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize,
+		GetXmlConfigAttribute(xmlAceDebug)->ConsoleName,
+		GetXmlConfigAttribute(xmlAceDebug)->Level);
+
+	PSS_LOGGER_DEBUG("[main]PSS is load conf ok.");
 
 	//显式加载PacketParse
 	if (0 != Load_PacketParse_Module())
@@ -376,11 +376,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	}
 
 	//如果日志流不等于空，则回收
-	if (nullptr != pLogoStream)
-	{
-		pLogoStream->close();
-		SAFE_DELETE(pLogoStream);
-	}
 
 	return 0;
 }

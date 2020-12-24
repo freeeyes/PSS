@@ -491,6 +491,7 @@
     <ClInclude Include="..\Common\ClientCommand.h" />
     <ClInclude Include="..\Common\ClientMessage.h" />
     <ClInclude Include="..\Common\ClientUDPMassage.h" />
+    <ClInclude Include="..\Common\consoleoutput.hpp" />
     <ClInclude Include="..\Common\ConvertBuffer.h" />
     <ClInclude Include="..\Common\CreateInfo.h" />
     <ClInclude Include="..\Common\date.h" />

@@ -18,12 +18,10 @@ bool CEchartlog::Writelog(const char* pPath, const char* pFileName, const char* 
 
     if(pPath[ACE_OS::strlen(pPath) - 1] == '\\' || pPath[ACE_OS::strlen(pPath) - 1] == '/')
     {
-        OUR_DEBUG((LM_ERROR, "[CEchartlog::Writelog]1.\n", szFileName));
         sprintf_safe(szFileName, MAX_BUFF_200, "%s%s", pPath, pFileName);
     }
     else
     {
-        OUR_DEBUG((LM_ERROR, "[CEchartlog::Writelog]2.\n", szFileName));
         sprintf_safe(szFileName, MAX_BUFF_200, "%s\\%s", pPath, pFileName);
     }
 
@@ -31,7 +29,7 @@ bool CEchartlog::Writelog(const char* pPath, const char* pFileName, const char* 
 
     if (nullptr == pFile)
     {
-        OUR_DEBUG((LM_ERROR, "[CEchartlog::Writelog]open file error(%s).\n", szFileName));
+        PSS_LOGGER_DEBUG("[CEchartlog::Writelog]open file error({0}).", szFileName);
         return false;
     }
 

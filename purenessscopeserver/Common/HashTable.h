@@ -520,7 +520,7 @@ public:
 			//没有找到共享内存
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Pop]m_lpTable is nullptr.\n"));
+				PSS_LOGGER_DEBUG("[Pop]m_lpTable is nullptr.");
 			}
 
 			return pT;
@@ -540,7 +540,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Pop]1 pKey = %s.\n", pKey));
+					PSS_LOGGER_DEBUG("[Pop]1 pKey = {0}.\n", pKey);
 				}
 
 				//回收数据
@@ -548,7 +548,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Pop]1 index=%d, Del_Hash_Data(%d), Currused=%d pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
+					PSS_LOGGER_DEBUG("[Pop]1 index={0}, Del_Hash_Data({1}), Currused={2} pT={3}.", m_nCurrLinkIndex, nRet, Get_Used_Count(), fmt::ptr(pT));
 				}
 
 				u4Pos = i;
@@ -566,7 +566,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Pop]2 pKey = %s.\n", pKey));
+					PSS_LOGGER_DEBUG("[Pop]2 pKey = {0}.", pKey);
 				}
 
 				//设置状态
@@ -577,7 +577,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, Del_Hash_Data(%d), Currused=%d, pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
+					PSS_LOGGER_DEBUG("[Pop]2 index={0}, Del_Hash_Data{1}, Currused={2}, pT={3}.", m_nCurrLinkIndex, nRet, Get_Used_Count(), fmt::ptr(pT));
 				}
 
 				u4Pos = i;
@@ -587,7 +587,7 @@ public:
 
 		if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 		{
-			OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, no Find, Currused=%d.\n", m_nCurrLinkIndex, Get_Used_Count()));
+			PSS_LOGGER_DEBUG("[Pop]2 index={0}, no Find, Currused={1}.", m_nCurrLinkIndex, Get_Used_Count());
 		}
 
 		return pT;
@@ -603,7 +603,7 @@ public:
 			//没有找到共享内存
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Pop]m_lpTable is nullptr.\n"));
+				PSS_LOGGER_DEBUG("[Pop]m_lpTable is nullptr.");
 			}
 
 			return pT;
@@ -623,7 +623,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Pop]1 pKey = %s.\n", pKey));
+					PSS_LOGGER_DEBUG("[Pop]1 pKey = {0}.", pKey);
 				}
 
 				//回收数据
@@ -631,7 +631,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Pop]1 index=%d, Del_Hash_Data(%d), Currused=%d pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
+					PSS_LOGGER_DEBUG("[Pop]1 index={0}, Del_Hash_Data({1}), Currused={2} pT={3}.", m_nCurrLinkIndex, nRet, Get_Used_Count(), fmt::ptr(pT));
 				}
 
 				return pT;
@@ -648,7 +648,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Pop]2 pKey = %s.\n", pKey));
+					PSS_LOGGER_DEBUG("[Pop]2 pKey = {0}.", pKey);
 				}
 
 				//设置状态
@@ -659,7 +659,7 @@ public:
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, Del_Hash_Data(%d), Currused=%d, pT=0x%08x.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), pT));
+					PSS_LOGGER_DEBUG("[Pop]2 index={0}, Del_Hash_Data({1}), Currused={2}, pT={3}.\n", m_nCurrLinkIndex, nRet, Get_Used_Count(), fmt::ptr(pT));
 				}
 
 				return pT;
@@ -668,7 +668,7 @@ public:
 
 		if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 		{
-			OUR_DEBUG((LM_INFO, "[Pop]2 index=%d, no Find, Currused=%d.\n", m_nCurrLinkIndex, Get_Used_Count()));
+			PSS_LOGGER_DEBUG("[Pop]2 index={0}, no Find, Currused={1}.", m_nCurrLinkIndex, Get_Used_Count());
 		}
 
 		return pT;
@@ -688,7 +688,7 @@ public:
 			//没有找到共享内存
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Push] m_lpTable is nullptr, pKey=%s, pT=0x%08x.\n", pKey, pT));
+				PSS_LOGGER_DEBUG("[Push] m_lpTable is nullptr, pKey={0}, pT={1}.\n", pKey, fmt::ptr(pT));
 			}
 
 			return false;
@@ -699,7 +699,7 @@ public:
 
 		if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 		{
-			OUR_DEBUG((LM_INFO, "[Push] index =%d, pKey=%s, pT=0x%08x.\n", uHashStart, pKey, pT));
+			PSS_LOGGER_DEBUG("[Push] index ={0}, pKey={1}, pT={2}.", uHashStart, pKey, fmt::ptr(pT));
 		}
 
 		_Hash_Link_Info<T>* pLastLink = m_lpTable[uHashStart];
@@ -725,7 +725,7 @@ public:
 		{
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Push]m_objHashPool pData = nullptr.\n"));
+				PSS_LOGGER_DEBUG("[Push]m_objHashPool pData = nullptr.");
 			}
 
 			return false;
@@ -737,7 +737,7 @@ public:
 		{
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Push]m_objHashLinkPool pData = nullptr.\n"));
+				PSS_LOGGER_DEBUG("[Push]m_objHashLinkPool pData = nullptr.");
 			}
 
 			return false;
@@ -759,7 +759,7 @@ public:
 
 		if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 		{
-			OUR_DEBUG((LM_INFO, "[Push] index =%d, pKey=%s, Currused=%d, pT=0x%08x OK.\n", m_emHashDebug, pKey, Get_Used_Count(), pT));
+			PSS_LOGGER_DEBUG("[Push] index ={0}, pKey={1}, Currused={2}, pT={3} OK.", m_emHashDebug, pKey, Get_Used_Count(), fmt::ptr(pT));
 		}
 
 		return true;
@@ -789,7 +789,7 @@ public:
 					}
 					else
 					{
-						OUR_DEBUG((LM_INFO, "[CHashTable::Get_All_Used]pLastLink->m_pData is nullptr.\n"));
+						PSS_LOGGER_DEBUG("[CHashTable::Get_All_Used]pLastLink->m_pData is nullptr.");
 					}
 
 					pLastLink = pLastLink->m_pNext;
@@ -822,7 +822,7 @@ public:
 					}
 					else
 					{
-						OUR_DEBUG((LM_INFO, "[CHashTable::Get_All_Used_Key]pLastLink->m_pData is nullptr.\n"));
+						PSS_LOGGER_DEBUG("[CHashTable::Get_All_Used_Key]pLastLink->m_pData is nullptr.");
 					}
 
 					pLastLink = pLastLink->m_pNext;
@@ -843,7 +843,7 @@ public:
 
 		if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 		{
-			OUR_DEBUG((LM_INFO, "[Clear](%d)Data is Clear.\n", Get_Used_Count()));
+			PSS_LOGGER_DEBUG("[Clear]({0})Data is Clear.", Get_Used_Count());
 		}
 
 		for (int32 i = 0; i < m_objHashPool.Get_Count(); i++)
@@ -860,7 +860,7 @@ public:
 					}
 					else
 					{
-						OUR_DEBUG((LM_INFO, "[CHashTable::Clear]pLastLink->m_pData is nullptr.\n"));
+						PSS_LOGGER_DEBUG("[CHashTable::Clear]pLastLink->m_pData is nullptr.");
 					}
 
 					pLastLink = pLastLink->m_pNext;
@@ -873,7 +873,7 @@ public:
 		{
 			if (-1 == Del_Hash_Data(vecList[i].c_str()))
 			{
-				OUR_DEBUG((LM_INFO, "[CHashTable::Clear](%s) is Delete error.\n", vecList[i].c_str()));
+				PSS_LOGGER_DEBUG("[CHashTable::Clear]({0}) is Delete error.", vecList[i].c_str());
 			}
 		}
 	}
@@ -889,7 +889,7 @@ public:
 
 		if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 		{
-			OUR_DEBUG((LM_INFO, "[CHashTable::Clear_Unit32](%d)Data is Clear.\n", Get_Used_Count()));
+			PSS_LOGGER_DEBUG("[CHashTable::Clear_Unit32]({0})Data is Clear.", Get_Used_Count());
 		}
 
 		for (uint32 i = 0; i < (uint32)m_objHashPool.Get_Count(); i++)
@@ -906,7 +906,7 @@ public:
 					}
 					else
 					{
-						OUR_DEBUG((LM_INFO, "[CHashTable::Clear]pLastLink->m_pData is nullptr.\n"));
+						PSS_LOGGER_DEBUG("[CHashTable::Clear]pLastLink->m_pData is nullptr.");
 					}
 
 					pLastLink = pLastLink->m_pNext;
@@ -919,7 +919,7 @@ public:
 		{
 			if (-1 == Del_Hash_Data_By_Unit32(vecList[i]))
 			{
-				OUR_DEBUG((LM_INFO, "[CHashTable::Clear_Unit32](%d) is Delete error.\n", vecList[i]));
+				PSS_LOGGER_DEBUG("[CHashTable::Clear_Unit32]({0}) is Delete error.", vecList[i]);
 			}
 		}
 	}
@@ -934,7 +934,7 @@ public:
 			//没有找到共享内存
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Add_Hash_Data]m_lpTable is nullptr.\n"));
+				PSS_LOGGER_DEBUG("[Add_Hash_Data]m_lpTable is nullptr.");
 			}
 
 			return -1;
@@ -948,7 +948,7 @@ public:
 			//内存已满，或者数据已经存在
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Add_Hash_Data]GetHashTablePos is -1.\n", nPos));
+				PSS_LOGGER_DEBUG("[Add_Hash_Data]GetHashTablePos is -1.");
 			}
 
 			return -1;
@@ -1034,7 +1034,7 @@ public:
 			//没有找到共享内存
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Add_Hash_Data]m_lpTable is nullptr.\n"));
+				PSS_LOGGER_DEBUG("[Add_Hash_Data]m_lpTable is nullptr.");
 			}
 
 			return -1;
@@ -1045,7 +1045,7 @@ public:
 			//当前key的长度超过了HashTable的key长度。
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Add_Hash_Data](short)strlen(pKey) >= m_objHashPool.Get_Key_Length().\n"));
+				PSS_LOGGER_DEBUG("[Add_Hash_Data](short)strlen(pKey) >= m_objHashPool.Get_Key_Length().");
 			}
 
 			return -1;
@@ -1059,7 +1059,7 @@ public:
 			//内存已满，或者数据已经存在
 			if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 			{
-				OUR_DEBUG((LM_INFO, "[Add_Hash_Data]GetHashTablePos is -1.\n", nPos));
+				PSS_LOGGER_DEBUG("[Add_Hash_Data]GetHashTablePos is -1.");
 			}
 
 			return -1;
@@ -1091,7 +1091,7 @@ public:
 
 					if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 					{
-						OUR_DEBUG((LM_INFO, "[Test]Add 1 pKey=%s, pData->m_pKey=%s.\n", pKey, pData->m_pKey));
+						PSS_LOGGER_DEBUG("[Test]Add 1 pKey={0}, pData->m_pKey={1}.", pKey, pData->m_pKey);
 					}
 				}
 			}
@@ -1133,7 +1133,7 @@ public:
 
 					if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 					{
-						OUR_DEBUG((LM_INFO, "[Test]Add 2 pKey=%s, pData->m_pKey=%s.\n", pKey, pData->m_pKey));
+						PSS_LOGGER_DEBUG("[Test]Add 2 pKey={0}, pData->m_pKey={1}.\n", pKey, pData->m_pKey);
 					}
 
 					if (nullptr != pLastLink)
@@ -1261,9 +1261,6 @@ private:
 
 			while (nullptr != pLastLink)
 			{
-				//printf("[CHashTable::GetHashTablePos]pLastLink->m_pData=0x%08x.\n", pLastLink->m_pData);
-				//printf("[CHashTable::GetHashTablePos]pLastLink->m_pData->m_pKey=%s.\n", pLastLink->m_pData->m_pKey);
-				//printf("[CHashTable::GetHashTablePos]lpszString=%s.\n", lpszString);
 				if (nullptr != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, szCurrKey) == 0)
 				{
 					//找到了对应的key,这个数据已经存在
@@ -1417,7 +1414,7 @@ private:
 			{
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
-					OUR_DEBUG((LM_INFO, "[Test]lpszString=%s, pLastLink->m_pData->m_pKey=%s.\n", lpszString, pLastLink->m_pData->m_pKey));
+					PSS_LOGGER_DEBUG("[Test]lpszString={0}, pLastLink->m_pData->m_pKey={1}.", lpszString, pLastLink->m_pData->m_pKey);
 				}
 
 				if (nullptr != pLastLink->m_pData && strcmp(pLastLink->m_pData->m_pKey, lpszString) == 0)

@@ -925,14 +925,6 @@ int CMessageServiceGroup::timer_task(brynet::TimerMgr::Ptr timerMgr)
         OUR_DEBUG((LM_ERROR, "[CMessageServiceGroup::handle_timeout]CheckPlugInState is fail.\n"));
     }
 
-    //检查日志文件
-    auto pLogoStream = (ofstream*)ACE_LOG_MSG->msg_ostream();
-	Set_Output_To_File(GetXmlConfigAttribute(xmlAceDebug)->TrunOn,
-		pLogoStream,
-        GetXmlConfigAttribute(xmlAceDebug)->DebugPath.c_str(),
-		GetXmlConfigAttribute(xmlAceDebug)->DebugName.c_str(),
-		GetXmlConfigAttribute(xmlAceDebug)->LogFileMaxSize);
-
     if (m_blTimerState)
     {
         //开启定时器

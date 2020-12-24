@@ -18,7 +18,7 @@ int Make_Common_Dispose_Client_WorkTread_Message(uint16 u2CommandID, uint32 u4Se
     if (nullptr == pWorkThreadMessage)
     {
         //放入消息框架失败
-        OUR_DEBUG((LM_ERROR, "[CConnectClient::SendMessageGroup] ConnectID = %d CreateMessage fail.\n", u4ServerID));
+        PSS_LOGGER_DEBUG("[CConnectClient::SendMessageGroup] ConnectID = {0} CreateMessage fail.", u4ServerID);
         App_MessageBlockManager::instance()->Close(pmblk);
         return -1;
     }

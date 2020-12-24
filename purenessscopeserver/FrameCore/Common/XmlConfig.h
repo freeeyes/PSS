@@ -365,10 +365,10 @@ class xmlAceDebug : public IConfigOpeation
 {
 public:
     uint8 TrunOn          = 0;
-    std::string DebugPath = "./";
-    std::string DebugName = "serverdebug";
-    uint32 LogFileMaxSize = 10240;
-    std::string Level;
+    std::string ConsoleName = "./consoleoutput";
+    uint32 LogFileMaxSize = 10240000;
+    uint16 FileCount = 3;
+    std::string Level = "info";
     xmlAceDebug(XmlConfig config, const char* name) : IConfigOpeation(config, name) {}
     bool Init(CXmlOpeation* pXmlOperation) final;
 };
