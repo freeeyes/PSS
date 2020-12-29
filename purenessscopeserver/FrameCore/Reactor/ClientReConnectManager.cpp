@@ -784,14 +784,12 @@ void CClientReConnectManager::Close()
         });
 
     PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]UDP Close.");
-
+    
     m_objClientUDPList.clear();
 
-    m_u4MaxPoolCount = 0;
+    std::this_thread::sleep_for(chrono::seconds(1));
 
-    //等待各自的连接对象自己关闭，因为不是在当前线程关闭，所以这里要等一下。
-    ACE_Time_Value tvSleep(0, 10000);
-    ACE_OS::sleep(tvSleep);
+    m_u4MaxPoolCount = 0;
 
     PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]End.");
 }

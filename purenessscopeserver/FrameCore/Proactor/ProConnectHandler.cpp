@@ -749,11 +749,11 @@ bool CProConnectHandler::Send_Input_To_TCP(CSendMessageInfo objSendMessageInfo, 
     ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_USER + objSendMessageInfo.nMessageID;
     m_pBlockMessage->msg_type(objType);
 
-    blState = PutSendPacket(GetConnectID(), m_pBlockMessage, (uint32)m_pBlockMessage->length(), objSendMessageInfo.tvSendBegin);
-    if (true == blState)
-    {
-        m_pBlockMessage->reset();
-    }
+    PutSendPacket(GetConnectID(), m_pBlockMessage, (uint32)m_pBlockMessage->length(), objSendMessageInfo.tvSendBegin);
+
+    //ÇåÀí»º³å
+    m_pBlockMessage->reset();
+
 
     return blState;
 }

@@ -901,15 +901,8 @@ bool CConnectHandler::Send_Input_To_TCP(const CSendMessageInfo& objSendMessageIn
         (uint32)m_pBlockMessage->length(),
         objSendMessageInfo.tvSendBegin);
 
-	if (true == blRet)
-	{
-		m_pBlockMessage->reset();
-	}
-	else
-	{
-        PSS_LOGGER_DEBUG("[CConnectHandler::handle_output]ConnectID={0} write is close.", GetConnectID());
-		return false;
-	}
+    //Ö±½ÓÇå¿Õ»º³å
+    m_pBlockMessage->reset();
 
     return true;
 }
