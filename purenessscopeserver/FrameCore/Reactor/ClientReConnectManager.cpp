@@ -768,16 +768,22 @@ void CClientReConnectManager::Close()
     //如果有定时器，则删除定时器
     CancelConnectTask();
 
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]CancelConnectTask.");
+
     //关闭所有已存在的链接
     for_each(m_objClientTCPList.begin(), m_objClientTCPList.end(), [](const std::pair<int, shared_ptr<CReactorClientInfo>>& iter) {
         iter.second->GetConnectClient()->ClientClose();
         });
+
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]TCP Close.");
 
     m_objClientTCPList.clear();
 
     for_each(m_objClientUDPList.begin(), m_objClientUDPList.end(), [](const std::pair<int, shared_ptr<CReactorUDPClient>>& iter) {
         iter.second->Close();
         });
+
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::Close]UDP Close.");
 
     m_objClientUDPList.clear();
 

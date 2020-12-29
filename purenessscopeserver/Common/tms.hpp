@@ -120,6 +120,22 @@ public:
         }
     };
 
+    bool CloseLogic(uint32 u4LogicID)  //关闭一个逻辑线程
+    {
+        auto f = m_mapLogicList.find(u4LogicID);
+        if (f != m_mapLogicList.end())
+        {
+            auto pLogicTask = f->second;
+            pLogicTask->Close();
+            m_mapLogicList.erase(f);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     //添加消息(即时)
     bool AddMessage(uint32 u4LogicID, task_function func)
     {
@@ -138,27 +154,24 @@ public:
     };
 
     //添加消息(延时)
-    bool AddMessage(uint32 u4LogicID, std::chrono::milliseconds millisecond, task_function func)
+    brynet::Timer::WeakPtr AddMessage(uint32 u4LogicID, std::chrono::milliseconds millisecond, task_function func)
     {
+        brynet::Timer::WeakPtr timer;
         auto f = m_mapLogicList.find(u4LogicID);
         if (f != m_mapLogicList.end())
         {
             auto pLogicMessage = std::make_shared<CLogicMessage>();
             pLogicMessage->m_func = func;
 
-            m_timerManager.addTimer(millisecond, [this, u4LogicID, pLogicMessage]() {
+            timer = m_timerManager.addTimer(millisecond, [this, u4LogicID, pLogicMessage]() {
                 m_mapLogicList[u4LogicID]->Put(pLogicMessage);
-                cout << "Timer execute is ok." << endl;
+                //cout << "Timer execute is ok." << endl;
                 });
 
-            cout << "Timer add is ok." << endl;
+            //cout << "Timer add is ok." << endl;
+        }
 
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return timer;
     }
 
     //关闭系统
