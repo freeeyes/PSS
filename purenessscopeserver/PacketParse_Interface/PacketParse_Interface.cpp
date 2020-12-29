@@ -45,8 +45,6 @@ extern "C"
     //解析包头，需要填充pHeadInfo数据结构，完成后填充_Head_Info的数据结构
     bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo, EM_CONNECT_IO_TYPE emIOType)
     {
-        ACE_UNUSED_ARG(emIOType);
-
         if(NULL == pHeadInfo || NULL == pMessageBlockManager)
         {
             return false;
@@ -73,11 +71,12 @@ extern "C"
         u4Pos += sizeof(char)*32;
 
         PACKETPARSE_SHOW_BEGIN
-        OUR_DEBUG((LM_INFO, "[CPacketParse::SetPacketHead]u4ConnectID=%d,m_u2Version=%d,m_u2CmdID=%d,m_u4BodyLen=%d.\n",
-                   u4ConnectID,
-                   u2Version,
-                   u2CmdID,
-                   u4BodyLen));
+            PSS_LOGGER_INFO("[CPacketParse::SetPacketHead]u4ConnectID={},m_u2Version={},m_u2CmdID={},m_u4BodyLen={}，emIOType={}.",
+                u4ConnectID,
+                u2Version,
+                u2CmdID,
+                u4BodyLen,
+                emIOType);
         PACKETPARSE_SHOW_END
 
         //如果命令ID为0，则为错误包
@@ -99,15 +98,13 @@ extern "C"
     //解析包体，需要填充pBodyInfo数据结构，完成后填充_Body_Info的数据结构
     bool Parse_Packet_Body_Info(uint32 u4ConnectID, ACE_Message_Block* pmbbody, IMessageBlockManager* pMessageBlockManager, _Body_Info* pBodyInfo, EM_CONNECT_IO_TYPE emIOType)
     {
-        ACE_UNUSED_ARG(emIOType);
-
         if(NULL == pBodyInfo || NULL == pMessageBlockManager)
         {
             return false;
         }
 
         PACKETPARSE_SHOW_BEGIN
-        OUR_DEBUG((LM_INFO, "[CPacketParse::Parse_Packet_Body_Info]u4ConnectID=%d,pmbbody=%d.\n", u4ConnectID, pmbbody->length()));
+            PSS_LOGGER_INFO("[CPacketParse::Parse_Packet_Body_Info]u4ConnectID={},pmbbody={},emIOType={}.", u4ConnectID, pmbbody->length(), emIOType);
         PACKETPARSE_SHOW_END
 
         //填充返回给框架的包体信息
@@ -176,7 +173,7 @@ extern "C"
         pPacketInfo->m_u4BodyCurrLen = objBodyInfo.m_u4BodyCurrLen;
 
         PACKETPARSE_SHOW_BEGIN
-        OUR_DEBUG((LM_INFO, "[CPacketParse::Parse_Packet_Stream]u4ConnectID=%d,pCurrMessage=%d.\n", u4ConnectID, pCurrMessage->length()));
+            PSS_LOGGER_INFO("[CPacketParse::Parse_Packet_Stream]u4ConnectID={},pCurrMessage={}.", u4ConnectID, pCurrMessage->length());
         PACKETPARSE_SHOW_END
 
         return PACKET_GET_ENOUGH;
@@ -191,7 +188,7 @@ extern "C"
         }
 
         PACKETPARSE_SHOW_BEGIN
-        OUR_DEBUG((LM_INFO, "[CPacketParse::Make_Send_Packet]Make_Send_Packet=%d,u4Len=%d.\n", u4ConnectID, u4Len));
+            PSS_LOGGER_INFO("[CPacketParse::Make_Send_Packet]Make_Send_Packet={},u4Len={}.", u4ConnectID, u4Len);
         PACKETPARSE_SHOW_END
 
         //拼装数据包
@@ -212,7 +209,7 @@ extern "C"
         }
 
         PACKETPARSE_SHOW_BEGIN
-        OUR_DEBUG((LM_INFO, "[CPacketParse::Make_Send_Packet_Length]Make_Send_Packet=%d,u4DataLen=%d.\n", u4ConnectID, u4DataLen));
+            PSS_LOGGER_INFO("[CPacketParse::Make_Send_Packet_Length]Make_Send_Packet={},u4DataLen={}.\n", u4ConnectID, u4DataLen);
         PACKETPARSE_SHOW_END
 
         return u4DataLen + sizeof(uint32);
@@ -223,12 +220,12 @@ extern "C"
     {
 
         PACKETPARSE_SHOW_BEGIN
-        OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d,objClientIPInfo=(%s:%d),objLocalIPInfo=(%s:%d).\n",
+            PSS_LOGGER_INFO("[CPacketParse::Connect]u4ConnectID={},objClientIPInfo=({}:{}),objLocalIPInfo=({}:{}).\n",
                    u4ConnectID,
-                   objClientIPInfo.m_strClientIP.c_str(),
+                   objClientIPInfo.m_strClientIP,
                    objClientIPInfo.m_u2Port,
-                   objLocalIPInfo.m_strClientIP.c_str(),
-                   objLocalIPInfo.m_u2Port));
+                   objLocalIPInfo.m_strClientIP,
+                   objLocalIPInfo.m_u2Port);
         return false;
         PACKETPARSE_SHOW_END
 
@@ -239,13 +236,15 @@ extern "C"
     void DisConnect(uint32 u4ConnectID)
     {
         PACKETPARSE_SHOW_BEGIN
-        OUR_DEBUG((LM_INFO, "[CPacketParse::Connect]u4ConnectID=%d\n", u4ConnectID));
+            PSS_LOGGER_INFO("[CPacketParse::Connect]u4ConnectID={}.", u4ConnectID);
         PACKETPARSE_SHOW_END
     }
 
     //插件退出的时候调用
     void Close()
     {
-        OUR_DEBUG((LM_INFO, "[CPacketParse::Close]exit.\n"));
+        PACKETPARSE_SHOW_BEGIN
+            PSS_LOGGER_INFO("[CPacketParse::Close]exit.");
+        PACKETPARSE_SHOW_END
     }
 }

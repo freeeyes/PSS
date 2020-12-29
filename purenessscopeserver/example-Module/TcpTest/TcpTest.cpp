@@ -45,7 +45,7 @@ int LoadModuleData(CServerObject* pServerObject)
 
     g_BaseCommand = std::make_shared<CBaseCommand>();
 
-    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Begin.\n"));
+    PSS_LOGGER_INFO("[Base LoadModuleData] Begin.");
 
     if(g_pServerObject != NULL)
     {
@@ -53,7 +53,7 @@ int LoadModuleData(CServerObject* pServerObject)
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pServerObject is NULL.\n"));
+        PSS_LOGGER_INFO("[Base LoadModuleData] pServerObject is NULL.");
     }
 
     IMessageManager* pMessageManager = g_pServerObject->GetMessageManager();
@@ -77,7 +77,7 @@ int LoadModuleData(CServerObject* pServerObject)
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] pMessageManager = NULL.\n"));
+        PSS_LOGGER_INFO("[Base LoadModuleData] pMessageManager = NULL.");
     }
 
     //显示监听端口信息
@@ -87,25 +87,25 @@ int LoadModuleData(CServerObject* pServerObject)
     {
         _ControlInfo objControlInfo;
         pServerObject->GetControlListen()->ShowListen(i, objControlInfo);
-        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] Listen IP=%s, Pord=%d.\n", objControlInfo.m_strListenIP.c_str(), objControlInfo.m_u4Port));
+        PSS_LOGGER_INFO("[Base LoadModuleData] Listen IP={0}, Pord={1}.", objControlInfo.m_strListenIP, objControlInfo.m_u4Port);
     }
 
     //显示框架工作线程ID
-    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] *********************************.\n"));
+    PSS_LOGGER_INFO("[Base LoadModuleData] *********************************.");
 
     uint32 u4WorkThread = pMessageManager->GetWorkThreadCount();
-    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] WorkThreadCount=%d.\n", u4WorkThread));
+    PSS_LOGGER_INFO("[Base LoadModuleData] WorkThreadCount={0}.", u4WorkThread);
 
     for(uint32 u4Index = 0; u4Index < u4WorkThread; u4Index++)
     {
-        OUR_DEBUG((LM_INFO, "[Base LoadModuleData] WorkThreadID=%d.\n", pMessageManager->GetWorkThreadByIndex(u4Index)));
+        PSS_LOGGER_INFO("[Base LoadModuleData] WorkThreadID={0}.", pMessageManager->GetWorkThreadByIndex(u4Index));
     }
 
-    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] *********************************.\n"));
+    PSS_LOGGER_INFO("[Base LoadModuleData] *********************************.");
 
     g_BaseCommand->ReadIniFile(pServerObject->GetModuleInfo()->GetModuleParam(g_szName));
 
-    OUR_DEBUG((LM_INFO, "[Base LoadModuleData] End.\n"));
+    PSS_LOGGER_INFO("[Base LoadModuleData] End.");
 
     return 0;
 }
@@ -113,16 +113,16 @@ int LoadModuleData(CServerObject* pServerObject)
 int UnLoadModuleData()
 {
     //卸载插件，会自动调用插件回收，不需要在手动pMessageManager->DelClientCommand
-    OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] Begin.\n"));
+    PSS_LOGGER_INFO("[Base UnLoadModuleData] Begin.");
 
-    OUR_DEBUG((LM_INFO, "[Base UnLoadModuleData] End.\n"));
+    PSS_LOGGER_INFO("[Base UnLoadModuleData] End.");
     return 0;
 }
 
 int InitModule(CServerObject* pServerObject)
 {
-    OUR_DEBUG((LM_INFO, "[InitModule] Begin.\n"));
-    ACE_UNUSED_ARG(pServerObject);
+    PSS_LOGGER_INFO("[InitModule] Begin.");
+    PSS_UNUSED_ARG(pServerObject);
     return 0;
 }
 
@@ -144,10 +144,10 @@ const char* GetModuleKey()
 //用于模块间的调用接口
 int DoModuleMessage(uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket)
 {
-    OUR_DEBUG((LM_INFO, "[DoModuleMessage] u2CommandID=%d, size=%d, return=%d.\n",
+    PSS_LOGGER_INFO("[DoModuleMessage] u2CommandID={0}, size={1}, return={2}.",
                u2CommandID,
                pBuffPacket->GetPacketLen(),
-               pReturnBuffPacket->GetPacketLen()));
+               pReturnBuffPacket->GetPacketLen());
     return 0;
 }
 
@@ -158,8 +158,8 @@ int DoModuleMessage(uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, sha
 //框架会根据这个设置，发送邮件给指定的邮箱
 bool GetModuleState(uint32& u4ErrorID)
 {
-    OUR_DEBUG((LM_INFO, "[GetModuleState] u4ErrorID=%d.\n",
-               u4ErrorID));
+    PSS_LOGGER_INFO("[GetModuleState] u4ErrorID={0}.",
+               u4ErrorID);
     return true;
 }
 

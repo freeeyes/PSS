@@ -30,13 +30,13 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag, IBuffPacket* 
 
     if(m_pServerObject == NULL)
     {
-        OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] m_pServerObject is NULL(%d).\n", bDeleteFlag));
+        PSS_LOGGER_INFO("[CBaseCommand::DoMessage] m_pServerObject is NULL({0}).", bDeleteFlag);
         return -1;
     }
 
     if(pMessage == NULL)
     {
-        OUR_DEBUG((LM_ERROR, "[CBaseCommand::DoMessage] pMessage is NULL.\n"));
+        PSS_LOGGER_INFO("[CBaseCommand::DoMessage] pMessage is NULL.");
         return -1;
     }
 
@@ -58,26 +58,26 @@ int CBaseCommand::DoMessage(IMessage* pMessage, bool& bDeleteFlag, IBuffPacket* 
 
 int CBaseCommand::Do_Connect(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
-    ACE_UNUSED_ARG(pSendBuffPacket);
-    OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_Connect] (%d)TCP CLIENT_LINK_CONNECT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
+    PSS_UNUSED_ARG(pSendBuffPacket);
+    PSS_LOGGER_INFO("[CBaseCommand::Do_Connect] ({0})TCP CLIENT_LINK_CONNECT OK.", pMessage->GetMessageBase()->m_u4ConnectID);
 
     return 0;
 }
 
 int CBaseCommand::Do_DisConnect(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
-    ACE_UNUSED_ARG(pSendBuffPacket);
+    PSS_UNUSED_ARG(pSendBuffPacket);
     //处理连接断开事件
-    OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLIENT_LINK_CDISCONNET OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
+    PSS_LOGGER_INFO("[CBaseCommand::Do_DisConnect]({0})CLIENT_LINK_CDISCONNET OK.", pMessage->GetMessageBase()->m_u4ConnectID);
 
     return 0;
 }
 
 int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
-    ACE_UNUSED_ARG(pSendBuffPacket);
+    PSS_UNUSED_ARG(pSendBuffPacket);
     //处理服务器发送客户端数据连接超过阀值的事件
-    OUR_DEBUG((LM_ERROR, "[CBaseCommand::Do_DisConnect](%d)CLINET_LINK_SNEDTIMEOUT OK.\n", pMessage->GetMessageBase()->m_u4ConnectID));
+    PSS_LOGGER_INFO("[CBaseCommand::Do_DisConnect]({0})CLINET_LINK_SNEDTIMEOUT OK.", pMessage->GetMessageBase()->m_u4ConnectID);
 
     return 0;
 }
@@ -85,13 +85,10 @@ int CBaseCommand::Do_ClientSendTimeout(IMessage* pMessage, IBuffPacket* pSendBuf
 int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
 {
     //m_pServerObject->GetLogManager()->WriteToMail(LOG_SYSTEM, 1, "测试邮件", "测试");
-    ACE_UNUSED_ARG(pSendBuffPacket);
+    PSS_UNUSED_ARG(pSendBuffPacket);
 
     _PacketInfo BodyPacket;
     pMessage->GetPacketBody(BodyPacket);
-
-    //消息染色测试
-    DO_TRACE("./", pMessage->GetMessageBase()->m_szTraceID);
 
     //测试记录二进制日志
     //m_pServerObject->GetLogManager()->WriteLogBinary(LOG_SYSTEM, BodyPacket.m_pData, BodyPacket.m_nDataLen);
@@ -127,10 +124,8 @@ int CBaseCommand::Do_Base(IMessage* pMessage, IBuffPacket* pSendBuffPacket)
     }
     else
     {
-        OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage] m_pConnectManager = NULL"));
+        PSS_LOGGER_INFO("[CBaseCommand::DoMessage] m_pConnectManager = NULL");
     }
-
-    //m_pServerObject->GetConnectManager()->CloseConnect(pMessage->GetMessageBase()->m_u4ConnectID);
 
     return 0;
 }
@@ -152,8 +147,6 @@ int CBaseCommand::Do_ClientSendOk(IMessage* pMessage, IBuffPacket* pSendBuffPack
     pMessage->GetPacketHead(HeadPacket);
     int nMessageID = 0;
     memcpy_safe(HeadPacket.m_pData, sizeof(int),(char* )&nMessageID, sizeof(int));
-
-    //OUR_DEBUG((LM_INFO, "[CBaseCommand::DoMessage]nMessageID=%d, ConnectID=%d.\n", nMessageID, pMessage->GetMessageBase()->m_u4ConnectID));
 
     return 0;
 }
@@ -178,7 +171,6 @@ int CBaseCommand::Do_ReplyTest_Sync(IMessage* pMessage, IBuffPacket* pSendBuffPa
 
     shared_ptr<IBuffPacket> pCurrSendPacket= m_pServerObject->GetPacketManager()->Create();
 
-    int nRet = 0;
     //拼装发送包体
     char szSession[32] = { '\0' };
     uint16 u2Version = (short)NET_VERSION;
@@ -213,7 +205,7 @@ int CBaseCommand::SendClient(_PacketInfo BodyPacket, short nCommand, uint32 nCon
 {
 	__ENTER_FUNCTION();
 
-    ACE_UNUSED_ARG(nConnectId);
+    PSS_UNUSED_ARG(nConnectId);
 
 	int nRet = 0;
 	//拼装发送包体

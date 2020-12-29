@@ -57,7 +57,10 @@ using int64   = int64_t;
 using float32 = float;
 using float64 = double;
 
-#define PSS_UNUSED_ARG(a) do {/* null */} while (&a == 0)
+//暂不使用的参数
+template <typename T>
+void PSS_UNUSED_ARG(T&&)
+{ }
 
 //自动判定操作系统
 #define PLATFORM_WIN     0
