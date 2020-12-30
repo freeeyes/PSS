@@ -423,7 +423,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Common\ProgramService.cpp" />
     <ClCompile Include="Common\SendMessage.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</ObjectFileName>
@@ -450,7 +449,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Common\WindowsProcess.cpp" />
     <ClCompile Include="Common\XmlOpeation.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
@@ -653,14 +651,12 @@
     <ClInclude Include="Common\MakePacket.h" />
     <ClInclude Include="Common\MessageBlockManager.h" />
     <ClInclude Include="Common\MyACELoggingStrategy.h" />
-    <ClInclude Include="Common\ProgramService.h" />
     <ClInclude Include="Common\Ring.h" />
     <ClInclude Include="Common\SendMessage.h" />
     <ClInclude Include="Common\ThreadInfo.h" />
     <ClInclude Include="Common\TimerManager.h" />
     <ClInclude Include="Common\WindowsCPU.h" />
     <ClInclude Include="Common\WindowsDump.h" />
-    <ClInclude Include="Common\WindowsProcess.h" />
     <ClInclude Include="Common\XmlOpeation.h" />
     <ClInclude Include="TinyXML\tinystr.h" />
     <ClInclude Include="TinyXML\tinyxml.h" />

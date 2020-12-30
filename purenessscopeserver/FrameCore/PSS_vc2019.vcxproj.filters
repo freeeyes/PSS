@@ -91,9 +91,6 @@
     <ClCompile Include="Common\ProfileTime.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Common\ProgramService.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Proactor\ProServerManager.cpp">
       <Filter>Proactor\cppfile</Filter>
     </ClCompile>
@@ -125,9 +122,6 @@
       <Filter>tinyXML\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="Common\WindowsCPU.cpp">
-      <Filter>Common\cppfile</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\WindowsProcess.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
     <ClCompile Include="Message\WorkThreadAI.cpp">
@@ -468,9 +462,6 @@
     <ClInclude Include="Proactor\ProControlListen.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\ProgramService.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="Proactor\ProServerManager.h">
       <Filter>Proactor\hfile</Filter>
     </ClInclude>
@@ -502,9 +493,6 @@
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\WindowsDump.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\WindowsProcess.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Message\WorkThreadAI.h">

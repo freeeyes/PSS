@@ -24,6 +24,8 @@
 //如果是windows
 #include "WindowsDump.h"
 #include <windows.h>
+#include <ProServerManager.h>
+#include <tchar.h>
 #endif
 
 #include <iostream>
@@ -55,6 +57,36 @@ int Load_PacketParse_Module()
 
 	return 0;
 }
+
+#ifdef WIN32
+static int32 ServerMain()
+{
+    //启动主服务器监控
+    if (!App_ProServerManager::instance()->Init())
+    {
+        PSS_LOGGER_DEBUG("[main]App_ProServerManager::instance()->Init() error.");
+        App_ProServerManager::instance()->Close();
+        return 0;
+    }
+
+    if (!App_ProServerManager::instance()->Start())
+    {
+        PSS_LOGGER_DEBUG("[main]App_ProServerManager::instance()->Start() error.");
+        App_ProServerManager::instance()->Close();
+        return 0;
+    }
+
+    if (GetXmlConfigAttribute(xmlServerType)->Type == 0)
+    {
+        //等待服务结束
+        ACE_Thread_Manager::instance()->wait();
+    }
+
+    PSS_LOGGER_DEBUG("[main]Server Run is End.");
+
+    return 0;
+}
+#endif
 
 #ifndef WIN32
 int CheckCoreLimit(int nMaxCoreFile)
@@ -301,13 +333,13 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 	//指定当前目录，防止访问文件失败
 	TCHAR szFileName[MAX_PATH] = { 0 };
 	GetModuleFileName(0, szFileName, MAX_PATH);
-	LPTSTR pszEnd = _tcsrchr(szFileName, TEXT('\\'));
+    LPTSTR pszEnd = _tcsrchr(szFileName, TEXT('\\'));
 
-	if (pszEnd != 0)
-	{
-		pszEnd++;
-		*pszEnd = 0;
-	}
+    if (pszEnd != 0)
+    {
+        pszEnd++;
+        *pszEnd = 0;
+    }
 
 	PSS_LOGGER_DEBUG("[main]PSS is Starting.");
 
@@ -349,11 +381,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 
 	//回收隐式加载PacketParse
 	App_PacketParseLoader::instance()->Close();
-
-	if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
-	{
-		App_Process::instance()->stopprocesslog();
-	}
 
 	//如果日志流不等于空，则回收
 
