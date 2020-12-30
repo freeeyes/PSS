@@ -103,9 +103,6 @@
     <ClCompile Include="Common\SendMessage.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
-    <ClCompile Include="Mail\smtp.cpp">
-      <Filter>Mail\cppfile</Filter>
-    </ClCompile>
     <ClCompile Include="Common\ThreadInfo.cpp">
       <Filter>Common\cppfile</Filter>
     </ClCompile>
@@ -473,9 +470,6 @@
     </ClInclude>
     <ClInclude Include="Common\SendMessage.h">
       <Filter>Common\hfile</Filter>
-    </ClInclude>
-    <ClInclude Include="Mail\smtp.h">
-      <Filter>Mail\hfile</Filter>
     </ClInclude>
     <ClInclude Include="Common\ThreadInfo.h">
       <Filter>Common\hfile</Filter>

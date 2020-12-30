@@ -89,7 +89,7 @@ matrix:
         - sleep 5
         - cd $TRAVIS_BUILD_DIR/Build/Linux
         - killall PurenessScopeServer
-        - sleep 28
+        - sleep 30
         - tail -n 100 pssout.file        
         - cd $TRAVIS_BUILD_DIR/Build/Linux/.obj
         - ls *.gcda
