@@ -22,7 +22,6 @@
 #include "ace/Synch.h"
 #else
 //如果是windows
-#include "WindowsProcess.h"
 #include "WindowsDump.h"
 #include <windows.h>
 #endif
@@ -345,20 +344,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR* argv[])
 		return 0;
 	}
 
-	//判断是否是需要以服务的状态启动
-	if (GetXmlConfigAttribute(xmlServerType)->Type == 1)
-	{
-		App_Process::instance()->startprocesslog();
-
-		//以服务状态启动
-		//首先看有没有配置启动windows服务
-		App_Process::instance()->run(argc, argv);
-	}
-	else
-	{
-		//正常启动
-		ServerMain();
-	}
+	//正常启动
+	ServerMain();
 
 	//回收隐式加载PacketParse
 	App_PacketParseLoader::instance()->Close();
