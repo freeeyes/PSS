@@ -896,7 +896,7 @@ bool CConnectHandler::Send_Input_To_TCP(const CSendMessageInfo& objSendMessageIn
 	Recovery_Common_BuffPacket(objSendMessageInfo.blDelete, objSendMessageInfo.pBuffPacket);
 
     //直接发送数据，不在放到队列里，否则在压测过程中处理太慢
-	bool blRet = PutSendPacket(GetConnectID(),
+	PutSendPacket(GetConnectID(),
         m_pBlockMessage, 
         (uint32)m_pBlockMessage->length(),
         objSendMessageInfo.tvSendBegin);

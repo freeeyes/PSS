@@ -90,33 +90,18 @@ void CConnectClient::SetIsLog(bool blIsLog)
 
 void CConnectClient::ClientClose()
 {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
-    //将连接消息断开放在output去执行，这样就不需要同步加锁了。
-    ACE_Message_Block* pMbData = App_MessageBlockManager::instance()->Create(sizeof(int));
-
-    if (nullptr == pMbData)
-    {
-        PSS_LOGGER_DEBUG("[CConnectClient::ClientClose] Connectid={0}, pMbData is nullptr.", GetServerID());
-        return;
-    }
-
-    ACE_Message_Block::ACE_Message_Type objType = ACE_Message_Block::MB_STOP;
-    pMbData->msg_type(objType);
-
     //这里主动关闭，不在要求回调连接断开消息
     SetClientMessage(nullptr);
 
+    PSS_LOGGER_DEBUG("[CConnectClient::ClientClose]Begin.");
     Close();
+    PSS_LOGGER_DEBUG("[CConnectClient::ClientClose]End.");
 }
 
 int CConnectClient::open(void* p)
 {
-    if (p != nullptr)
-    {
-        PSS_LOGGER_DEBUG("[CConnectClient::open]p is not nullptr.");
-    }
-
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_ThreadLock);
+    PSS_UNUSED_ARG(p);
 
     msg_queue()->high_water_mark(MAX_MSG_MASK);
     msg_queue()->low_water_mark(MAX_MSG_MASK);
@@ -161,7 +146,7 @@ int CConnectClient::open(void* p)
 
     m_u1ConnectState = CONNECTSTATE::CONNECT_OPEN;
 
-    PSS_LOGGER_DEBUG("[CConnectClient::open] Connection from [{0}:{1}].", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number());
+    PSS_LOGGER_DEBUG("[CConnectClient::open] Connection from [{0}:{1}] ServerID={3}.", m_addrRemote.get_host_addr(), m_addrRemote.get_port_number(), m_nServerID);
 
     if (EM_CONNECT_IO_DISPOSE::CONNECT_IO_FRAME == m_emDispose)
     {

@@ -38,6 +38,7 @@ void CUnit_ConnectTcp::Test_Connect_Tcp_Server(void)
     vecClientConnectInfo VecClientConnectInfo;
     App_ClientReConnectManager::instance()->GetConnectInfo(VecClientConnectInfo);
 
+    PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server]VecClientConnectInfo.size()={0}.", VecClientConnectInfo.size());
     if (1 != VecClientConnectInfo.size())
     {
         PSS_LOGGER_DEBUG("[Test_Connect_Tcp_Server]App_ClientReConnectManager::instance()->GetConnectInfo() is fail.");
