@@ -53,7 +53,7 @@ public:
         Put(pLogicMessage);
 
         m_ttlogic.join();
-        std::cout << "Thread(" << m_u4ThreadID << ") is Finish." << std::endl;
+        PSS_LOGGER_DEBUG("Thread({0}) is Finish.", m_u4ThreadID);
     }
 
     void svc()
@@ -75,7 +75,7 @@ public:
             }
         }
 
-        std::cout << "Thread is over." << std::endl;
+        PSS_LOGGER_DEBUG("Thread({0}) is over.", m_u4ThreadID);
     }
 
 private:
@@ -116,7 +116,8 @@ public:
 
             m_mapLogicList[u4LogicID] = pLogicTask;
 
-            cout << "CreateLogic(" << u4LogicID << ")." << endl;
+            PSS_LOGGER_DEBUG("CreateLogic({0}) is created.", u4LogicID);
+            return true;
         }
     };
 
@@ -165,10 +166,7 @@ public:
 
             timer = m_timerManager.addTimer(millisecond, [this, u4LogicID, pLogicMessage]() {
                 m_mapLogicList[u4LogicID]->Put(pLogicMessage);
-                //cout << "Timer execute is ok." << endl;
                 });
-
-            //cout << "Timer add is ok." << endl;
         }
 
         return timer;
@@ -185,7 +183,8 @@ public:
         m_timerManager.Close();
         m_ttTimer.join();
 
-        cout << "TMS is close." << endl;
+        PSS_LOGGER_DEBUG("TMS is close.");
+
     }
 
 private:
