@@ -474,9 +474,6 @@
     <ClInclude Include="Common\ThreadInfo.h">
       <Filter>Common\hfile</Filter>
     </ClInclude>
-    <ClInclude Include="Common\TimerManager.h">
-      <Filter>Common\hfile</Filter>
-    </ClInclude>
     <ClInclude Include="TinyXML\tinystr.h">
       <Filter>tinyXML\hfile</Filter>
     </ClInclude>

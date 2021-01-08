@@ -104,14 +104,13 @@ namespace brynet {
             F&& callback,
             TArgs&& ...args)
         {
+            std::lock_guard<std::mutex> lock(mtx);
             auto timer = std::make_shared<Timer>(
                 std::chrono::steady_clock::now(),
                 std::chrono::nanoseconds(timeout),
                 std::bind(std::forward<F>(callback), std::forward<TArgs>(args)...));
 
-            mtx_queue.lock();
             mTimers.push(timer);
-            mtx_queue.unlock();
 
             //唤醒线程
             timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_ADD_TIMER;
@@ -121,9 +120,8 @@ namespace brynet {
 
         void addTimer(const Timer::Ptr& timer)
         {
-            mtx_queue.lock();
+            std::lock_guard<std::mutex> lock(mtx);
             mTimers.push(timer);
-            mtx_queue.unlock();
             //唤醒线程
             timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_ADD_TIMER;
             cv.notify_one();
@@ -131,6 +129,7 @@ namespace brynet {
 
         void Close()
         {
+            std::lock_guard<std::mutex> lock(mtx);
             timer_run_ = false;
             //唤醒线程
             timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_ADD_TIMER;
@@ -157,9 +156,7 @@ namespace brynet {
                 return ENUM_WHILE_STATE::WHILE_STATE_CONTINUE;
             }
 
-            mtx_queue.lock();
             auto tmp = mTimers.top();
-            mtx_queue.unlock();
 
             auto timer_wait = tmp->getLeftTime();
             if (timer_wait > std::chrono::nanoseconds::zero())
@@ -178,10 +175,9 @@ namespace brynet {
                 return ENUM_WHILE_STATE::WHILE_STATE_BREAK;
             }
 
-            mtx_queue.lock();
             mTimers.pop();
-            mtx_queue.unlock();
             (*tmp)();
+
             timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_EXECUTE_TIMER;
 
             return ENUM_WHILE_STATE::WHILE_STATE_CONTINUE;
@@ -216,14 +212,13 @@ namespace brynet {
         // if timer empty, return zero
         std::chrono::nanoseconds nearLeftTime()
         {
+            std::unique_lock <std::mutex> lck(mtx);
             if (mTimers.empty())
             {
                 return std::chrono::nanoseconds::zero();
             }
 
-            mtx_queue.lock();
             auto result = mTimers.top()->getLeftTime();
-            mtx_queue.unlock();
             if (result < std::chrono::nanoseconds::zero())
             {
                 return std::chrono::nanoseconds::zero();
@@ -234,11 +229,10 @@ namespace brynet {
 
         void clear()
         {
+            std::unique_lock <std::mutex> lck(mtx);
             while (!mTimers.empty())
             {
-                mtx_queue.lock();
                 mTimers.pop();
-                mtx_queue.unlock();
             }
         }
 
@@ -258,7 +252,6 @@ namespace brynet {
 
         std::priority_queue<Timer::Ptr, std::vector<Timer::Ptr>, CompareTimer>  mTimers;
         std::mutex mtx;
-        std::mutex mtx_queue;
         std::condition_variable cv;
         bool timer_run_ = false;
         EM_TIMER_STATE timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_EXECUTE_TIMER;

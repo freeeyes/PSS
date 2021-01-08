@@ -653,7 +653,6 @@
     <ClInclude Include="Common\Ring.h" />
     <ClInclude Include="Common\SendMessage.h" />
     <ClInclude Include="Common\ThreadInfo.h" />
-    <ClInclude Include="Common\TimerManager.h" />
     <ClInclude Include="Common\WindowsCPU.h" />
     <ClInclude Include="Common\WindowsDump.h" />
     <ClInclude Include="Common\XmlOpeation.h" />
