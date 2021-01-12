@@ -2,7 +2,7 @@
 
 //线程处理队列，处理消息队列和定时消息
 //add by freeeyes
-#include "threadqueue.h"
+#include "ThreadQueue.h"
 #include "TimerManager.hpp"
 #include "TimeStamp.hpp"
 #include <map>
