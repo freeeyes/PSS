@@ -28,6 +28,7 @@ public:
     const char* (*GetModuleKey)(void)                   = nullptr;
     int (*DoModuleMessage)(uint16 u2CommandID, shared_ptr<IBuffPacket>, shared_ptr<IBuffPacket>) = nullptr;
     bool (*GetModuleState)(uint32& u4AErrorID)          = nullptr;
+    void (*Set_output)(shared_ptr<spdlog::logger> logger) = nullptr;
 
     _ModuleInfo() = default;
 };

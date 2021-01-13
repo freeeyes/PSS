@@ -526,6 +526,15 @@ ENUM_WHILE_STATE CConnectHandler::Recv_Packet_Cut(bool& blRet)
 
             //判断处理后的数据包体长度是否包含
             uint32 u4BodyLength = m_pPacketParse->GetPacketBodySrcLen();
+
+            //如果包体为0，则继续循环
+            if (u4BodyLength == 0)
+            {
+                //没有包体，处理完成了一个完整的包，整体偏移一下
+                m_pBlockRecv->rd_ptr(m_pPacketParseInfo->m_u4OrgLength);
+                return ENUM_WHILE_STATE::WHILE_STATE_CONTINUE;
+            }
+
             uint32 u4AllPacketLength = u4BodyLength + m_pPacketParseInfo->m_u4OrgLength;
             if (u4AllPacketLength <= (uint32)m_pBlockRecv->length())
             {

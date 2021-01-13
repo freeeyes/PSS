@@ -318,6 +318,18 @@ bool CLoadModule::LoadModuleInfo(string strModuleName, shared_ptr<_ModuleInfo> p
         return false;
     }
 
+    pModuleInfo->Set_output = (void(*)(shared_ptr<spdlog::logger>))CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "Set_output");
+
+    if (nullptr == pModuleInfo->GetModuleState)
+    {
+        PSS_LOGGER_DEBUG("[CLoadModule::LoadModuleInfo] strModuleName = {0}, Function GetModuleState is error({1})!", strModuleName, errno);
+        m_tmModule.release();
+        return false;
+    }
+
+    //设置日志生效
+    pModuleInfo->Set_output(spdlog::default_logger());
+
     //这个可以为空，当为空的时候初始化不调用
     pModuleInfo->InitModule = (int(*)(CServerObject*))CLoadLibrary::PSS_dlsym(pModuleInfo->hModule, "InitModule");
 

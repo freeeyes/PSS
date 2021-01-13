@@ -113,6 +113,19 @@ bool CLoadPacketParse::LoadPacketInfo(uint32 u4PacketParseID, uint8 u1Type, uint
         return false;
     }
 
+    pPacketParseInfo->Set_output = (void(*)(shared_ptr<spdlog::logger>))CLoadLibrary::PSS_dlsym(pPacketParseInfo->m_hModule, "Set_output");
+
+    if (nullptr == pPacketParseInfo->m_hModule || !pPacketParseInfo->Set_output)
+    {
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo] strModuleName = {0}, Function Set_output is error!", szPacketParseName);
+        CLoadLibrary::PSS_dlClose(pPacketParseInfo->m_hModule);
+        PSS_LOGGER_DEBUG("[CLoadPacketParse::LoadPacketInfo]PacketID={0}, ret={1}.", pPacketParseInfo->m_u4PacketParseID, nRet);
+        return false;
+    }
+
+    //设置日志生效
+    pPacketParseInfo->Set_output(spdlog::default_logger());
+
     //添加到HashPool里面
     m_objPacketParseList[pPacketParseInfo->m_u4PacketParseID] = pPacketParseInfo;
     return true;

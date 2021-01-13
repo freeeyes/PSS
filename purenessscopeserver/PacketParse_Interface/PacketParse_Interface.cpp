@@ -41,6 +41,8 @@ extern "C"
     DECLDIR bool Connect(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo const& objLocalIPInfo);
     DECLDIR void DisConnect(uint32 u4ConnectID);
     DECLDIR void Close();
+    DECLDIR void Close();
+    DECLDIR void Set_output(shared_ptr<spdlog::logger> logger);
 
     //解析包头，需要填充pHeadInfo数据结构，完成后填充_Head_Info的数据结构
     bool Parse_Packet_Head_Info(uint32 u4ConnectID, ACE_Message_Block* pmbHead, IMessageBlockManager* pMessageBlockManager, _Head_Info* pHeadInfo, EM_CONNECT_IO_TYPE emIOType)
@@ -248,3 +250,10 @@ extern "C"
         PACKETPARSE_SHOW_END
     }
 }
+
+void Set_output(shared_ptr<spdlog::logger> logger)
+{
+    //设置输出对象
+    spdlog::set_default_logger(logger);
+}
+

@@ -28,6 +28,7 @@ public:
     bool (*Connect)(uint32 u4ConnectID, _ClientIPInfo objClientIPInfo, _ClientIPInfo const& objLocalIPInfo) = nullptr;
     void (*DisConnect)(uint32 u4ConnectID) = nullptr;
     void(*Close)() = nullptr;
+    void(*Set_output)(shared_ptr<spdlog::logger> logger) = nullptr;
 
     _Packet_Parse_Info() = default;
 };

@@ -34,6 +34,7 @@ extern "C"
     DECLDIR const char* GetModuleKey();
     DECLDIR int DoModuleMessage(uint16 u2CommandID, shared_ptr<IBuffPacket> pBuffPacket, shared_ptr<IBuffPacket> pReturnBuffPacket);
     DECLDIR bool GetModuleState(uint32& u4ErrorID);
+    DECLDIR void Set_output(shared_ptr<spdlog::logger> logger);
 }
 
 shared_ptr<CBaseCommand>   g_BaseCommand   = NULL;
@@ -163,3 +164,8 @@ bool GetModuleState(uint32& u4ErrorID)
     return true;
 }
 
+void Set_output(shared_ptr<spdlog::logger> logger)
+{
+    //设置输出对象
+    spdlog::set_default_logger(logger);
+}
