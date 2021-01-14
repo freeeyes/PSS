@@ -693,6 +693,7 @@ int CConnectHandler::Dispose_Paceket_Parse_Head(ACE_Message_Block* pmbHead)
         m_pPacketParse->SetPacket_Head_Curr_Length(objHeadInfo.m_u4HeadCurrLen);
         m_pPacketParse->SetPacket_Body_Src_Length(objHeadInfo.m_u4BodySrcLen);
         m_pPacketParse->SetPacket_CommandID(objHeadInfo.m_u2PacketCommandID);
+        m_pPacketParse->SetPacket_Body_Message(nullptr);
     }
 
     uint32 u4PacketBodyLen = m_pPacketParse->GetPacketBodySrcLen();
