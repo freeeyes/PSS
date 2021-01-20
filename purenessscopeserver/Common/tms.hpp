@@ -65,8 +65,14 @@ public:
             if (true == m_thread_queue.Pop(msg))
             {
                 if (EM_LOGIC_TYPE::LOGIC_TYPE_RUN == msg->m_emType)
+                {
                     //获得了数据，进行处理
                     msg->m_func();
+                }
+                else
+                {
+                    break;
+                }
             }
             else
             {
