@@ -50,7 +50,8 @@ namespace brynet {
             :
             mCallback(std::move(callback)),
             mStartTime(startTime),
-            mLastTime(lastTime)
+            mLastTime(lastTime),
+            mTimerType(timertype)
         {
         }
 
@@ -75,6 +76,11 @@ namespace brynet {
             std::call_once(mExecuteOnceFlag, [this]() {
                 mCallback = nullptr;
                 });
+        }
+
+        ENUM_TIMER_TYPE get_timer_type()
+        {
+            return mTimerType;
         }
 
     private:
@@ -222,10 +228,18 @@ namespace brynet {
 
             mtx_queue.lock();
             mTimers.pop();
-            mtx_queue.unlock();
             (*tmp)();
-            timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_EXECUTE_TIMER;
 
+            //如果是循环消息，则自动添加。
+            if (ENUM_TIMER_TYPE::TIMER_TYPE_LOOP == tmp->get_timer_type())
+            {
+                //重新插入
+                mTimers.push(tmp);
+            }
+
+            mtx_queue.unlock();
+
+            timer_wakeup_state = EM_TIMER_STATE::TIMER_STATE_EXECUTE_TIMER;
             return ENUM_WHILE_STATE::WHILE_STATE_CONTINUE;
         }
 
