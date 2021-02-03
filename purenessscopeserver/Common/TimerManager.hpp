@@ -105,8 +105,8 @@ namespace brynet {
                 if (mCallback != nullptr)
                 {
                     mCallback();
-                    mStartTime = std::chrono::steady_clock::now();
                 }
+                mStartTime = std::chrono::steady_clock::now();
             }
         }
 
@@ -231,7 +231,7 @@ namespace brynet {
             (*tmp)();
 
             //如果是循环消息，则自动添加。
-            if (ENUM_TIMER_TYPE::TIMER_TYPE_LOOP == tmp->get_timer_type())
+            if (ENUM_TIMER_TYPE::TIMER_TYPE_LOOP == tmp->get_timer_type() && tmp->mCallback != nullptr)
             {
                 //重新插入
                 mTimers.push(tmp);
