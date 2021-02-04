@@ -45,12 +45,14 @@ namespace brynet {
 
         Timer(std::chrono::steady_clock::time_point startTime,
             std::chrono::nanoseconds lastTime,
+            std::chrono::seconds delayTime,
             ENUM_TIMER_TYPE timertype,
             Callback&& callback)
             :
             mCallback(std::move(callback)),
             mStartTime(startTime),
             mLastTime(lastTime),
+            mDelayTime(delayTime),
             mTimerType(timertype)
         {
         }
@@ -65,10 +67,12 @@ namespace brynet {
             return mLastTime;
         }
 
-        std::chrono::nanoseconds    getLeftTime() const
+        std::chrono::nanoseconds    getLeftTime()
         {
             const auto now = std::chrono::steady_clock::now();
-            return getLastTime() - (now - getStartTime());
+            auto delayTime = mDelayTime;
+            mDelayTime = std::chrono::seconds(0);
+            return getLastTime() - (now - getStartTime()) + delayTime;
         }
 
         void    cancel()
@@ -114,6 +118,7 @@ namespace brynet {
         Callback                                        mCallback;
         std::chrono::steady_clock::time_point           mStartTime;
         std::chrono::nanoseconds                        mLastTime;
+        std::chrono::seconds                            mDelayTime;
         ENUM_TIMER_TYPE                                 mTimerType = ENUM_TIMER_TYPE::TIMER_TYPE_ONCE;
 
         friend class TimerMgr;
@@ -126,6 +131,7 @@ namespace brynet {
 
         template<typename F, typename ...TArgs>
         Timer::WeakPtr  addTimer_loop(
+            std::chrono::seconds deleyTime,
             std::chrono::nanoseconds timeout,
             F&& callback,
             TArgs&& ...args)
@@ -133,6 +139,7 @@ namespace brynet {
             auto timer = std::make_shared<Timer>(
                 std::chrono::steady_clock::now(),
                 std::chrono::nanoseconds(timeout),
+                deleyTime,
                 ENUM_TIMER_TYPE::TIMER_TYPE_LOOP,
                 std::bind(std::forward<F>(callback), std::forward<TArgs>(args)...));
             mtx_queue.lock();
@@ -154,6 +161,7 @@ namespace brynet {
             auto timer = std::make_shared<Timer>(
                 std::chrono::steady_clock::now(),
                 std::chrono::nanoseconds(timeout),
+                std::chrono::seconds(0),
                 ENUM_TIMER_TYPE::TIMER_TYPE_ONCE,
                 std::bind(std::forward<F>(callback), std::forward<TArgs>(args)...));
 

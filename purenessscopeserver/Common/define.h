@@ -1587,6 +1587,35 @@ inline vector<string> split_string(const string& s, const char& c)
     return v;
 }
 
+inline std::chrono::seconds get_time_delay(std::string date)
+{
+    std::chrono::seconds delete_seconds;
+    std::tm tm_;
+    int year, month, day, hour, minute, second;// 定义时间的各个int临时变量。
+#if PSS_PLATFORM != PLATFORM_WIN
+    sscanf(date.c_str(), "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+#else
+    sscanf_s(date.c_str(), "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+#endif
+
+    tm_.tm_year = year - 1900;
+    tm_.tm_mon = month - 1;
+    tm_.tm_mday = day;
+    tm_.tm_hour = hour;
+    tm_.tm_min = minute;
+    tm_.tm_sec = second;
+    tm_.tm_isdst = 0;                          // 非夏令时。
+
+    auto tp_tag = std::chrono::system_clock::from_time_t(mktime(&tm_));
+    auto tp_now = std::chrono::system_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(tp_tag - tp_now);
+
+    //std::cout << "seconds=" << duration.count() << std::endl;
+    delete_seconds = std::chrono::seconds(duration.count());
+    return delete_seconds;
+}
+
 #if PSS_PLATFORM != PLATFORM_WIN
 
 //获得当前文件打开数
