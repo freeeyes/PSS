@@ -346,9 +346,11 @@ public:
 
     void Close()
     {
-        m_timerMgr->Close();
-
-        m_ttTimerThread.join();
+        if (nullptr != m_timerMgr)
+        {
+            m_timerMgr->Close();
+            m_ttTimerThread.join();
+        }
     };
 
     brynet::TimerMgr::Ptr GetTimerPtr() const
