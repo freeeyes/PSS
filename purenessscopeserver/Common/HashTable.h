@@ -619,7 +619,14 @@ public:
 				char* pKey = m_lpTable[i]->m_pData->m_pKey;
 
 				//设置状态
-				m_nCurrLinkIndex = i;
+				if (i < m_objHashPool.Get_Count() - 1)
+				{
+					m_nCurrLinkIndex = i;
+				}
+				else
+				{
+					m_nCurrLinkIndex = 0;
+				}
 
 				if (EM_HASH_DEBUG::HASH_DEBUG_ON == m_emHashDebug)
 				{
@@ -652,7 +659,14 @@ public:
 				}
 
 				//设置状态
-				m_nCurrLinkIndex = i;
+                if (i < m_objHashPool.Get_Count() - 1)
+                {
+                    m_nCurrLinkIndex = i + 1;
+                }
+                else
+                {
+                    m_nCurrLinkIndex = 0;
+                }
 
 				//回收数据
 				int32 nRet = Del_Hash_Data(pKey);
