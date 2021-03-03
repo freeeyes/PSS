@@ -866,7 +866,7 @@ int CClientReConnectManager::timer_task(brynet::TimerMgr::Ptr timerMgr)
 
 void CClientReConnectManager::start_new_task(brynet::TimerMgr::Ptr timerMgr)
 {
-    PSS_LOGGER_DEBUG("[CMessageServiceGroup::start_new_task]new timer is set.");
+    PSS_LOGGER_DEBUG("[CClientReConnectManager::start_new_task]new timer is set.");
     auto timer = timerMgr->addTimer(std::chrono::seconds(m_u2ThreadTimeCheck), [this, timerMgr]() {
         timer_task(timerMgr);
         });

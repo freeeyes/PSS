@@ -180,6 +180,7 @@ bool CServerManager::Run()
 {
     //启动定时器
     App_TimerManager::instance()->Start();
+    PSS_LOGGER_DEBUG("[CServerManager::Run]run timer start.");
 
     //对应多进程，epoll必须在子进程里进行初始化
     if (NETWORKMODE::NETWORKMODE_RE_EPOLL == GetXmlConfigAttribute(xmlNetWorkMode)->Mode
