@@ -105,6 +105,7 @@ matrix:
         - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/Reactor/*.cpp > /dev/null
         - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/UDP/*.cpp > /dev/null
         - gcov -r -o ./.obj ../../purenessscopeserver/FrameCore/CppUnit/*.cpp > /dev/null
+        - ls
         - cd $TRAVIS_BUILD_DIR/Build/Linux/reports/cppunit
         #- ls 
         - cat report.xml
