@@ -216,9 +216,6 @@ bool CProactorUDPHandler::PutSendPacket(uint32 u4ConnectID, ACE_Message_Block* p
         m_atvOutput = tvSend;
     }
 
-    //发送完成回收
-    App_MessageBlockManager::instance()->Close(pMbData);
-
     return true;
 }
 
