@@ -25,7 +25,7 @@ bool Udp_Common_Send_Message(_Send_Message_Param const& obj_Send_Message_Param,
 
     if (nErr != 0)
     {
-        PSS_LOGGER_DEBUG("[Udp_Common_Send_Message]set_address error[{0}].", errno);
+        PSS_LOGGER_DEBUG("[Udp_Common_Send_Message]set_address error[{0}:{1} {2}].", obj_Send_Message_Param.m_strClientIP.c_str(), obj_Send_Message_Param.m_u2Port, errno);
         return false;
     }
 

@@ -135,7 +135,6 @@ bool CReactorUDPHander::SendMessage(const CSendMessageInfo& objSendMessageInfo, 
     {
         //ÊÍ·Å·¢ËÍÌå
         App_MessageBlockManager::instance()->Close(pMbData);
-
         return false;
     }
 

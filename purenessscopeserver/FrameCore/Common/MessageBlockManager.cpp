@@ -19,7 +19,10 @@ bool CMessageBlockManager::Close(ACE_Message_Block* pMessageBlock, uint32 u4Bloc
 {
     ACE_UNUSED_ARG(u4BlockLen);
 
-    pMessageBlock->release();
+    if (nullptr != pMessageBlock)
+    {
+        pMessageBlock->release();
+    }
 
     return true;
 }
