@@ -13,7 +13,7 @@ English | [简体中文](./README_Chinese.md)
 [![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)
 </center>
 
-## [A better version based on asio PSS3.0](https://github.com/freeeyes/PSS )  
+## [A better version based on asio PSS3.0](https://github.com/ArkNX/PSS_ASIO)  
 
 # OverView
 this is a server framework. Support the way developers use plug-ins ( so or dll library).  
