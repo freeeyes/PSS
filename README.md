@@ -13,8 +13,9 @@ English | [简体中文](./README_Chinese.md)
 [![Platform](https://img.shields.io/badge/platform-Linux,%20Windows-green.svg?style=flat)](https://github.com/freeeyes/PSS)
 </center>
 
-# OverView
+## [A better version based on asio PSS3.0](https://github.com/freeeyes/PSS )  
 
+# OverView
 this is a server framework. Support the way developers use plug-ins ( so or dll library).  
 develop logical services for related TCP and UDP. This service framework is based on ace and can be compiled and run adaptively under windows and Linux.
 
@@ -48,47 +49,6 @@ hope to be able to step by step with you to improve the system, really do a valu
 
 > **Provides several piezometric data ( TCP pass tool available from PSS open source kit )**
 
-----------
-
-### Windows
-
-> Test PSS IP:172.21.1.200, Port:10002. (Windows7 x64 DEBUG)
-
-* Test IO protocal:TCP  
-* Begin Time: 2013-09-18 11:07:42  
-* End Time: 2013-09-18 12:06:00  
-* Thread counts:10  
-* connect counts:10  
-* send package counts:11675202  
-* recv package counts:11675202
-* connect fails:0  
-* send fails:0  
-* recv dails:0  
-* connect success rote:100.000000%  
-* send success rote:100.000000%  
-* recv success rote:100.000000%  
-
-----------
-
-### Linux
-
-> Test PSS IP:172.21.1.68, port:10002.(Linux ContOS6 x64 DEBUG)
-
-* Test IO protocal:TCP
-* Begin Time:: 2013-09-16 09:55:58
-* End Time: 2013-09-16 10:38:09
-* Thread counts:10
-* connect counts:10
-* send package counts:11514132
-* recv package counts:11514132
-* connect fails:3125
-* send fails:0
-* recv dails:0
-* connect success rote:100.000000%
-* send success rote:100.000000%
-* recv success rote:100.000000%
-
-----------
 
 Author & Thanks: 
 凹凸man,w1w,乔戈,Bobo,弄香花满衣,崔,kz,瑞奇
